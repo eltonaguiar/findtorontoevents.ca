@@ -23,7 +23,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -r tools/scrapers/requirements.txt
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: Verify scraper imports
+        run: python -c "import sys; sys.path.insert(0, 'tools'); from scrapers.unified_scraper import UnifiedTorontoScraper; print('imports OK')"
 
       - name: Run scraper
         env:
