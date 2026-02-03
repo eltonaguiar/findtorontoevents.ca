@@ -60,35 +60,31 @@ def normalize_event_for_sync(event: dict) -> dict:
 
 
 def sync_to_database(events: list, api_base: str = "https://findtorontoevents.ca/fc/api", chunk_size: int = 150):
-    """Sync events to the remote database via API. Uses chunked POST to avoid 412/large-body limits."""
+    """Sync events to the remote database via API. Uses chunk when needed; falls back to events-router if 412."""
     sync_url = f"{api_base}/events_sync.php"
+    router_url = api_base.replace("/fc/api", "") + "/fc/events-router.php?e=sync"
     events = [normalize_event_for_sync(e) for e in events]
     total = len(events)
-    
+
+    def _post(url: str, payload: dict):
+        r = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=120)
+        if r.status_code == 412 and url == sync_url:
+            r = requests.post(router_url, json=payload, headers={"Content-Type": "application/json"}, timeout=120)
+        return r
+
     try:
         print(f"Syncing {total} events to database (chunk_size={chunk_size})...")
         if total <= chunk_size:
-            response = requests.post(
-                sync_url,
-                json={"events": events, "source": "api_post"},
-                headers={"Content-Type": "application/json"},
-                timeout=120
-            )
+            response = _post(sync_url, {"events": events, "source": "api_post"})
             response.raise_for_status()
             result = response.json()
             print(f"Sync result: {result}")
             return result
-        # Chunked sync: each chunk creates one pull and upserts its events
         last_result = None
         for i in range(0, total, chunk_size):
             chunk = events[i : i + chunk_size]
             print(f"  Sending chunk {i // chunk_size + 1} ({len(chunk)} events)...")
-            response = requests.post(
-                sync_url,
-                json={"events": chunk, "source": "api_post"},
-                headers={"Content-Type": "application/json"},
-                timeout=120
-            )
+            response = _post(sync_url, {"events": chunk, "source": "api_post"})
             response.raise_for_status()
             last_result = response.json()
             if not last_result.get("ok"):
@@ -230,16 +226,24 @@ def main():
     print("\nSaving events...")
     save_events(merged, events_path)
 
-    # Write last_update.json for stats page (last updated date/time and source)
+    # Keep next/events.json in sync so frontend (loads /next/events.json) sees all sources including e.g. sofiaadelgiudice
+    next_events = PROJECT_ROOT / "next" / "events.json"
+    if events_path.resolve() == (PROJECT_ROOT / "events.json").resolve():
+        next_events.parent.mkdir(parents=True, exist_ok=True)
+        save_events(merged, next_events)
+
+    # Write last_update.json for stats page (last updated, source, and today's run: new/modified counts)
     update_source = os.environ.get("EVENTS_UPDATE_SOURCE", "cursor")
     last_update = {
         "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": update_source,
+        "new_count": added_count,
+        "modified_count": updated_count,
     }
     last_update_path = PROJECT_ROOT / "last_update.json"
     with open(last_update_path, "w", encoding="utf-8") as f:
         json.dump(last_update, f, indent=2)
-    print(f"Wrote {last_update_path} (source={update_source})")
+    print(f"Wrote {last_update_path} (source={update_source}, new={added_count}, modified={updated_count})")
     
     # Sync to database if requested
     if args.sync:
