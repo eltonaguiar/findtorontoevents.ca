@@ -623,7 +623,13 @@
         document.querySelectorAll('.pricing-card .btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 const planName = this.closest('.pricing-card').querySelector('.plan-name').textContent;
-                alert(`🎉 ${planName} plan selected!\n\nThis is a demo. In production, this would redirect to the payment flow with Stripe/PayPal integration.`);
+
+                if (planName === 'Free') {
+                    // Redirect to working movie app
+                    window.location.href = '/MOVIESHOWS/';
+                } else {
+                    alert(`🎉 ${planName} plan selected!\n\nThis is a demo. In production, this would redirect to the payment flow with Stripe/PayPal integration.`);
+                }
             });
         });
 
