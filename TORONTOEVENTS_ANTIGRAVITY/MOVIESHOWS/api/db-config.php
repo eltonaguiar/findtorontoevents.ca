@@ -92,7 +92,8 @@ function getDbConnection()
 function sendJson($data, $statusCode = 200)
 {
     http_response_code($statusCode);
-    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    // PHP 5.2 compatible - no JSON_UNESCAPED constants
+    echo json_encode($data);
     exit();
 }
 
