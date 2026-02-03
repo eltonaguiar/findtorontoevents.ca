@@ -167,15 +167,15 @@ function addTrailer($pdo, $movieId, $trailerData)
             VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([
+    $stmt->execute(array(
         $movieId,
         $trailerData['youtube_id'],
-        $trailerData['title'] ?? null,
-        $trailerData['priority'] ?? 0,
-        $trailerData['source'] ?? 'manual',
-        $trailerData['view_count'] ?? 0,
-        $trailerData['duration'] ?? null
-    ]);
+        isset($trailerData['title']) ? $trailerData['title'] : null,
+        isset($trailerData['priority']) ? $trailerData['priority'] : 0,
+        isset($trailerData['source']) ? $trailerData['source'] : 'manual',
+        isset($trailerData['view_count']) ? $trailerData['view_count'] : 0,
+        isset($trailerData['duration']) ? $trailerData['duration'] : null
+    ));
 }
 
 /**
@@ -187,14 +187,14 @@ function addThumbnail($pdo, $movieId, $thumbnailData)
             VALUES (?, ?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([
+    $stmt->execute(array(
         $movieId,
         $thumbnailData['url'],
-        $thumbnailData['source'] ?? 'manual',
-        $thumbnailData['priority'] ?? 0,
-        $thumbnailData['width'] ?? null,
-        $thumbnailData['height'] ?? null
-    ]);
+        isset($thumbnailData['source']) ? $thumbnailData['source'] : 'manual',
+        isset($thumbnailData['priority']) ? $thumbnailData['priority'] : 0,
+        isset($thumbnailData['width']) ? $thumbnailData['width'] : null,
+        isset($thumbnailData['height']) ? $thumbnailData['height'] : null
+    ));
 }
 
 /**
