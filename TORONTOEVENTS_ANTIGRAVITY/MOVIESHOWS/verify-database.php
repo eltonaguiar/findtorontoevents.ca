@@ -6,7 +6,7 @@
 
 $host = 'localhost';
 $dbname = 'ejaguiar1_tvmoviestrailers';
-$username = 'ejaguiar1_tvmoviestrailers';
+$username = 'ejaguiar1';
 $password = 'tvmoviestrailers';
 
 header('Content-Type: text/plain; charset=utf-8');
