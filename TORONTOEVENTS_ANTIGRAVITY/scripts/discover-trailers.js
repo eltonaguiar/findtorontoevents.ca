@@ -4,12 +4,14 @@
  */
 
 const axios = require('axios');
+require('dotenv').config();
 
-// You'll need to add your YouTube API key to .env
+// YouTube API key from environment
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || '';
 const YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
 const YOUTUBE_VIDEO_URL = 'https://www.googleapis.com/youtube/v3/videos';
 const API_URL = 'https://findtorontoevents.ca/MOVIESHOWS/api';
+
 
 /**
  * Search YouTube for movie trailers
