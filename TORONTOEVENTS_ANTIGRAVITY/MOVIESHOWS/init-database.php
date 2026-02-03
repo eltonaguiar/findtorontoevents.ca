@@ -7,8 +7,8 @@
 // Database credentials
 $host = 'localhost';
 $dbname = 'ejaguiar1_tvmoviestrailers';
-$username = 'ejaguiar1';
-$password = 'tvmoviestrailers';
+$username = 'ejaguiar1_tvmoviestrailers';
+$password = 'virus2016';
 
 header('Content-Type: text/plain; charset=utf-8');
 
