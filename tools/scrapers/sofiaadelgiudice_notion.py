@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Sofia Adel Giudice calendar (Notion).
+Sofia Adel Giudice (@sofiaadelgiudice) Toronto events calendar (Notion).
 Provider: sofiaadelgiudice
-Source: https://www.notion.so/2a11557746e4806ca2f8c95fba80ab77?v=2a11557746e480ccbd4c000cddb9687e
-Validation: Feb 4 = FREE AGO Wednesday nights 6-9pm
+Source (link to use): https://www.notion.so/2a11557746e4806ca2f8c95fba80ab77?v=2a11557746e480ccbd4c000cddb9687e
+Validation: e.g. FREE AGO Wednesday nights 6-9pm. If Notion fetch fails, fallback list is used.
 """
 import re
 from datetime import datetime
@@ -94,7 +94,10 @@ class SofiaAdelGiudiceNotionScraper(BaseScraper):
     def scrape(self) -> List[ScrapedEvent]:
         year = datetime.now().year
         events = []
-        soup = self.fetch_page(self.NOTION_URL)
+        try:
+            soup = self.fetch_page(self.NOTION_URL)
+        except Exception:
+            soup = None
         if soup:
             for block in soup.find_all(class_=re.compile(r"notion-|page-content|block", re.I)) or soup.find_all(["div", "p", "li"]):
                 text = block.get_text(strip=True)

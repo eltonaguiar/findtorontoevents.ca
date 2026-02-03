@@ -1348,7 +1348,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:07:51.561356Z",
+    "last_updated": "2026-02-03T00:29:53.269538Z",
     "isFree": false
   },
   {
@@ -2241,7 +2241,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.611678Z",
+    "last_updated": "2026-02-03T01:02:48.609023Z",
     "isFree": true
   },
   {
@@ -2269,7 +2269,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.611982Z",
+    "last_updated": "2026-02-03T01:02:48.609183Z",
     "isFree": true
   },
   {
@@ -3118,7 +3118,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:19.950556Z",
+    "last_updated": "2026-02-03T01:02:54.671760Z",
     "isFree": true
   },
   {
@@ -3141,7 +3141,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:19.950580Z",
+    "last_updated": "2026-02-03T01:02:54.671790Z",
     "isFree": true
   },
   {
@@ -3164,7 +3164,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:19.950600Z",
+    "last_updated": "2026-02-03T01:02:54.671817Z",
     "isFree": true
   },
   {
@@ -4025,7 +4025,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:19.950619Z",
+    "last_updated": "2026-02-03T01:02:54.671842Z",
     "isFree": true
   },
   {
@@ -5169,7 +5169,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-03T00:31:19.950644Z",
+    "last_updated": "2026-02-03T01:02:54.671871Z",
     "isFree": true
   },
   {
@@ -5647,7 +5647,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-03T00:31:19.950664Z",
+    "last_updated": "2026-02-03T01:02:54.671897Z",
     "isFree": true
   },
   {
@@ -5670,7 +5670,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:19.950683Z",
+    "last_updated": "2026-02-03T01:02:54.671921Z",
     "isFree": true
   },
   {
@@ -5693,7 +5693,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:19.950707Z",
+    "last_updated": "2026-02-03T01:02:54.671945Z",
     "isFree": true
   },
   {
@@ -7048,7 +7048,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-03T00:31:19.950728Z",
+    "last_updated": "2026-02-03T01:02:54.671971Z",
     "isFree": true
   },
   {
@@ -9449,7 +9449,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:19.950745Z",
+    "last_updated": "2026-02-03T01:02:54.671995Z",
     "isFree": true
   },
   {
@@ -10696,7 +10696,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:19.950761Z",
+    "last_updated": "2026-02-03T01:02:54.672016Z",
     "isFree": true
   },
   {
@@ -14671,7 +14671,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.610852Z",
+    "last_updated": "2026-02-03T01:02:48.608604Z",
     "isFree": true
   },
   {
@@ -16138,7 +16138,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.611335Z",
+    "last_updated": "2026-02-03T01:02:48.608852Z",
     "isFree": true
   },
   {
@@ -18987,7 +18987,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.196309Z",
+    "last_updated": "2026-02-03T01:02:48.275876Z",
     "isFree": true
   },
   {
@@ -19734,6 +19734,29 @@
     ]
   },
   {
+    "id": "4933b91fd1a0147ad733345976c59ab2",
+    "title": "Art Battle Toronto - April 21, 2026",
+    "date": "2026-04-21T00:00:00Z",
+    "location": "Toronto, ON",
+    "source": "AllEvents.in",
+    "host": "AllEvents.in",
+    "url": "https://allevents.in/toronto/art-battle-toronto-april-21-2026/100001981909986120",
+    "price": "See Tickets",
+    "price_amount": 0.0,
+    "is_free": false,
+    "description": "",
+    "categories": [
+      "Arts"
+    ],
+    "tags": [
+      "Art"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-03T01:02:51.434085Z",
+    "isFree": false
+  },
+  {
     "id": "0e7fec1dd2309015443246d174bc9d3b",
     "title": "Sarah Kinsley, Charlie Burg in Toronto",
     "date": "2026-04-22T19:00:00-04:00",
@@ -19889,7 +19912,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.196410Z",
+    "last_updated": "2026-02-03T01:02:48.275936Z",
     "isFree": true
   },
   {
@@ -20251,7 +20274,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.196504Z",
+    "last_updated": "2026-02-03T01:02:48.275992Z",
     "isFree": true
   },
   {
@@ -21067,7 +21090,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-03T00:31:13.196701Z",
+    "last_updated": "2026-02-03T01:02:48.276089Z",
     "isFree": true
   },
   {
@@ -21090,7 +21113,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:14.336929Z",
+    "last_updated": "2026-02-03T01:02:48.872142Z",
     "isFree": true
   },
   {
@@ -21470,7 +21493,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.196804Z",
+    "last_updated": "2026-02-03T01:02:48.276146Z",
     "isFree": true
   },
   {
@@ -21679,7 +21702,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.196880Z",
+    "last_updated": "2026-02-03T01:02:48.276187Z",
     "isFree": true
   },
   {
@@ -22293,7 +22316,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.196985Z",
+    "last_updated": "2026-02-03T01:02:48.276242Z",
     "isFree": true
   },
   {
@@ -22723,7 +22746,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197086Z",
+    "last_updated": "2026-02-03T01:02:48.276296Z",
     "isFree": true
   },
   {
@@ -22866,7 +22889,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197140Z",
+    "last_updated": "2026-02-03T01:02:48.276323Z",
     "isFree": true
   },
   {
@@ -22952,7 +22975,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197182Z",
+    "last_updated": "2026-02-03T01:02:48.276345Z",
     "isFree": true
   },
   {
@@ -23023,7 +23046,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-03T00:31:13.197330Z",
+    "last_updated": "2026-02-03T01:02:48.276399Z",
     "isFree": true
   },
   {
@@ -23069,7 +23092,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197361Z",
+    "last_updated": "2026-02-03T01:02:48.276416Z",
     "isFree": true
   },
   {
@@ -23345,7 +23368,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197433Z",
+    "last_updated": "2026-02-03T01:02:48.276457Z",
     "isFree": true
   },
   {
@@ -23477,7 +23500,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197516Z",
+    "last_updated": "2026-02-03T01:02:48.276502Z",
     "isFree": true
   },
   {
@@ -23525,7 +23548,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197559Z",
+    "last_updated": "2026-02-03T01:02:48.276517Z",
     "isFree": true
   },
   {
@@ -23683,7 +23706,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197614Z",
+    "last_updated": "2026-02-03T01:02:48.276547Z",
     "isFree": true
   },
   {
@@ -23833,7 +23856,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197672Z",
+    "last_updated": "2026-02-03T01:02:48.276578Z",
     "isFree": true
   },
   {
@@ -23939,7 +23962,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197732Z",
+    "last_updated": "2026-02-03T01:02:48.276611Z",
     "isFree": true
   },
   {
@@ -24025,7 +24048,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197920Z",
+    "last_updated": "2026-02-03T01:02:48.276675Z",
     "isFree": true
   },
   {
@@ -24071,7 +24094,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.197975Z",
+    "last_updated": "2026-02-03T01:02:48.276692Z",
     "isFree": true
   },
   {
@@ -24149,7 +24172,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.614285Z",
+    "last_updated": "2026-02-03T01:02:48.610413Z",
     "isFree": true
   },
   {
@@ -24195,7 +24218,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.198061Z",
+    "last_updated": "2026-02-03T01:02:48.276716Z",
     "isFree": true
   },
   {
@@ -24276,7 +24299,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.614003Z",
+    "last_updated": "2026-02-03T01:02:48.610226Z",
     "isFree": true
   },
   {
@@ -24320,19 +24343,19 @@
     "is_free": true,
     "description": "Banner made of coloured squares draped in an atriumLamination 1.0 by Studio Rat, Nuit Blanche 2025. Photo by Henry Chan.Nuit BlancheShareThis PageShare toFacebook(opens in a new window)Share toX(opens in a new window)Share toLinkedIn(opens in a new window)Share toCopy Link(opens in a new window)PrintTranslateReturns October 3, 2026Toronto’s free all-night celebration of contemporary art transforms public spaces into extraordinary landscapes from 7 p.m. on October 3 to 7 a.m. on October 4.For the",
     "categories": [
-      "Arts",
-      "Nightlife"
+      "Nightlife",
+      "Arts"
     ],
     "tags": [
+      "Installation",
       "Celebration",
       "Community",
-      "Nuit Blanche",
       "Art",
-      "Installation"
+      "Nuit Blanche"
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-03T00:31:14.381931Z",
+    "last_updated": "2026-02-03T01:02:48.897014Z",
     "address": "100 Queens Park, Toronto, ON M5S 2C6",
     "lat": 43.6677,
     "lng": -79.3948,
@@ -24368,7 +24391,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.613570Z",
+    "last_updated": "2026-02-03T01:02:48.609969Z",
     "isFree": true
   },
   {
@@ -24414,7 +24437,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.198218Z",
+    "last_updated": "2026-02-03T01:02:48.276764Z",
     "isFree": true
   },
   {
@@ -24565,7 +24588,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-03T00:31:13.198421Z",
+    "last_updated": "2026-02-03T01:02:48.276834Z",
     "isFree": true
   },
   {
@@ -24612,7 +24635,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.198507Z",
+    "last_updated": "2026-02-03T01:02:48.276860Z",
     "isFree": true
   },
   {
@@ -24647,7 +24670,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.613122Z",
+    "last_updated": "2026-02-03T01:02:48.609758Z",
     "isFree": true
   },
   {
@@ -24697,7 +24720,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.612593Z",
+    "last_updated": "2026-02-03T01:02:48.609495Z",
     "isFree": true
   },
   {
@@ -24744,7 +24767,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-03T00:31:13.198730Z",
+    "last_updated": "2026-02-03T01:02:48.276921Z",
     "isFree": true
   },
   {
@@ -24771,7 +24794,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-03T00:31:13.198780Z",
+    "last_updated": "2026-02-03T01:02:48.276937Z",
     "isFree": true
   },
   {
@@ -24822,7 +24845,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.612274Z",
+    "last_updated": "2026-02-03T01:02:48.609340Z",
     "isFree": true
   },
   {
@@ -24869,7 +24892,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-03T00:31:13.198893Z",
+    "last_updated": "2026-02-03T01:02:48.276971Z",
     "isFree": true
   }
 ]

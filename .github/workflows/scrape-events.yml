@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Remove broken STOCKSUNIFY submodule entry so checkout post step (git submodule foreach) doesn't fail with exit 128
+      # Exception: STOCKSUNIFY is a git submodule (see https://github.com/eltonaguiar/stocksunify). Remove its broken .gitmodules entry so checkout post step doesn't fail with exit 128.
       - name: Fix broken submodule entry
         run: |
           if [ -f .gitmodules ]; then
@@ -35,10 +35,29 @@ jobs:
       - name: Verify scraper imports
         run: python -c "import sys; sys.path.insert(0, 'tools'); from scrapers.unified_scraper import UnifiedTorontoScraper; print('imports OK')"
 
+      - name: Ensure next/ exists
+        run: mkdir -p next
+
       - name: Run scraper
         env:
           EVENTS_UPDATE_SOURCE: github_actions
         run: python tools/scrape_and_sync_events.py
+
+      - name: Verify calendar source (sofiaadelgiudice) in events.json
+        run: |
+          count=$(python -c "
+          import json
+          with open('events.json') as f:
+              data = json.load(f)
+          events = data if isinstance(data, list) else data.get('events', [])
+          n = sum(1 for e in events if (e.get('source') or '').strip() == 'sofiaadelgiudice')
+          print(n)
+          ")
+          echo "sofiaadelgiudice events in events.json: $count"
+          if [ "$count" -lt 1 ]; then
+            echo "::error::events.json has no sofiaadelgiudice events; scraper or merge may have failed."
+            exit 1
+          fi
 
       - name: Commit and push if changed
         env:
@@ -47,6 +66,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add events.json last_update.json
+          [ -f next/events.json ] && git add next/events.json
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
