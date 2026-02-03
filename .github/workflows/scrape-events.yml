@@ -17,6 +17,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Remove broken STOCKSUNIFY submodule entry so checkout post step (git submodule foreach) doesn't fail with exit 128
+      - name: Fix broken submodule entry
+        run: |
+          if [ -f .gitmodules ]; then
+            git config -f .gitmodules --remove-section submodule.STOCKSUNIFY 2>/dev/null || true
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
