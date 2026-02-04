@@ -774,6 +774,77 @@
             transform: scale(0.95);
         }
 
+        /* Login Modal */
+        .login-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+        }
+
+        .login-overlay.active {
+            display: block;
+        }
+
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            width: 90%;
+            max-width: 400px;
+            z-index: 1001;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-modal.active {
+            display: block;
+        }
+
+        .login-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .login-close:hover {
+            opacity: 1;
+        }
+
+        /* User Profile */
+        .user-profile {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+
         /* Mute Overlay Modal */
         .mute-overlay {
             position: fixed;
@@ -1179,6 +1250,37 @@
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div class="login-overlay" id="loginOverlay" onclick="closeLogin()"></div>
+    <div class="login-modal" id="loginModal">
+        <button class="login-close" onclick="closeLogin()">✕</button>
+        <h2 style="margin: 0 0 24px 0; font-size: 24px;">Sign In to Like Movies</h2>
+        <form id="loginForm" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; gap: 16px;">
+            <input type="email" id="loginEmail" placeholder="Email" required
+                style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-size: 14px;">
+            <input type="password" id="loginPassword" placeholder="Password" required
+                style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-size: 14px;">
+            <button type="submit"
+                style="padding: 12px; border-radius: 8px; border: none; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; font-weight: 700; cursor: pointer; font-size: 14px;">
+                Sign In
+            </button>
+        </form>
+        <div id="loginError" style="color: #ef4444; margin-top: 12px; font-size: 13px; display: none;"></div>
+        <div
+            style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 12px; opacity: 0.7; text-align: center;">
+            Demo: admin / admin
+        </div>
+    </div>
+
+    <!-- User Profile (when logged in) -->
+    <div class="user-profile" id="userProfile" style="display: none;">
+        <span id="userName" style="margin-right: 12px; font-size: 14px;"></span>
+        <button onclick="handleLogout()"
+            style="padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.5); color: white; cursor: pointer; font-size: 12px;">
+            Logout
+        </button>
+    </div>
+
     <!-- Sidebar Actions -->
     <div class="sidebar-actions">
         <button class="action-btn" onclick="likeMovie()" title="Like">❤️</button>
@@ -1208,6 +1310,109 @@
             yearTo: null
         };
         let browseFilteredMovies = [];
+
+        // Authentication state
+        let currentUser = null;
+        let userLikes = [];
+        let likeCounts = {};
+
+        // Check session on page load
+        async function checkSession() {
+            try {
+                const response = await fetch('/MOVIESHOWS3/api/check-session.php');
+                const data = await response.json();
+                if (data.user) {
+                    currentUser = data.user;
+                    updateUserProfile();
+                    await loadLikes();
+                }
+            } catch (error) {
+                console.error('Session check failed:', error);
+            }
+        }
+
+        // Load likes data
+        async function loadLikes() {
+            try {
+                const response = await fetch('/MOVIESHOWS3/api/get-likes.php');
+                const data = await response.json();
+                likeCounts = data.like_counts || {};
+                userLikes = data.user_likes || [];
+                console.log('✅ Loaded likes:', { likeCounts, userLikes });
+            } catch (error) {
+                console.error('Failed to load likes:', error);
+            }
+        }
+
+        // Update user profile display
+        function updateUserProfile() {
+            const userProfile = document.getElementById('userProfile');
+            const userName = document.getElementById('userName');
+            if (currentUser) {
+                userName.textContent = currentUser.display_name || currentUser.email;
+                userProfile.style.display = 'flex';
+            } else {
+                userProfile.style.display = 'none';
+            }
+        }
+
+        // Show login modal
+        function showLogin() {
+            document.getElementById('loginOverlay').classList.add('active');
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        // Close login modal
+        function closeLogin() {
+            document.getElementById('loginOverlay').classList.remove('active');
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        // Handle login form submission
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            try {
+                const response = await fetch('/MOVIESHOWS3/api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+
+                if (data.user) {
+                    currentUser = data.user;
+                    updateUserProfile();
+                    await loadLikes();
+                    closeLogin();
+                    console.log('✅ Logged in as:', currentUser.display_name);
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+                console.error('Login error:', error);
+            }
+        }
+
+        // Handle logout
+        async function handleLogout() {
+            try {
+                await fetch('/MOVIESHOWS3/api/logout.php', { method: 'POST' });
+                currentUser = null;
+                userLikes = [];
+                updateUserProfile();
+                console.log('✅ Logged out');
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
 
         // Auto-scroll settings
         let autoScrollSettings = {
@@ -1697,14 +1902,76 @@
             }
         }
 
-        function likeMovie() {
-            alert('❤️ Liked!');
+        async function likeMovie() {
+            // Check if user is logged in
+            if (!currentUser) {
+                showLogin();
+                return;
+            }
+
+            // Get current video index
+            const currentIndex = Math.floor(document.getElementById('container').scrollTop / window.innerHeight);
+            const movie = filteredMovies[currentIndex];
+
+            if (!movie) {
+                alert('⚠️ No video to like');
+                return;
+            }
+
+            try {
+                const response = await fetch('/MOVIESHOWS3/api/like-movie.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ movie_id: movie.id })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update local state
+                    if (data.is_liked) {
+                        if (!userLikes.includes(movie.id)) {
+                            userLikes.push(movie.id);
+                        }
+                        console.log(`❤️ Liked "${movie.title}"`);
+                    } else {
+                        userLikes = userLikes.filter(id => id !== movie.id);
+                        console.log(`💔 Unliked "${movie.title}"`);
+                    }
+                    likeCounts[movie.id] = data.like_count;
+
+                    // Show feedback
+                    const message = data.is_liked ? `❤️ Liked "${movie.title}"!` : `💔 Unliked "${movie.title}"`;
+                    alert(message);
+                } else {
+                    alert('❌ Failed to like movie');
+                }
+            } catch (error) {
+                console.error('Like error:', error);
+                alert('❌ Network error. Please try again.');
+            }
         }
 
         function shareMovie() {
-            const url = window.location.href;
-            navigator.clipboard.writeText(url);
-            alert('🔗 Link copied to clipboard!');
+            // Get current video index
+            const currentIndex = Math.floor(document.getElementById('container').scrollTop / window.innerHeight);
+            const movie = filteredMovies[currentIndex];
+
+            if (!movie) {
+                alert('⚠️ No video to share');
+                return;
+            }
+
+            // Build shareable URL with video index as hash
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = `${baseUrl}#video=${currentIndex}`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert(`🔗 Link copied!\n\n"${movie.title}"\n${shareUrl}`);
+            }).catch(() => {
+                // Fallback if clipboard API fails
+                alert(`🔗 Share this link:\n\n"${movie.title}"\n${shareUrl}`);
+            });
         }
 
         function renderQueue() {
@@ -2035,10 +2302,42 @@
             console.log('✅ YouTube IFrame API loaded');
         };
 
+        // Handle URL hash navigation (for shared video links)
+        function handleUrlHash() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#video=')) {
+                const videoIndex = parseInt(hash.replace('#video=', ''));
+                if (!isNaN(videoIndex) && videoIndex >= 0 && videoIndex < filteredMovies.length) {
+                    console.log(`📍 Navigating to shared video ${videoIndex}`);
+                    setTimeout(() => {
+                        const container = document.getElementById('container');
+                        container.scrollTo({
+                            top: videoIndex * window.innerHeight,
+                            behavior: 'smooth'
+                        });
+
+                        // Trigger autoplay after scroll
+                        setTimeout(() => {
+                            const targetIframe = document.getElementById(`player-${videoIndex}`);
+                            if (targetIframe) {
+                                const currentSrc = targetIframe.src;
+                                if (!currentSrc.includes('autoplay=1')) {
+                                    targetIframe.src = currentSrc.replace(/autoplay=[01]/, 'autoplay=1');
+                                }
+                            }
+                            updateMuteOverlay();
+                        }, 1000);
+                    }, 500);
+                }
+            }
+        }
+
         // Load movies and setup autoplay
         loadMovies().then(() => {
             setupScrollAutoplay();
             loadAutoScrollSettings();  // Load auto-scroll settings from localStorage
+            handleUrlHash();  // Handle shared video links
+            checkSession();  // Check if user is logged in
         });
     </script>
 </body>
