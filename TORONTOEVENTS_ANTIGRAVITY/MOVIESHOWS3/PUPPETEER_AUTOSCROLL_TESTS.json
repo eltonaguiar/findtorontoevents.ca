@@ -1,0 +1,129 @@
+{
+  "timestamp": "2026-02-04T17:45:52.672Z",
+  "total": 20,
+  "passed": 0,
+  "failed": 20,
+  "consoleErrors": [],
+  "results": [
+    {
+      "test": 1,
+      "name": "Settings initialized",
+      "result": "FAIL",
+      "error": "Settings not initialized correctly"
+    },
+    {
+      "test": 2,
+      "name": "triggerAutoScroll exists",
+      "result": "FAIL",
+      "error": "Function not found"
+    },
+    {
+      "test": 3,
+      "name": "toggleAutoScroll exists",
+      "result": "FAIL",
+      "error": "Function not found"
+    },
+    {
+      "test": 4,
+      "name": "updateAutoScrollDelay exists",
+      "result": "FAIL",
+      "error": "Function not found"
+    },
+    {
+      "test": 5,
+      "name": "loadAutoScrollSettings exists",
+      "result": "FAIL",
+      "error": "Function not found"
+    },
+    {
+      "test": 6,
+      "name": "Enable programmatically",
+      "result": "FAIL",
+      "error": "autoScrollSettings is not defined"
+    },
+    {
+      "test": 7,
+      "name": "Change delay programmatically",
+      "result": "FAIL",
+      "error": "autoScrollSettings is not defined"
+    },
+    {
+      "test": 8,
+      "name": "No scroll when disabled",
+      "result": "FAIL",
+      "error": "autoScrollSettings is not defined"
+    },
+    {
+      "test": 9,
+      "name": "Timeout set when enabled",
+      "result": "FAIL",
+      "error": "autoScrollSettings is not defined"
+    },
+    {
+      "test": 10,
+      "name": "Timeout clears on toggle off",
+      "result": "FAIL",
+      "error": "Waiting for selector `#autoScrollToggle` failed"
+    },
+    {
+      "test": 11,
+      "name": "Min delay is 5",
+      "result": "FAIL",
+      "error": "Error: failed to find element matching selector \"#autoScrollDelay\""
+    },
+    {
+      "test": 12,
+      "name": "Max delay is 30",
+      "result": "FAIL",
+      "error": "Error: failed to find element matching selector \"#autoScrollDelay\""
+    },
+    {
+      "test": 13,
+      "name": "Step is 1",
+      "result": "FAIL",
+      "error": "Error: failed to find element matching selector \"#autoScrollDelay\""
+    },
+    {
+      "test": 14,
+      "name": "Rapid toggles",
+      "result": "FAIL",
+      "error": "No element found for selector: #autoScrollToggle"
+    },
+    {
+      "test": 15,
+      "name": "Rapid delay changes",
+      "result": "FAIL",
+      "error": "Cannot set properties of null (setting 'value')"
+    },
+    {
+      "test": 16,
+      "name": "Settings persist",
+      "result": "FAIL",
+      "error": "autoScrollSettings is not defined"
+    },
+    {
+      "test": 17,
+      "name": "Invalid data handling",
+      "result": "FAIL",
+      "error": "autoScrollSettings is not defined"
+    },
+    {
+      "test": 18,
+      "name": "Timeout variable exists",
+      "result": "FAIL",
+      "error": "Variable not found"
+    },
+    {
+      "test": 19,
+      "name": "Console logging",
+      "result": "FAIL",
+      "error": "Waiting for selector `#autoScrollToggle` failed"
+    },
+    {
+      "test": 20,
+      "name": "No memory leaks",
+      "result": "FAIL",
+      "error": "autoScrollSettings is not defined"
+    }
+  ]
+}
