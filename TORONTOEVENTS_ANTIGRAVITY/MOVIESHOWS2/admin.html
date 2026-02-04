@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie/TV Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 { color: #58a6ff; margin-bottom: 4px; font-size: 1.6em; }
+        .subtitle { color: #8b949e; margin-bottom: 20px; font-size: 0.9em; }
+        a { color: #58a6ff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 2px; margin-bottom: 20px; border-bottom: 1px solid #30363d; }
+        .tab {
+            padding: 10px 20px; cursor: pointer; border: 1px solid transparent;
+            border-bottom: none; border-radius: 8px 8px 0 0; color: #8b949e;
+            font-size: 0.95em; transition: all 0.2s;
+        }
+        .tab:hover { color: #c9d1d9; background: #161b22; }
+        .tab.active { color: #f0f6fc; background: #161b22; border-color: #30363d; border-bottom-color: #161b22; margin-bottom: -1px; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Search */
+        .search-box {
+            display: flex; gap: 8px; margin-bottom: 20px;
+        }
+        .search-box input {
+            flex: 1; padding: 10px 14px; background: #0d1117; border: 1px solid #30363d;
+            border-radius: 6px; color: #c9d1d9; font-size: 1em; outline: none;
+        }
+        .search-box input:focus { border-color: #58a6ff; }
+        .search-box select {
+            padding: 10px; background: #161b22; border: 1px solid #30363d;
+            border-radius: 6px; color: #c9d1d9; font-size: 0.9em;
+        }
+        .search-box button, .btn {
+            padding: 10px 20px; background: #238636; color: #fff; border: none;
+            border-radius: 6px; cursor: pointer; font-size: 0.9em; font-weight: 600;
+        }
+        .btn:hover { background: #2ea043; }
+        .btn-blue { background: #1f6feb; }
+        .btn-blue:hover { background: #388bfd; }
+        .btn-sm { padding: 5px 12px; font-size: 0.8em; }
+        .btn-danger { background: #da3633; }
+        .btn-disabled { background: #30363d; cursor: not-allowed; color: #8b949e; }
+
+        /* Cards */
+        .section {
+            background: #161b22; border: 1px solid #30363d;
+            border-radius: 8px; padding: 20px; margin-bottom: 20px;
+        }
+        .section h2 { color: #f0f6fc; font-size: 1.1em; margin-bottom: 14px; }
+
+        /* Search Results */
+        .result-card {
+            display: flex; gap: 14px; padding: 12px; border: 1px solid #21262d;
+            border-radius: 6px; margin-bottom: 8px; transition: background 0.2s;
+        }
+        .result-card:hover { background: #1c2128; }
+        .result-card img {
+            width: 60px; height: 90px; object-fit: cover; border-radius: 4px; flex-shrink: 0;
+        }
+        .result-card .no-poster {
+            width: 60px; height: 90px; background: #21262d; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center; font-size: 0.7em;
+            color: #484f58; flex-shrink: 0;
+        }
+        .result-info { flex: 1; }
+        .result-title { font-weight: 600; color: #f0f6fc; margin-bottom: 4px; }
+        .result-meta { font-size: 0.8em; color: #8b949e; margin-bottom: 4px; }
+        .result-overview { font-size: 0.82em; color: #8b949e; line-height: 1.4; }
+        .result-actions { display: flex; align-items: center; flex-shrink: 0; }
+
+        .badge {
+            display: inline-block; padding: 2px 8px; border-radius: 12px;
+            font-size: 0.75em; font-weight: 600;
+        }
+        .badge-movie { background: #1f6feb; color: #fff; }
+        .badge-tv { background: #8957e5; color: #fff; }
+        .badge-yes { background: #238636; color: #fff; }
+        .badge-no { background: #da3633; color: #fff; }
+
+        /* Year Grid */
+        .year-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px;
+        }
+        .year-card {
+            background: #0d1117; border: 1px solid #21262d; border-radius: 6px; padding: 14px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .year-card:hover { border-color: #58a6ff; background: #161b22; }
+        .year-card .year-label {
+            font-size: 1.3em; font-weight: bold; color: #f0f6fc; margin-bottom: 8px;
+        }
+        .year-card .year-counts { display: flex; gap: 12px; margin-bottom: 8px; }
+        .year-card .count-item { font-size: 0.85em; }
+        .year-card .count-num { font-weight: bold; }
+        .year-bar {
+            height: 6px; background: #21262d; border-radius: 3px; overflow: hidden;
+            display: flex;
+        }
+        .year-bar .bar-movie { background: #1f6feb; }
+        .year-bar .bar-tv { background: #8957e5; }
+        .year-card .gap-indicator {
+            font-size: 0.75em; margin-top: 6px; padding: 2px 6px;
+            border-radius: 4px; display: inline-block;
+        }
+        .gap-low { background: #da3633; color: #fff; }
+        .gap-medium { background: #d29922; color: #fff; }
+        .gap-good { background: #238636; color: #fff; }
+
+        /* Status */
+        .status-bar {
+            background: #161b22; border: 1px solid #30363d; border-radius: 6px;
+            padding: 12px 16px; margin-bottom: 20px; display: flex;
+            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .status-item { text-align: center; }
+        .status-num { font-size: 1.5em; font-weight: bold; color: #58a6ff; }
+        .status-label { font-size: 0.75em; color: #8b949e; }
+
+        /* Fetch controls */
+        .fetch-controls {
+            display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;
+        }
+        .fetch-controls label { font-size: 0.85em; color: #8b949e; }
+        .fetch-controls select, .fetch-controls input[type="number"] {
+            padding: 6px 10px; background: #0d1117; border: 1px solid #30363d;
+            border-radius: 4px; color: #c9d1d9; font-size: 0.85em;
+        }
+
+        /* Output log */
+        .output-log {
+            background: #0d1117; border: 1px solid #21262d; border-radius: 6px;
+            padding: 12px; max-height: 400px; overflow-y: auto; font-family: monospace;
+            font-size: 0.82em; white-space: pre-wrap; line-height: 1.5; color: #8b949e;
+        }
+
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #30363d;
+            border-top-color: #58a6ff; border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .hidden { display: none; }
+
+        @media (max-width: 700px) {
+            body { padding: 10px; }
+            .year-grid { grid-template-columns: repeat(2, 1fr); }
+            .status-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Movie & TV Series Admin Panel</h1>
+<p class="subtitle">
+    Manage database content &bull;
+    <a href="log/">View Sync Log</a> &bull;
+    <a href="./">Back to App</a>
+</p>
+
+<!-- Status Bar -->
+<div class="status-bar" id="statusBar">
+    <div class="status-item"><div class="status-num" id="statTotal">-</div><div class="status-label">Total</div></div>
+    <div class="status-item"><div class="status-num" id="statMovies" style="color:#1f6feb">-</div><div class="status-label">Movies</div></div>
+    <div class="status-item"><div class="status-num" id="statTV" style="color:#8957e5">-</div><div class="status-label">TV Shows</div></div>
+    <div class="status-item"><div class="status-num" id="statTrailers" style="color:#3fb950">-</div><div class="status-label">Trailers</div></div>
+    <div class="status-item"><div class="status-num" id="statLastSync" style="font-size:0.9em">-</div><div class="status-label">Last Sync</div></div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <div class="tab active" onclick="switchTab('search')">Search & Add</div>
+    <div class="tab" onclick="switchTab('years')">Year Analysis</div>
+    <div class="tab" onclick="switchTab('fetch')">Bulk Fetch</div>
+</div>
+
+<!-- Tab 1: Search -->
+<div class="tab-panel active" id="panel-search">
+    <div class="section">
+        <h2>Search TMDB for Movies/TV Series</h2>
+        <p style="color:#8b949e; font-size:0.85em; margin-bottom:12px;">
+            Search to check if a title exists in our database. If missing, you can add it directly.
+        </p>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search for a movie or TV show..." onkeydown="if(event.key==='Enter')doSearch()">
+            <select id="searchType">
+                <option value="multi">All</option>
+                <option value="movie">Movies</option>
+                <option value="tv">TV Shows</option>
+            </select>
+            <button class="btn" onclick="doSearch()">Search</button>
+        </div>
+        <div id="searchResults"></div>
+    </div>
+</div>
+
+<!-- Tab 2: Year Analysis -->
+<div class="tab-panel" id="panel-years">
+    <div class="section">
+        <h2>Content by Year - Gap Analysis</h2>
+        <p style="color:#8b949e; font-size:0.85em; margin-bottom:12px;">
+            Click a year card to fetch more content for that year. Color indicates coverage level.
+        </p>
+        <div class="year-grid" id="yearGrid"></div>
+    </div>
+
+    <!-- Year fetch panel -->
+    <div class="section hidden" id="yearFetchPanel">
+        <h2>Fetch for Year: <span id="fetchYearLabel">-</span></h2>
+        <div class="fetch-controls">
+            <label>Type:</label>
+            <select id="yearFetchType">
+                <option value="both">Both</option>
+                <option value="movie">Movies Only</option>
+                <option value="tv">TV Only</option>
+            </select>
+            <label>Pages:</label>
+            <input type="number" id="yearFetchPages" value="5" min="1" max="10" style="width:60px">
+            <button class="btn btn-blue" onclick="runYearFetch()">Fetch Now</button>
+            <span id="yearFetchSpinner" class="hidden"><span class="spinner"></span> Fetching...</span>
+        </div>
+        <div class="output-log hidden" id="yearFetchOutput"></div>
+    </div>
+</div>
+
+<!-- Tab 3: Bulk Fetch -->
+<div class="tab-panel" id="panel-fetch">
+    <div class="section">
+        <h2>Bulk Fetch - Trending & Discover</h2>
+        <p style="color:#8b949e; font-size:0.85em; margin-bottom:12px;">
+            Fetch trending or newly discovered movies/TV shows from TMDB.
+        </p>
+        <div class="fetch-controls">
+            <label>Mode:</label>
+            <select id="bulkMode">
+                <option value="trending">Trending This Week</option>
+                <option value="discover">Discover (Current Year)</option>
+            </select>
+            <label>Type:</label>
+            <select id="bulkType">
+                <option value="both">Both</option>
+                <option value="movie">Movies</option>
+                <option value="tv">TV Shows</option>
+            </select>
+            <label>Pages:</label>
+            <input type="number" id="bulkPages" value="5" min="1" max="10" style="width:60px">
+            <button class="btn" onclick="runBulkFetch()">Run Fetch</button>
+            <span id="bulkSpinner" class="hidden"><span class="spinner"></span> Fetching...</span>
+        </div>
+        <div class="output-log hidden" id="bulkOutput"></div>
+    </div>
+</div>
+
+<script>
+const AUTH_KEY = 'ms2_sync_2024_findto';
+const BASE = '';  // same directory
+
+// --- Tab switching ---
+function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+        const panels = ['search', 'years', 'fetch'];
+        t.classList.toggle('active', panels[i] === name);
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    if (name === 'years' && !yearDataLoaded) loadYearData();
+}
+
+// --- Load stats ---
+let yearData = {};
+let yearDataLoaded = false;
+
+function loadStats() {
+    fetch(BASE + 'log/api_status.php?t=' + Date.now())
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) return;
+            document.getElementById('statTotal').textContent = data.stats.total_titles.toLocaleString();
+            document.getElementById('statMovies').textContent = data.stats.movies.toLocaleString();
+            document.getElementById('statTV').textContent = data.stats.tv_shows.toLocaleString();
+            document.getElementById('statTrailers').textContent = data.stats.active_trailers.toLocaleString();
+
+            if (data.recent_syncs && data.recent_syncs.length > 0) {
+                document.getElementById('statLastSync').textContent = data.recent_syncs[0].created_at.substring(0, 16);
+            } else {
+                document.getElementById('statLastSync').textContent = 'Never';
+            }
+
+            // Build year data
+            yearData = {};
+            data.by_year.forEach(row => {
+                const y = parseInt(row.release_year);
+                if (!yearData[y]) yearData[y] = { movie: 0, tv: 0 };
+                yearData[y][row.type] = parseInt(row.count);
+            });
+        })
+        .catch(() => {});
+}
+
+// --- Year Grid ---
+function loadYearData() {
+    yearDataLoaded = true;
+    const grid = document.getElementById('yearGrid');
+    grid.innerHTML = '';
+
+    // Target years: 2015-current+1
+    const currentYear = new Date().getFullYear();
+    const targetYears = [];
+    for (let y = currentYear + 1; y >= 2000; y--) targetYears.push(y);
+
+    // Find max for scaling bars
+    let maxTotal = 0;
+    targetYears.forEach(y => {
+        const d = yearData[y] || { movie: 0, tv: 0 };
+        maxTotal = Math.max(maxTotal, d.movie + d.tv);
+    });
+
+    targetYears.forEach(y => {
+        const d = yearData[y] || { movie: 0, tv: 0 };
+        const total = d.movie + d.tv;
+        const moviePct = maxTotal > 0 ? (d.movie / maxTotal * 100) : 0;
+        const tvPct = maxTotal > 0 ? (d.tv / maxTotal * 100) : 0;
+
+        // Gap analysis thresholds
+        let gapClass, gapText;
+        if (y > currentYear) {
+            gapClass = total < 50 ? 'gap-low' : (total < 100 ? 'gap-medium' : 'gap-good');
+            gapText = total < 50 ? 'Needs more' : (total < 100 ? 'Growing' : 'Good');
+        } else if (y >= 2015) {
+            gapClass = total < 100 ? 'gap-low' : (total < 250 ? 'gap-medium' : 'gap-good');
+            gapText = total < 100 ? 'Low - needs filling' : (total < 250 ? 'Moderate' : 'Well covered');
+        } else {
+            gapClass = total < 20 ? 'gap-low' : (total < 50 ? 'gap-medium' : 'gap-good');
+            gapText = total < 20 ? 'Sparse' : (total < 50 ? 'Some coverage' : 'Good');
+        }
+
+        const card = document.createElement('div');
+        card.className = 'year-card';
+        card.onclick = () => openYearFetch(y);
+        card.innerHTML = `
+            <div class="year-label">${y}</div>
+            <div class="year-counts">
+                <div class="count-item"><span class="count-num" style="color:#1f6feb">${d.movie}</span> movies</div>
+                <div class="count-item"><span class="count-num" style="color:#8957e5">${d.tv}</span> TV</div>
+            </div>
+            <div class="year-bar">
+                <div class="bar-movie" style="width:${moviePct}%"></div>
+                <div class="bar-tv" style="width:${tvPct}%"></div>
+            </div>
+            <div class="gap-indicator ${gapClass}">${gapText} (${total} total)</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function openYearFetch(year) {
+    const panel = document.getElementById('yearFetchPanel');
+    panel.classList.remove('hidden');
+    document.getElementById('fetchYearLabel').textContent = year;
+    document.getElementById('yearFetchOutput').classList.add('hidden');
+    panel.scrollIntoView({ behavior: 'smooth' });
+    panel.dataset.year = year;
+}
+
+function runYearFetch() {
+    const year = document.getElementById('yearFetchPanel').dataset.year;
+    const type = document.getElementById('yearFetchType').value;
+    const pages = document.getElementById('yearFetchPages').value;
+    const spinner = document.getElementById('yearFetchSpinner');
+    const output = document.getElementById('yearFetchOutput');
+
+    spinner.classList.remove('hidden');
+    output.classList.remove('hidden');
+    output.textContent = 'Starting fetch for year ' + year + '...\n';
+
+    fetch(`${BASE}admin_fetch_year.php?key=${AUTH_KEY}&year=${year}&type=${type}&pages=${pages}`)
+        .then(r => r.text())
+        .then(text => {
+            output.textContent = text;
+            spinner.classList.add('hidden');
+            loadStats();
+            setTimeout(loadYearData, 1000);
+        })
+        .catch(err => {
+            output.textContent = 'Error: ' + err.message;
+            spinner.classList.add('hidden');
+        });
+}
+
+// --- Search ---
+function doSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    const type = document.getElementById('searchType').value;
+    const results = document.getElementById('searchResults');
+
+    if (!query) return;
+
+    results.innerHTML = '<span class="spinner"></span> Searching...';
+
+    fetch(`${BASE}admin_search.php?q=${encodeURIComponent(query)}&type=${type}`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) {
+                results.innerHTML = '<p style="color:#da3633">' + (data.error || 'Search failed') + '</p>';
+                return;
+            }
+            if (data.results.length === 0) {
+                results.innerHTML = '<p style="color:#8b949e">No results found on TMDB.</p>';
+                return;
+            }
+
+            let html = `<p style="color:#8b949e; font-size:0.85em; margin-bottom:12px;">${data.total_results} results found on TMDB</p>`;
+            data.results.forEach(item => {
+                const typeClass = item.type === 'movie' ? 'badge-movie' : 'badge-tv';
+                const inDb = item.in_database;
+                const dbBadge = inDb ?
+                    '<span class="badge badge-yes">In Database</span>' :
+                    '<span class="badge badge-no">Missing</span>';
+
+                const poster = item.poster ?
+                    `<img src="${item.poster}" alt="" loading="lazy">` :
+                    `<div class="no-poster">No Image</div>`;
+
+                const addBtn = inDb ?
+                    '<button class="btn btn-sm btn-disabled" disabled>Already Added</button>' :
+                    `<button class="btn btn-sm btn-blue" onclick="addSingle(${item.tmdb_id},'${item.type}',this)">+ Add</button>`;
+
+                html += `
+                <div class="result-card">
+                    ${poster}
+                    <div class="result-info">
+                        <div class="result-title">${escHtml(item.title)}</div>
+                        <div class="result-meta">
+                            <span class="badge ${typeClass}">${item.type}</span>
+                            ${item.year ? item.year : '?'} &bull;
+                            ${item.rating ? item.rating + '/10' : 'N/A'} &bull;
+                            ${dbBadge}
+                        </div>
+                        <div class="result-overview">${escHtml(item.overview || '')}</div>
+                    </div>
+                    <div class="result-actions">${addBtn}</div>
+                </div>`;
+            });
+            results.innerHTML = html;
+        })
+        .catch(err => {
+            results.innerHTML = '<p style="color:#da3633">Error: ' + err.message + '</p>';
+        });
+}
+
+function addSingle(tmdbId, type, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+    btn.className = 'btn btn-sm btn-disabled';
+
+    fetch(`${BASE}admin_add_single.php?key=${AUTH_KEY}&tmdb_id=${tmdbId}&type=${type}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                btn.textContent = 'Added!';
+                btn.className = 'btn btn-sm btn-disabled';
+                loadStats();
+            } else {
+                btn.textContent = data.error || 'Failed';
+                if (data.error === 'Already in database') {
+                    btn.className = 'btn btn-sm btn-disabled';
+                } else {
+                    btn.className = 'btn btn-sm btn-danger';
+                    btn.disabled = false;
+                    btn.onclick = () => addSingle(tmdbId, type, btn);
+                }
+            }
+        })
+        .catch(err => {
+            btn.textContent = 'Error';
+            btn.className = 'btn btn-sm btn-danger';
+        });
+}
+
+// --- Bulk Fetch ---
+function runBulkFetch() {
+    const mode = document.getElementById('bulkMode').value;
+    const type = document.getElementById('bulkType').value;
+    const pages = document.getElementById('bulkPages').value;
+    const spinner = document.getElementById('bulkSpinner');
+    const output = document.getElementById('bulkOutput');
+
+    spinner.classList.remove('hidden');
+    output.classList.remove('hidden');
+    output.textContent = 'Starting bulk fetch (' + mode + ')...\n';
+
+    fetch(`${BASE}fetch_new_content.php?key=${AUTH_KEY}&type=${type}&pages=${pages}&mode=${mode}`)
+        .then(r => r.text())
+        .then(text => {
+            output.textContent = text;
+            spinner.classList.add('hidden');
+            loadStats();
+        })
+        .catch(err => {
+            output.textContent = 'Error: ' + err.message;
+            spinner.classList.add('hidden');
+        });
+}
+
+function escHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// Init
+loadStats();
+</script>
+</body>
+</html>
