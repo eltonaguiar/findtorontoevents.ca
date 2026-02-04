@@ -877,17 +877,37 @@
             const options = {
                 root: null,
                 rootMargin: '0px',
-                threshold: 0.5
+                threshold: 0.75  // Increased threshold for better detection
             };
+
+            let currentlyPlaying = null;
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     const iframe = entry.target.querySelector('iframe');
-                    if (entry.isIntersecting) {
-                        // Video is in view - ensure it's playing
-                        const currentUrl = iframe.src;
-                        if (!currentUrl.includes('autoplay=1')) {
-                            iframe.src = currentUrl.replace(/autoplay=[01]/, 'autoplay=1');
+                    const index = entry.target.dataset.index;
+
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
+                        // This video is in view - play it
+                        if (currentlyPlaying !== index) {
+                            console.log(`Playing video ${index}`);
+
+                            // Force reload iframe to trigger autoplay
+                            const currentSrc = iframe.src;
+                            if (!currentSrc.includes('autoplay=1')) {
+                                iframe.src = currentSrc.replace(/autoplay=[01]/, 'autoplay=1');
+                            } else {
+                                // Force reload to restart
+                                iframe.src = iframe.src;
+                            }
+
+                            currentlyPlaying = index;
+                        }
+                    } else if (currentlyPlaying === index) {
+                        // Video scrolled out of view - pause it
+                        const pauseSrc = iframe.src.replace(/autoplay=1/, 'autoplay=0');
+                        if (pauseSrc !== iframe.src) {
+                            iframe.src = pauseSrc;
                         }
                     }
                 });
@@ -897,6 +917,18 @@
             document.querySelectorAll('.video-card').forEach(card => {
                 observer.observe(card);
             });
+
+            // Force play the first video after a short delay
+            setTimeout(() => {
+                const firstCard = document.querySelector('.video-card');
+                if (firstCard) {
+                    const firstIframe = firstCard.querySelector('iframe');
+                    if (firstIframe) {
+                        console.log('Force playing first video');
+                        firstIframe.src = firstIframe.src; // Reload to trigger autoplay
+                    }
+                }
+            }, 1000);
         }
 
         function escapeHtml(text) {
