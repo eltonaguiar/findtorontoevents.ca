@@ -256,6 +256,139 @@
             margin-bottom: 10px;
         }
 
+        .browse-search-bar {
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .browse-search-input {
+            width: 100%;
+            padding: 14px 50px 14px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .browse-search-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f59e0b;
+        }
+
+        .browse-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .browse-search-clear {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s;
+        }
+
+        .browse-search-clear.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .browse-search-clear:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .browse-filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 700;
+            opacity: 0.7;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .filter-chip.active {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            color: black;
+        }
+
+        .year-range-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .year-input {
+            width: 80px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            outline: none;
+        }
+
+        .year-input:focus {
+            border-color: #f59e0b;
+        }
+
+        .browse-results-count {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 16px;
+        }
+
         .browse-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -827,7 +960,58 @@
         <button class="browse-close" onclick="toggleBrowse()">✕</button>
         <div class="browse-header">
             <h1>Browse All Movies & TV Shows</h1>
-            <p style="opacity: 0.7;">Click any title to start watching or add to queue</p>
+            <p style="opacity: 0.7;">Search by name, filter by genre, year, or content type</p>
+
+            <!-- Search Bar -->
+            <div class="browse-search-bar">
+                <input type="text" id="browseSearchInput" class="browse-search-input" placeholder="Search by title..."
+                    oninput="applyBrowseFilters()">
+                <button class="browse-search-clear" id="browseSearchClear" onclick="clearSearch()">✕</button>
+            </div>
+
+            <!-- Filters -->
+            <div class="browse-filters">
+                <!-- Content Type Filter -->
+                <div class="filter-section">
+                    <div class="filter-label">Content Type</div>
+                    <div class="filter-buttons">
+                        <button class="filter-chip active" data-type="all"
+                            onclick="setContentTypeFilter('all')">All</button>
+                        <button class="filter-chip" data-type="movie"
+                            onclick="setContentTypeFilter('movie')">Movies</button>
+                        <button class="filter-chip" data-type="tv" onclick="setContentTypeFilter('tv')">TV
+                            Series</button>
+                        <button class="filter-chip" data-type="now-playing"
+                            onclick="setContentTypeFilter('now-playing')">Now Playing</button>
+                        <button class="filter-chip" data-type="out-this-week"
+                            onclick="setContentTypeFilter('out-this-week')">Out This Week</button>
+                    </div>
+                </div>
+
+                <!-- Genre Filter -->
+                <div class="filter-section">
+                    <div class="filter-label">Genre</div>
+                    <div class="filter-buttons" id="genreFilters">
+                        <button class="filter-chip active" data-genre="all" onclick="setGenreFilter('all')">All</button>
+                        <!-- Genres will be populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Year Range -->
+                <div class="filter-section" style="flex: 0 0 auto;">
+                    <div class="filter-label">Year Range</div>
+                    <div class="year-range-container">
+                        <input type="number" id="yearFrom" class="year-input" placeholder="From" min="1900" max="2027"
+                            oninput="applyBrowseFilters()">
+                        <span style="opacity: 0.5;">-</span>
+                        <input type="number" id="yearTo" class="year-input" placeholder="To" min="1900" max="2027"
+                            oninput="applyBrowseFilters()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Count -->
+            <div class="browse-results-count" id="browseResultsCount">Loading...</div>
         </div>
         <div class="browse-grid" id="browseGrid"></div>
     </div>
@@ -870,6 +1054,16 @@
         let myQueue = JSON.parse(localStorage.getItem('movieQueue') || '[]');
         let currentMovieIndex = 0;
 
+        // Browse filter state
+        let browseFilters = {
+            searchQuery: '',
+            contentType: 'all',
+            genre: 'all',
+            yearFrom: null,
+            yearTo: null
+        };
+        let browseFilteredMovies = [];
+
         function toggleMenu() {
             document.getElementById('menuOverlay').classList.toggle('active');
             document.getElementById('menuPanel').classList.toggle('active');
@@ -880,7 +1074,10 @@
             const isActive = browseView.classList.toggle('active');
 
             if (isActive) {
-                renderBrowseGrid();
+                // Initialize genre filters from database
+                populateGenreFilters();
+                // Reset and apply filters
+                applyBrowseFilters();
             }
         }
 
@@ -904,27 +1101,203 @@
             // Update browse grid if open
             if (document.getElementById('browseView').classList.contains('active')) {
                 renderBrowseGrid();
+                applyBrowseFilters(); // Re-apply browse filters based on the new filteredMovies
             }
         }
 
         function renderBrowseGrid() {
             const grid = document.getElementById('browseGrid');
-            grid.innerHTML = filteredMovies.map((movie, index) => `
+            const resultsCount = document.getElementById('browseResultsCount');
+
+            // Use browseFilteredMovies instead of filteredMovies
+            const moviesToDisplay = browseFilteredMovies;
+
+            resultsCount.textContent = `Showing ${moviesToDisplay.length} result${moviesToDisplay.length !== 1 ? 's' : ''}`;
+
+            if (moviesToDisplay.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; padding: 40px; opacity: 0.5;">No results found. Try adjusting your filters.</div>';
+                return;
+            }
+
+            grid.innerHTML = moviesToDisplay.map((movie, index) => {
+                // Find the actual index in filteredMovies for playback
+                const actualIndex = filteredMovies.findIndex(m => m.id === movie.id);
+
+                return `
                 <div class="movie-card">
                     <div class="movie-card-actions">
-                        <button class="movie-card-add-queue" onclick="event.stopPropagation(); addToQueueFromBrowse(${index});" title="Add to Queue">➕</button>
+                        <button class="movie-card-add-queue" onclick="event.stopPropagation(); addToQueueFromBrowseFiltered(${movie.id});" title="Add to Queue">\u2795</button>
                     </div>
-                    <div onclick="playMovieFromBrowse(${index})" style="cursor: pointer;">
+                    <div onclick="playMovieFromBrowse(${actualIndex})" style="cursor: pointer;">
                         <img src="${movie.thumbnail || 'https://placehold.co/200x300/1a1a1a/666?text=' + encodeURIComponent(movie.title)}" alt="${escapeHtml(movie.title)}" onerror="this.src='https://placehold.co/200x300/1a1a1a/666?text=No+Image'">
                         <div class="movie-card-info">
                             <div class="movie-card-title">${escapeHtml(movie.title)}</div>
                             <div class="movie-card-meta">
-                                ${movie.release_year || ''} ${movie.imdb_rating ? '⭐ ' + movie.imdb_rating : ''}
+                                ${movie.release_year || ''} ${movie.imdb_rating ? '\u2b50 ' + movie.imdb_rating : ''}
                             </div>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
+        }
+
+        function populateGenreFilters() {
+            // Extract unique genres from all movies
+            const genresSet = new Set();
+            filteredMovies.forEach(movie => {
+                if (movie.genres) {
+                    const genres = movie.genres.split(',').map(g => g.trim());
+                    genres.forEach(genre => {
+                        if (genre) genresSet.add(genre);
+                    });
+                }
+            });
+
+            const genres = Array.from(genresSet).sort();
+            const genreFiltersContainer = document.getElementById('genreFilters');
+
+            // Keep the "All" button and add genre buttons
+            const allButton = genreFiltersContainer.querySelector('[data-genre="all"]');
+            genreFiltersContainer.innerHTML = '';
+            genreFiltersContainer.appendChild(allButton);
+
+            genres.forEach(genre => {
+                const button = document.createElement('button');
+                button.className = 'filter-chip';
+                button.setAttribute('data-genre', genre);
+                button.textContent = genre;
+                button.onclick = () => setGenreFilter(genre);
+                genreFiltersContainer.appendChild(button);
+            });
+        }
+
+        function applyBrowseFilters() {
+            // Get filter values
+            const searchQuery = document.getElementById('browseSearchInput').value.toLowerCase().trim();
+            const yearFrom = parseInt(document.getElementById('yearFrom').value) || null;
+            const yearTo = parseInt(document.getElementById('yearTo').value) || null;
+
+            // Update search clear button visibility
+            const clearBtn = document.getElementById('browseSearchClear');
+            if (searchQuery) {
+                clearBtn.classList.add('visible');
+            } else {
+                clearBtn.classList.remove('visible');
+            }
+
+            // Update filter state
+            browseFilters.searchQuery = searchQuery;
+            browseFilters.yearFrom = yearFrom;
+            browseFilters.yearTo = yearTo;
+
+            // Start with current filter (all/movie/tv)
+            let results = [...filteredMovies];
+
+            // Apply content type filter (now-playing, out-this-week)
+            if (browseFilters.contentType === 'now-playing') {
+                // Movies released in the last 3 months and currently in theaters
+                const threeMonthsAgo = new Date();
+                threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+                const currentYear = new Date().getFullYear();
+
+                results = results.filter(m => {
+                    if (m.type !== 'movie') return false;
+                    const releaseYear = parseInt(m.release_year);
+                    return releaseYear >= currentYear - 1 && releaseYear <= currentYear;
+                });
+            } else if (browseFilters.contentType === 'out-this-week') {
+                // Content released in the last 7 days
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                const currentYear = new Date().getFullYear();
+
+                results = results.filter(m => {
+                    const releaseYear = parseInt(m.release_year);
+                    return releaseYear === currentYear;
+                });
+            }
+
+            // Apply search query
+            if (searchQuery) {
+                results = results.filter(m =>
+                    m.title.toLowerCase().includes(searchQuery) ||
+                    (m.description && m.description.toLowerCase().includes(searchQuery))
+                );
+            }
+
+            // Apply genre filter
+            if (browseFilters.genre !== 'all') {
+                results = results.filter(m => {
+                    if (!m.genres) return false;
+                    const genres = m.genres.split(',').map(g => g.trim().toLowerCase());
+                    return genres.includes(browseFilters.genre.toLowerCase());
+                });
+            }
+
+            // Apply year range filter
+            if (yearFrom) {
+                results = results.filter(m => {
+                    const year = parseInt(m.release_year);
+                    return !isNaN(year) && year >= yearFrom;
+                });
+            }
+
+            if (yearTo) {
+                results = results.filter(m => {
+                    const year = parseInt(m.release_year);
+                    return !isNaN(year) && year <= yearTo;
+                });
+            }
+
+            browseFilteredMovies = results;
+            renderBrowseGrid();
+        }
+
+        function setContentTypeFilter(type) {
+            browseFilters.contentType = type;
+
+            // Update button states
+            document.querySelectorAll('[data-type]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+
+            applyBrowseFilters();
+        }
+
+        function setGenreFilter(genre) {
+            browseFilters.genre = genre;
+
+            // Update button states
+            document.querySelectorAll('[data-genre]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-genre="${genre}"]`).classList.add('active');
+
+            applyBrowseFilters();
+        }
+
+        function clearSearch() {
+            document.getElementById('browseSearchInput').value = '';
+            applyBrowseFilters();
+        }
+
+        function addToQueueFromBrowseFiltered(movieId) {
+            const movie = browseFilteredMovies.find(m => m.id === movieId);
+
+            if (movie && !myQueue.find(m => m.id === movie.id)) {
+                myQueue.push(movie);
+                localStorage.setItem('movieQueue', JSON.stringify(myQueue));
+                document.getElementById('queueCount').textContent = myQueue.length;
+                alert(`\u2705 Added "${movie.title}" to queue`);
+
+                // Update queue if it's open
+                if (document.getElementById('queuePanel').classList.contains('active')) {
+                    renderQueue();
+                }
+            } else if (movie) {
+                alert('Already in queue!');
+            }
         }
 
         function playMovieFromBrowse(index) {
