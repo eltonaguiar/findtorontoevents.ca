@@ -148,6 +148,27 @@
             gap: 12px;
         }
 
+        .control-btn {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
         .filter-group {
             flex: 1;
             display: flex;
@@ -169,11 +190,116 @@
             cursor: pointer;
             font-size: 12px;
             font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            color: white;
         }
 
         .filter-btn.active {
             background: white;
             color: black;
+        }
+
+        /* Queue Panel */
+        .queue-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 250;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .queue-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .queue-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 400px;
+            max-width: 90vw;
+            background: rgba(24, 24, 24, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 251;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .queue-panel.active {
+            transform: translateX(0);
+        }
+
+        .queue-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .queue-header h2 {
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .queue-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .queue-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .queue-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .queue-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .queue-item img {
+            width: 80px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .queue-item-info {
+            flex: 1;
+        }
+
+        .queue-item-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .queue-item-meta {
+            font-size: 12px;
+            opacity: 0.7;
         }
 
         /* Sidebar Actions */
@@ -200,10 +326,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 24px;
         }
 
         .action-btn:hover {
             background: rgba(0, 0, 0, 0.6);
+            transform: scale(1.1);
         }
 
         #container {
@@ -337,18 +465,36 @@
 
     <!-- Top Controls -->
     <div class="top-controls">
+        <button class="control-btn" onclick="toggleQueue()" title="My Queue">
+            📋
+        </button>
         <div class="filter-group">
-            <button class="filter-btn active">All (39)</button>
-            <button class="filter-btn">Movies</button>
-            <button class="filter-btn">TV Shows</button>
+            <button class="filter-btn active" onclick="filterContent('all')" id="filterAll">All (<span
+                    id="countAll">0</span>)</button>
+            <button class="filter-btn" onclick="filterContent('movie')" id="filterMovies">Movies (<span
+                    id="countMovies">0</span>)</button>
+            <button class="filter-btn" onclick="filterContent('tv')" id="filterTV">TV (<span
+                    id="countTV">0</span>)</button>
+        </div>
+    </div>
+
+    <!-- Queue Panel -->
+    <div class="queue-overlay" id="queueOverlay" onclick="toggleQueue()"></div>
+    <div class="queue-panel" id="queuePanel">
+        <div class="queue-header">
+            <h2>My Queue</h2>
+            <button class="queue-close" onclick="toggleQueue()">✕</button>
+        </div>
+        <div class="queue-content" id="queueContent">
+            <p style="opacity: 0.5; text-align: center; padding: 20px;">Your queue is empty</p>
         </div>
     </div>
 
     <!-- Sidebar Actions -->
     <div class="sidebar-actions">
-        <button class="action-btn" title="Like">❤️</button>
-        <button class="action-btn" title="Save">🔖</button>
-        <button class="action-btn" title="Share">🔗</button>
+        <button class="action-btn" onclick="likeMovie()" title="Like">❤️</button>
+        <button class="action-btn" onclick="addToQueue()" title="Add to Queue">➕</button>
+        <button class="action-btn" onclick="shareMovie()" title="Share">🔗</button>
     </div>
 
     <!-- Video Container -->
@@ -358,10 +504,84 @@
 
     <script>
         const API_URL = '/MOVIESHOWS3/api/get-movies.php';
+        let allMovies = [];
+        let currentFilter = 'all';
+        let myQueue = JSON.parse(localStorage.getItem('movieQueue') || '[]');
 
         function toggleMenu() {
             document.getElementById('menuOverlay').classList.toggle('active');
             document.getElementById('menuPanel').classList.toggle('active');
+        }
+
+        function toggleQueue() {
+            document.getElementById('queueOverlay').classList.toggle('active');
+            document.getElementById('queuePanel').classList.toggle('active');
+            renderQueue();
+        }
+
+        function filterContent(type) {
+            currentFilter = type;
+
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`filter${type === 'all' ? 'All' : type === 'movie' ? 'Movies' : 'TV'}`).classList.add('active');
+
+            // Filter and render
+            const filtered = type === 'all' ? allMovies : allMovies.filter(m => m.type === type);
+            renderMovies(filtered);
+        }
+
+        function addToQueue() {
+            const currentIndex = Math.floor(document.getElementById('container').scrollTop / window.innerHeight);
+            const movie = allMovies[currentIndex];
+
+            if (movie && !myQueue.find(m => m.id === movie.id)) {
+                myQueue.push(movie);
+                localStorage.setItem('movieQueue', JSON.stringify(myQueue));
+                alert(`✅ Added "${movie.title}" to queue`);
+            }
+        }
+
+        function likeMovie() {
+            alert('❤️ Liked!');
+        }
+
+        function shareMovie() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url);
+            alert('🔗 Link copied to clipboard!');
+        }
+
+        function renderQueue() {
+            const content = document.getElementById('queueContent');
+
+            if (myQueue.length === 0) {
+                content.innerHTML = '<p style="opacity: 0.5; text-align: center; padding: 20px;">Your queue is empty</p>';
+                return;
+            }
+
+            content.innerHTML = myQueue.map(movie => `
+                <div class="queue-item" onclick="playMovie(${movie.id})">
+                    <img src="${movie.thumbnail || 'https://via.placeholder.com/80x120?text=No+Image'}" alt="${escapeHtml(movie.title)}">
+                    <div class="queue-item-info">
+                        <div class="queue-item-title">${escapeHtml(movie.title)}</div>
+                        <div class="queue-item-meta">
+                            ${movie.release_year || ''} ${movie.imdb_rating ? '⭐ ' + movie.imdb_rating : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playMovie(id) {
+            const index = allMovies.findIndex(m => m.id === id);
+            if (index !== -1) {
+                document.getElementById('container').scrollTo({
+                    top: index * window.innerHeight,
+                    behavior: 'smooth'
+                });
+                toggleQueue();
+            }
         }
 
         async function loadMovies() {
@@ -377,15 +597,18 @@
                     throw new Error('No movies with trailers found');
                 }
 
-                const container = document.getElementById('container');
-                container.innerHTML = '';
+                allMovies = data.movies;
 
-                data.movies.forEach((movie, index) => {
-                    const card = createMovieCard(movie, index);
-                    container.appendChild(card);
-                });
+                // Update counts
+                const movieCount = allMovies.filter(m => m.type === 'movie').length;
+                const tvCount = allMovies.filter(m => m.type === 'tv').length;
 
-                console.log(`✅ Loaded ${data.movies.length} movies`);
+                document.getElementById('countAll').textContent = allMovies.length;
+                document.getElementById('countMovies').textContent = movieCount;
+                document.getElementById('countTV').textContent = tvCount;
+
+                renderMovies(allMovies);
+                console.log(`✅ Loaded ${allMovies.length} movies`);
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('container').innerHTML = `
@@ -396,6 +619,16 @@
                     </div>
                 `;
             }
+        }
+
+        function renderMovies(movies) {
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+
+            movies.forEach((movie, index) => {
+                const card = createMovieCard(movie, index);
+                container.appendChild(card);
+            });
         }
 
         function createMovieCard(movie, index) {
