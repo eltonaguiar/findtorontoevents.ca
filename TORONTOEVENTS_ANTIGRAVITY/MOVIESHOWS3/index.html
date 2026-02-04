@@ -662,11 +662,16 @@
         }
 
         function playMovieFromBrowse(index) {
+            // Close browse view first
             document.getElementById('browseView').classList.remove('active');
-            document.getElementById('container').scrollTo({
-                top: index * window.innerHeight,
-                behavior: 'smooth'
-            });
+
+            // Wait for transition, then scroll
+            setTimeout(() => {
+                document.getElementById('container').scrollTo({
+                    top: index * window.innerHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
         }
 
         function addToQueue() {
