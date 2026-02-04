@@ -1,0 +1,115 @@
+Bulk Populating MovieShows Database
+======================================
+
+Processing year: 2015
+  Failed to fetch page 1 for year 2015
+  Failed to fetch page 2 for year 2015
+  Failed to fetch page 3 for year 2015
+  Failed to fetch page 4 for year 2015
+  Failed to fetch page 5 for year 2015
+  Year 2015 complete. Total added so far: 0
+
+Processing year: 2016
+  Failed to fetch page 1 for year 2016
+  Failed to fetch page 2 for year 2016
+  Failed to fetch page 3 for year 2016
+  Failed to fetch page 4 for year 2016
+  Failed to fetch page 5 for year 2016
+  Year 2016 complete. Total added so far: 0
+
+Processing year: 2017
+  Failed to fetch page 1 for year 2017
+  Failed to fetch page 2 for year 2017
+  Failed to fetch page 3 for year 2017
+  Failed to fetch page 4 for year 2017
+  Failed to fetch page 5 for year 2017
+  Year 2017 complete. Total added so far: 0
+
+Processing year: 2018
+  Failed to fetch page 1 for year 2018
+  Failed to fetch page 2 for year 2018
+  Failed to fetch page 3 for year 2018
+  Failed to fetch page 4 for year 2018
+  Failed to fetch page 5 for year 2018
+  Year 2018 complete. Total added so far: 0
+
+Processing year: 2019
+  Failed to fetch page 1 for year 2019
+  Failed to fetch page 2 for year 2019
+  Failed to fetch page 3 for year 2019
+  Failed to fetch page 4 for year 2019
+  Failed to fetch page 5 for year 2019
+  Year 2019 complete. Total added so far: 0
+
+Processing year: 2020
+  Failed to fetch page 1 for year 2020
+  Failed to fetch page 2 for year 2020
+  Failed to fetch page 3 for year 2020
+  Failed to fetch page 4 for year 2020
+  Failed to fetch page 5 for year 2020
+  Year 2020 complete. Total added so far: 0
+
+Processing year: 2021
+  Failed to fetch page 1 for year 2021
+  Failed to fetch page 2 for year 2021
+  Failed to fetch page 3 for year 2021
+  Failed to fetch page 4 for year 2021
+  Failed to fetch page 5 for year 2021
+  Year 2021 complete. Total added so far: 0
+
+Processing year: 2022
+  Failed to fetch page 1 for year 2022
+  Failed to fetch page 2 for year 2022
+  Failed to fetch page 3 for year 2022
+  Failed to fetch page 4 for year 2022
+  Failed to fetch page 5 for year 2022
+  Year 2022 complete. Total added so far: 0
+
+Processing year: 2023
+  Failed to fetch page 1 for year 2023
+  Failed to fetch page 2 for year 2023
+  Failed to fetch page 3 for year 2023
+  Failed to fetch page 4 for year 2023
+  Failed to fetch page 5 for year 2023
+  Year 2023 complete. Total added so far: 0
+
+Processing year: 2024
+  Failed to fetch page 1 for year 2024
+  Failed to fetch page 2 for year 2024
+  Failed to fetch page 3 for year 2024
+  Failed to fetch page 4 for year 2024
+  Failed to fetch page 5 for year 2024
+  Year 2024 complete. Total added so far: 0
+
+Processing year: 2025
+  Failed to fetch page 1 for year 2025
+  Failed to fetch page 2 for year 2025
+  Failed to fetch page 3 for year 2025
+  Failed to fetch page 4 for year 2025
+  Failed to fetch page 5 for year 2025
+  Year 2025 complete. Total added so far: 0
+
+Processing year: 2026
+  Failed to fetch page 1 for year 2026
+  Failed to fetch page 2 for year 2026
+  Failed to fetch page 3 for year 2026
+  Failed to fetch page 4 for year 2026
+  Failed to fetch page 5 for year 2026
+  Year 2026 complete. Total added so far: 0
+
+Processing year: 2027
+  Failed to fetch page 1 for year 2027
+  Failed to fetch page 2 for year 2027
+  Failed to fetch page 3 for year 2027
+  Failed to fetch page 4 for year 2027
+  Failed to fetch page 5 for year 2027
+  Year 2027 complete. Total added so far: 0
+
+
+Bulk population complete!
+Total movies added: 0
+Errors: 0
+
+Total movies in database: 279
+
+Visit: https://findtorontoevents.ca/MOVIESHOWS3/app.html

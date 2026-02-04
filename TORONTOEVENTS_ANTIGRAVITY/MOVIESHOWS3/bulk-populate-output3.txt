@@ -1,0 +1,2 @@
+<br />
+<b>Parse error</b>:  syntax error, unexpected '[' in <b>/home/www/findtorontoevents.ca/MOVIESHOWS3/bulk-populate.php</b> on line <b>69</b><br />
