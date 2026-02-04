@@ -37,6 +37,10 @@ async function deploy() {
         await client.uploadFrom(path.join(__dirname, 'play.html'), 'play.html');
         console.log('✅ play.html uploaded!\n');
 
+        console.log('📤 Uploading player.html (database-powered TikTok player)...');
+        await client.uploadFrom(path.join(__dirname, 'player.html'), 'player.html');
+        console.log('✅ player.html uploaded!\n');
+
         console.log('📤 Uploading app.html (main TikTok-style interface)...');
         await client.uploadFrom(path.join(__dirname, 'app.html'), 'app.html');
         console.log('✅ app.html uploaded!\n');
