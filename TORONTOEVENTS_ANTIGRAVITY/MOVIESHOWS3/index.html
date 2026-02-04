@@ -517,6 +517,43 @@
             margin-bottom: 20px;
         }
 
+        /* Play Overlay */
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 15;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .play-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            transition: transform 0.2s;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+        }
+
         /* Unmute Button */
         .unmute-btn {
             position: absolute;
@@ -835,6 +872,11 @@
                         allowfullscreen
                         loading="${index < 3 ? 'eager' : 'lazy'}"
                     ></iframe>
+                    ${index === 0 ? `
+                        <div class="play-overlay" id="play-overlay-${index}" onclick="startPlayback(${index})">
+                            <div class="play-button">▶</div>
+                        </div>
+                    ` : ''}
                     <button class="unmute-btn" onclick="toggleMute(${index})" title="Unmute">
                         🔇
                     </button>
@@ -859,6 +901,22 @@
         }
 
         let isMuted = true;
+        let hasUserInteracted = false;
+
+        function startPlayback(index) {
+            hasUserInteracted = true;
+            const overlay = document.getElementById(`play-overlay-${index}`);
+            if (overlay) {
+                overlay.classList.add('hidden');
+                setTimeout(() => overlay.remove(), 300);
+            }
+
+            // Reload iframe to trigger autoplay
+            const iframe = document.getElementById(`player-${index}`);
+            if (iframe) {
+                iframe.src = iframe.src;
+            }
+        }
 
         function toggleMute(index) {
             isMuted = !isMuted;
