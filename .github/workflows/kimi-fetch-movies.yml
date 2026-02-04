@@ -40,13 +40,13 @@ jobs:
           
       - name: Deploy to FTP
         env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASS: ${{ secrets.FTP_PASS }}
         run: |
           lftp -c "
           set ftp:ssl-allow no;
-          open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_SERVER;
+          open -u $FTP_USER,$FTP_PASS $FTP_HOST;
           cd public_html/movieshows2 || mkdir -p public_html/movieshows2;
           mirror -R --verbose --only-newer movieshows2/ public_html/movieshows2/;
           bye
