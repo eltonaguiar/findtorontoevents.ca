@@ -1,11 +1,21 @@
-# TikTok Live Check (TLC) Implementation
+# TLC - Multi-Platform Live Check Implementation
 
 **Created:** February 4, 2026  
-**Endpoint:** `https://findtorontoevents.ca/fc/TLC.php?user=USERNAME`
+**Updated:** February 4, 2026  
+**Endpoint:** `https://findtorontoevents.ca/fc/TLC.php`
 
 ## Overview
 
-TLC is a PHP endpoint that checks if a TikTok user is currently live streaming. It uses multiple detection methods and verification passes to ensure accurate results, even when TikTok's responses are inconsistent.
+TLC (The Live Check) is a PHP endpoint that checks if a streamer is currently live across multiple streaming platforms. It uses platform-specific detection methods, multiple verification passes, and proxy fallbacks to ensure accurate results.
+
+## Supported Platforms
+
+| Platform | Status | Detection Method |
+|----------|--------|-----------------|
+| TikTok | ✅ Full Support | SIGI_STATE JSON parsing, multiple HTML indicators |
+| Twitch | ✅ Full Support | JSON-LD `isLiveBroadcast`, og:description |
+| Kick | ✅ Full Support | API v1/v2 via proxies, HTML parsing fallback |
+| YouTube | ✅ Full Support | `ytInitialPlayerResponse` JSON, video URLs |
 
 ## Files
 
@@ -16,73 +26,168 @@ TLC is a PHP endpoint that checks if a TikTok user is currently live streaming. 
 
 ## Usage
 
-### Basic Check
+### By Username + Platform
+
 ```
-GET https://findtorontoevents.ca/fc/TLC.php?user=gabbyvn3
+GET https://findtorontoevents.ca/fc/TLC.php?user=USERNAME&platform=PLATFORM
 ```
 
-### Response (Live)
+**Examples:**
+```bash
+# TikTok (default if no platform specified)
+curl "https://findtorontoevents.ca/fc/TLC.php?user=gabbyvn3&platform=tiktok"
+curl "https://findtorontoevents.ca/fc/TLC.php?user=gabbyvn3"  # legacy support
+
+# Twitch
+curl "https://findtorontoevents.ca/fc/TLC.php?user=jynxzi&platform=twitch"
+
+# Kick
+curl "https://findtorontoevents.ca/fc/TLC.php?user=amandasoliss&platform=kick"
+
+# YouTube (channel)
+curl "https://findtorontoevents.ca/fc/TLC.php?user=wavemusic1809&platform=youtube"
+```
+
+### By URL (Auto-detects Platform)
+
+```
+GET https://findtorontoevents.ca/fc/TLC.php?url=STREAM_URL
+```
+
+**Examples:**
+```bash
+# TikTok URL
+curl "https://findtorontoevents.ca/fc/TLC.php?url=https://www.tiktok.com/@gabbyvn3/live"
+
+# Twitch URL
+curl "https://findtorontoevents.ca/fc/TLC.php?url=https://www.twitch.tv/jynxzi"
+
+# Kick URL
+curl "https://findtorontoevents.ca/fc/TLC.php?url=https://kick.com/amandasoliss"
+
+# YouTube video URL (for live streams)
+curl "https://findtorontoevents.ca/fc/TLC.php?url=https://www.youtube.com/watch?v=2Q_MTz0ObVA"
+
+# YouTube channel URL
+curl "https://findtorontoevents.ca/fc/TLC.php?url=https://www.youtube.com/@wavemusic1809/live"
+```
+
+### Response Format
+
+**Live:**
 ```json
 {
-  "user": "gabbyvn3",
+  "user": "jynxzi",
+  "platform": "twitch",
   "live": true,
-  "method": "sigi_user_status",
-  "checks": "1 live, 0 offline, 0 failed",
-  "checked_at": "2026-02-04T22:22:55Z"
+  "method": "isLiveBroadcast_true",
+  "checks": "1 live, 0 offline",
+  "checked_at": "2026-02-04T22:35:52Z"
 }
 ```
 
-### Response (Offline)
+**Offline:**
 ```json
 {
-  "user": "sunnystoktik",
+  "user": "pokimane",
+  "platform": "twitch",
   "live": false,
   "method": "consensus_offline",
-  "checks": "0 live, 3 offline, 0 failed",
-  "checked_at": "2026-02-04T22:23:15Z"
+  "checks": "0 live, 2 offline",
+  "checked_at": "2026-02-04T22:35:53Z"
+}
+```
+
+**With Viewers (Kick):**
+```json
+{
+  "user": "amandasoliss",
+  "platform": "kick",
+  "live": true,
+  "method": "kick_api_v1_livestream",
+  "checks": "1 api",
+  "checked_at": "2026-02-04T22:45:22Z",
+  "viewers": 1168
 }
 ```
 
 ### Debug Mode
+
 ```
-GET https://findtorontoevents.ca/fc/TLC.php?user=gabbyvn3&debug=1
+GET https://findtorontoevents.ca/fc/TLC.php?user=USERNAME&platform=PLATFORM&debug=1
 ```
-Returns additional `debug` object with all detection indicators and methods used.
 
-## Detection Methods (12 Total)
+Returns additional `debug` object with detailed check results.
 
-The endpoint uses multiple detection methods in order of reliability:
+---
 
-| # | Method | Description | Indicator |
-|---|--------|-------------|-----------|
-| 1 | `sigi_user_status` | SIGI_STATE JSON user.status | status:2 = live, status:4 = offline |
-| 2 | `sigi_room_status` | SIGI_STATE liveRoom.status | status:2 = live, status:4 = offline |
-| 3 | `sigi_roomId` | Non-empty roomId in SIGI_STATE | roomId with 10+ digits = live |
-| 4 | `universal_roomId` | roomId in __UNIVERSAL_DATA__ | Non-empty roomId = live |
-| 5 | `og_description_live` | og:description meta tag | Contains "currently LIVE" |
-| 6 | `title_contains_live` | Page title | Contains "is LIVE" |
-| 7 | `regex_roomId` | roomId regex in raw HTML | `"roomId":"1234567890"` pattern |
-| 8 | `stream_url` | TikTok CDN stream URLs | `pull-*.tiktokcdn.com/stage/stream-*` |
-| 9 | `webcast_url` | WebSocket/WebCast URLs | `wss://...webcast...tiktok` |
-| 10 | `viewer_count` | Viewer count fields | `user_count` or `viewerCount` > 0 |
-| 11 | `isLive_field` | Boolean fields | `"isLive":true` or `"alive":true` |
-| 12 | `roomInfo` | Room info object | Populated roomInfo = live |
+## Platform-Specific Detection
 
-## Verification Strategy
+### TikTok Detection Methods
 
-1. **Multiple Passes:** Performs up to 3 verification checks
-2. **Early Exit:** Stops immediately when LIVE is detected (optimistic approach)
-3. **Consensus:** If no LIVE detected, requires multiple offline confirmations
-4. **Fallback Chain:** Direct fetch → Different User-Agent → Proxy services
+| Priority | Method | Description |
+|----------|--------|-------------|
+| 1 | `sigi_user_status` | SIGI_STATE JSON `user.status` (2=live, 4=offline) |
+| 2 | `sigi_room_status` | SIGI_STATE `liveRoom.status` field |
+| 3 | `sigi_roomId` | Non-empty roomId (10+ digits) = live |
+| 4 | `universal_status` | __UNIVERSAL_DATA__ status field |
+| 5 | `regex_roomId` | roomId pattern in raw HTML |
+| 6 | `stream_url` | TikTok CDN stream URLs present |
+
+**TikTok Status Codes:**
+- `2` = **LIVE** - User is currently streaming
+- `4` = **OFFLINE** - User is not streaming
+
+### Twitch Detection Methods
+
+| Priority | Method | Description |
+|----------|--------|-------------|
+| 1 | `isLiveBroadcast_true` | JSON-LD schema `isLiveBroadcast: true` |
+| 2 | `isLiveBroadcast_false` | JSON-LD schema `isLiveBroadcast: false` |
+| 3 | `og_desc_stream_title` | og:description contains stream title pattern |
+| 4 | `viewer_count` | Viewer count found in HTML |
+| 5 | `offline_message` | "is offline" text present |
+
+### Kick Detection Methods
+
+| Priority | Method | Description |
+|----------|--------|-------------|
+| 1 | `kick_api_v2_is_live` | API v2 `is_live: true/false` field |
+| 2 | `kick_api_v1_livestream` | API v1 `livestream` object present |
+| 3 | `kick_api_*_no_stream` | API returns `livestream: null` |
+| 4 | `kick_nextdata_*` | __NEXT_DATA__ JSON parsing |
+| 5 | `kick_html_livestream_*` | HTML JSON pattern matching |
+| 6 | `kick_html_*_badge` | Text "LIVE" or "OFFLINE" badges |
+
+**Kick API Endpoints (tried via proxy):**
+- `https://kick.com/api/v2/channels/{username}` (newer)
+- `https://kick.com/api/v1/channels/{username}` (original)
+
+### YouTube Detection Methods
+
+| Priority | Method | Description |
+|----------|--------|-------------|
+| 1 | `yt_videoDetails_isLive` | `ytInitialPlayerResponse.videoDetails.isLive: true` |
+| 2 | `yt_isLiveContent` | `videoDetails.isLiveContent: true` |
+| 3 | `yt_liveStreamability` | `playabilityStatus.liveStreamability` present |
+| 4 | `yt_jsonld_live` | JSON-LD `isLiveBroadcast: true` |
+| 5 | `yt_isLive_true` | Raw `"isLive":true` pattern |
+| 6 | `yt_live_badge` | `BADGE_STYLE_TYPE_LIVE_NOW` present |
+
+**YouTube URL Support:**
+- Channel URLs: `youtube.com/@username/live`
+- Video URLs: `youtube.com/watch?v=VIDEO_ID`
+- Short URLs: `youtu.be/VIDEO_ID`
+
+---
 
 ## Anti-Blocking Features
 
 ### User-Agent Rotation
-Rotates through 6 different browser User-Agents:
-- Chrome (Windows, Mac, Linux)
-- Firefox
-- Safari (iPhone, iPad)
-- Edge
+Rotates through multiple browser User-Agents:
+- Chrome (Windows)
+- Safari (Mac)
+- Firefox (Windows)
 
 ### Proxy Fallbacks
 If direct fetch fails, tries these proxy services:
@@ -95,115 +200,153 @@ If direct fetch fails, tries these proxy services:
 - Sets `Cache-Control: no-cache` headers
 - Forces fresh connections with CURL
 
-### Request Headers
-Mimics real browser requests:
-- Proper Accept headers
-- Accept-Language
-- Sec-Fetch-* headers
-- Upgrade-Insecure-Requests
+---
 
-## TikTok Status Codes
+## Verification Strategy
 
-From TikTok's SIGI_STATE JSON:
+1. **Multiple Passes:** Performs 2 verification checks (configurable)
+2. **Early Exit:** Stops immediately when LIVE is detected
+3. **Consensus:** If no LIVE detected, reports offline after offline confirmations
+4. **Fallback Chain:** Direct fetch → Proxy services
 
-| Status | Meaning |
-|--------|---------|
-| `2` | **LIVE** - User is currently streaming |
-| `4` | **OFFLINE** - User is not streaming |
-| `0` | Indeterminate (check roomId) |
+---
 
-## Key Learnings
+## Architecture
 
-1. **"LIVE has ended" text is unreliable** - Always present in page as UI element, even during live streams
-2. **SIGI_STATE JSON is most reliable** - Contains actual status codes (2=live, 4=offline)
-3. **roomId presence indicates live** - Non-empty roomId (10+ digits) = streaming
-4. **TikTok responses can be inconsistent** - Multiple checks needed for reliability
-5. **Redirect detection** - `/live` URL redirecting to profile = not live
-
-## Code Location
-
-The main TLC.php file is located at:
 ```
-favcreators/docs/TLC.php
+Request: /fc/TLC.php?user=USERNAME&platform=PLATFORM
+           │
+           ▼
+    ┌──────────────┐
+    │ Parse Input  │──► URL provided? Extract platform & user
+    │ & Validate   │──► Default platform = tiktok (legacy)
+    └──────┬───────┘
+           │
+           ▼
+    ┌──────────────┐
+    │ Platform     │
+    │ Router       │
+    └──────┬───────┘
+           │
+     ┌─────┴─────┬─────────┬──────────┐
+     ▼           ▼         ▼          ▼
+  TikTok      Twitch     Kick      YouTube
+  Detection   Detection  Detection Detection
+     │           │         │          │
+     └─────┬─────┴─────────┴──────────┘
+           │
+           ▼
+    ┌──────────────┐
+    │ Return JSON  │
+    │ Response     │
+    └──────────────┘
 ```
 
-This gets deployed to:
-```
-https://findtorontoevents.ca/fc/TLC.php
-```
-
-## Deployment
-
-Files are deployed via:
-```bash
-python tools/deploy_to_ftp.py
-```
+---
 
 ## Testing
 
+### Quick Test Commands
+
 ```bash
-# Test live user
+# TikTok
 curl "https://findtorontoevents.ca/fc/TLC.php?user=gabbyvn3"
 
-# Test offline user  
-curl "https://findtorontoevents.ca/fc/TLC.php?user=sunnystoktik"
+# Twitch (live user)
+curl "https://findtorontoevents.ca/fc/TLC.php?user=jynxzi&platform=twitch"
 
-# Test with debug info
-curl "https://findtorontoevents.ca/fc/TLC.php?user=gabbyvn3&debug=1"
+# Twitch (offline user)
+curl "https://findtorontoevents.ca/fc/TLC.php?user=pokimane&platform=twitch"
+
+# Kick (live user)
+curl "https://findtorontoevents.ca/fc/TLC.php?user=amandasoliss&platform=kick"
+
+# Kick (offline user)
+curl "https://findtorontoevents.ca/fc/TLC.php?user=nataliereynolds&platform=kick"
+
+# YouTube (channel - offline)
+curl "https://findtorontoevents.ca/fc/TLC.php?user=tobedeleted2030&platform=youtube"
+
+# YouTube (video URL - live stream)
+curl "https://findtorontoevents.ca/fc/TLC.php?url=https://www.youtube.com/watch?v=2Q_MTz0ObVA"
 ```
 
-## IMPORTANT: Do Not Modify Without Reading
+### PowerShell Test
+
+```powershell
+Invoke-WebRequest -Uri "https://findtorontoevents.ca/fc/TLC.php?user=jynxzi&platform=twitch" | Select -Expand Content | ConvertFrom-Json
+```
+
+---
+
+## Deployment
+
+```bash
+# Copy and deploy
+Copy-Item "favcreators/docs/TLC.php" "favcreators/public/TLC.php" -Force
+python tools/deploy_to_ftp.py
+```
+
+---
+
+## Key Learnings
+
+1. **TikTok:** SIGI_STATE JSON is most reliable; "LIVE has ended" text is always present (unreliable)
+2. **Twitch:** JSON-LD `isLiveBroadcast` field is definitive
+3. **Kick:** Heavily blocks bots; API via proxy is most reliable, HTML parsing as fallback
+4. **YouTube:** `ytInitialPlayerResponse` embedded JSON is authoritative; supports video URLs
+5. **General:** Multiple detection methods and proxy fallbacks ensure reliability
+
+---
+
+## IMPORTANT: Modification Guidelines
 
 When making changes to TLC.php:
 
 1. **Read this document first**
-2. **Preserve all 12 detection methods** - Each serves as a fallback
+2. **Preserve platform-specific detection functions** - Each platform has unique patterns
 3. **Keep the multi-pass verification logic** - Prevents false negatives
-4. **Maintain proxy fallbacks** - Handles TikTok blocking
-5. **Test with both live AND offline users** before deploying
-6. **Run multiple consistency tests** (at least 10 rapid checks)
+4. **Maintain proxy fallbacks** - Handles platform blocking
+5. **Test with BOTH live AND offline users** for each platform before deploying
+6. **Use debug mode** (`?debug=1`) to verify detection methods
 
-## Architecture Diagram
+---
 
+## API Reference
+
+### Parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `user` | Yes* | Username/handle on the platform |
+| `platform` | No | Platform: `tiktok`, `twitch`, `kick`, `youtube`. Default: `tiktok` |
+| `url` | Yes* | Full stream URL (auto-detects platform and user) |
+| `debug` | No | Set to `1` for detailed debug output |
+
+*Either `user` or `url` must be provided.
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `user` | string | Username/identifier checked |
+| `platform` | string | Platform checked |
+| `live` | boolean/null | `true` = live, `false` = offline, `null` = undetermined |
+| `method` | string | Detection method that determined the result |
+| `checks` | string | Summary of check results |
+| `checked_at` | string | ISO 8601 timestamp |
+| `viewers` | number | (Optional) Viewer count if available |
+| `debug` | object | (Optional) Detailed check results when `debug=1` |
+
+### Error Response
+
+```json
+{
+  "error": "Missing user or url parameter",
+  "usage": {
+    "by_user": "/fc/TLC.php?user=USERNAME&platform=PLATFORM",
+    "by_url": "/fc/TLC.php?url=STREAM_URL",
+    "platforms": ["tiktok", "twitch", "kick", "youtube"]
+  }
+}
 ```
-Request: /fc/TLC.php?user=gabbyvn3
-           │
-           ▼
-    ┌──────────────┐
-    │ Validate     │
-    │ Username     │
-    └──────┬───────┘
-           │
-           ▼
-    ┌──────────────┐
-    │ Check #1:    │──► LIVE? ──► Return immediately
-    │ Direct Fetch │
-    └──────┬───────┘
-           │ Not Live/Failed
-           ▼
-    ┌──────────────┐
-    │ Check #2:    │──► LIVE? ──► Return immediately  
-    │ Diff UA      │
-    └──────┬───────┘
-           │ Not Live/Failed
-           ▼
-    ┌──────────────┐
-    │ Check #3:    │──► LIVE? ──► Return immediately
-    │ Via Proxy    │
-    └──────┬───────┘
-           │
-           ▼
-    ┌──────────────┐
-    │ Consensus:   │
-    │ Offline if   │
-    │ all checks   │
-    │ agree        │
-    └──────────────┘
-```
-
-## References
-
-- TikTok SIGI_STATE JSON structure
-- TikTok __UNIVERSAL_DATA_FOR_REHYDRATION__ format
-- Open Graph meta tag specifications
-- TikTok Live Connector library patterns
