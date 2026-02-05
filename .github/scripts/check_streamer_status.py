@@ -160,37 +160,41 @@ def update_last_seen(streamer: Dict[str, Any], status: Dict[str, Any]) -> bool:
 def get_streamers_from_api() -> List[Dict[str, Any]]:
     """
     Fetch the list of streamers to check from the API.
-    Gets all creators with their social accounts from the database.
+    Gets all creators from the guest list (user_id=0) which includes all default creators.
     """
-    url = f"{API_BASE}/public/api/get_all_creators_with_accounts.php"
+    # Use the existing working API endpoint for guest list
+    url = f"{API_BASE}/public/api/get_my_creators.php?user_id=0"
     
     try:
         result = _http_get(url, timeout=30)
         
         if result["status"] == 200:
             data = result["data"]
-            if data.get("ok") and data.get("creators"):
+            if isinstance(data, dict) and "creators" in data:
                 creators = data["creators"]
                 streamers = []
                 
                 # Convert creators to streamer format for checking
                 for creator in creators:
-                    for account in creator.get("accounts", []):
-                        # Only check supported platforms
-                        platform = account.get("platform", "").lower()
-                        if platform in ["tiktok", "twitch", "kick", "youtube"]:
-                            streamers.append({
-                                "creator_id": creator["id"],
-                                "creator_name": creator["name"],
-                                "platform": platform,
-                                "username": account.get("username", ""),
-                                "url": account.get("url", "")
-                            })
+                    accounts = creator.get("accounts", [])
+                    if isinstance(accounts, list):
+                        for account in accounts:
+                            # Only check supported platforms
+                            platform = account.get("platform", "").lower()
+                            if platform in ["tiktok", "twitch", "kick", "youtube"]:
+                                streamers.append({
+                                    "creator_id": creator.get("id", ""),
+                                    "creator_name": creator.get("name", ""),
+                                    "platform": platform,
+                                    "username": account.get("username", ""),
+                                    "url": account.get("url", "")
+                                })
                 
                 log_message(f"Fetched {len(creators)} creators with {len(streamers)} checkable accounts")
-                return streamers
+                if len(streamers) > 0:
+                    return streamers
             
-            log_message("API returned no creators, using default list")
+            log_message("API returned no creators or empty list, using default list")
             return DEFAULT_STREAMERS
             
         else:
