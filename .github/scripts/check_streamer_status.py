@@ -77,7 +77,7 @@ def check_live_status(platform: str, username: str) -> Dict[str, Any]:
     Check if a streamer is live using the TLC.php endpoint.
     """
     params = urllib.parse.urlencode({"platform": platform, "username": username})
-    url = f"{API_BASE}/docs/TLC.php?{params}"
+    url = f"{API_BASE}/TLC.php?{params}"
 
     for attempt in range(MAX_RETRIES):
         try:
