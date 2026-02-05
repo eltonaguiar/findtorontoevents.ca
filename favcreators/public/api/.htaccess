@@ -1,1 +1,14 @@
 # Allow PHP execution
+
+# Google OAuth Configuration
+# Set these via your hosting control panel instead of here for security
+# Or use php_value if your host supports it:
+# php_value GOOGLE_CLIENT_ID your_client_id_here
+# php_value GOOGLE_CLIENT_SECRET your_client_secret_here
+
+# CORS Headers
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
+</IfModule>

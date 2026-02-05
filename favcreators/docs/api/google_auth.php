@@ -2,8 +2,17 @@
 // google_auth.php
 // Initiates Google OAuth Flow (redirect to Google). No DB needed here.
 
+// Load config file if it exists (for local credentials)
+$config_file = dirname(__FILE__) . '/config.php';
+if (file_exists($config_file)) {
+    require_once $config_file;
+}
+
 // Load credentials from environment or config file
 $client_id = getenv('GOOGLE_CLIENT_ID');
+if (($client_id === false || $client_id === null || $client_id === '') && defined('GOOGLE_CLIENT_ID')) {
+    $client_id = GOOGLE_CLIENT_ID;
+}
 if ($client_id === false || $client_id === null) {
     $client_id = '';
 }
