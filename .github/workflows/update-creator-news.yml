@@ -1,0 +1,28 @@
+name: Update Creator News
+
+on:
+  schedule:
+    # Run every 2 hours
+    - cron: '0 */2 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger News Aggregation
+        run: |
+          curl -s "https://findtorontoevents.ca/fc/api/aggregate_creator_news.php" > /tmp/result.json
+          cat /tmp/result.json
+          
+      - name: Check Result
+        run: |
+          if grep -q '"success":true' /tmp/result.json; then
+            echo "✅ News aggregation successful"
+            cat /tmp/result.json | python3 -m json.tool
+          else
+            echo "❌ News aggregation failed"
+            cat /tmp/result.json
+            exit 1
+          fi

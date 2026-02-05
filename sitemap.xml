@@ -1,20 +1,75 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://findtorontoevents.ca/</loc>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://findtorontoevents.ca/allevents</loc>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://findtorontoevents.ca/about</loc>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://findtorontoevents.ca/contact</loc>
-    <priority>0.5</priority>
-  </url>
-  <!-- Add more URLs as needed for your site structure -->
-</urlset>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://findtorontoevents.ca/</loc>
+    <priority>1.0</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  
+  <url>
+    <loc>https://findtorontoevents.ca/allevents</loc>
+    <priority>0.8</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  
+  <url>
+    <loc>https://findtorontoevents.ca/about</loc>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  
+  <url>
+    <loc>https://findtorontoevents.ca/contact</loc>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  
+  <!-- FavCreators - Track creators across platforms -->
+  <url>
+    <loc>https://findtorontoevents.ca/fc/</loc>
+    <priority>0.9</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  
+  <url>
+    <loc>https://findtorontoevents.ca/fc/#/guest</loc>
+    <priority>0.9</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  
+  <!-- Movie Shows - Movie and TV show discovery -->
+  <url>
+    <loc>https://findtorontoevents.ca/movieshows2/</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  
+  <!-- Stocks - Stock market research and picks -->
+  <url>
+    <loc>https://findtorontoevents.ca/findstocks/</loc>
+    <priority>0.8</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  
+  <!-- Windows Fixer - Windows boot issue fixes -->
+  <url>
+    <loc>https://findtorontoevents.ca/WINDOWSFIXER/</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  
+  <!-- Mental Health Resources -->
+  <url>
+    <loc>https://findtorontoevents.ca/MENTALHEALTHRESOURCES/</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  
+  <!-- 2XKO - Fighting game frame data -->
+  <url>
+    <loc>https://findtorontoevents.ca/2xko/</loc>
+    <priority>0.6</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  
+</urlset>
