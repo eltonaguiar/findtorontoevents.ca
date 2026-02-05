@@ -120,7 +120,7 @@ def update_last_seen(streamer: Dict[str, Any], status: Dict[str, Any]) -> bool:
     """
     Update the last_seen tracking database.
     """
-    url = f"{API_BASE}/public/api/update_streamer_last_seen.php"
+    url = f"{API_BASE}/api/update_streamer_last_seen.php"
     
     payload = {
         "creator_id": streamer["creator_id"],
@@ -163,7 +163,7 @@ def get_streamers_from_api() -> List[Dict[str, Any]]:
     Gets all creators from the guest list (user_id=0) which includes all default creators.
     """
     # Use the existing working API endpoint for guest list
-    url = f"{API_BASE}/public/api/get_my_creators.php?user_id=0"
+    url = f"{API_BASE}/api/get_my_creators.php?user_id=0"
     
     try:
         result = _http_get(url, timeout=30)
