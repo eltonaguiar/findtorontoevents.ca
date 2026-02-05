@@ -160,11 +160,46 @@ def update_last_seen(streamer: Dict[str, Any], status: Dict[str, Any]) -> bool:
 def get_streamers_from_api() -> List[Dict[str, Any]]:
     """
     Fetch the list of streamers to check from the API.
-    In the future, this could get the guest list or all live streamers.
+    Gets all creators with their social accounts from the database.
     """
-    # For now, use the default list
-    # In production, this could call: f"{API_BASE}/public/api/get_all_followed_creators.php"
-    return DEFAULT_STREAMERS
+    url = f"{API_BASE}/public/api/get_all_creators_with_accounts.php"
+    
+    try:
+        result = _http_get(url, timeout=30)
+        
+        if result["status"] == 200:
+            data = result["data"]
+            if data.get("ok") and data.get("creators"):
+                creators = data["creators"]
+                streamers = []
+                
+                # Convert creators to streamer format for checking
+                for creator in creators:
+                    for account in creator.get("accounts", []):
+                        # Only check supported platforms
+                        platform = account.get("platform", "").lower()
+                        if platform in ["tiktok", "twitch", "kick", "youtube"]:
+                            streamers.append({
+                                "creator_id": creator["id"],
+                                "creator_name": creator["name"],
+                                "platform": platform,
+                                "username": account.get("username", ""),
+                                "url": account.get("url", "")
+                            })
+                
+                log_message(f"Fetched {len(creators)} creators with {len(streamers)} checkable accounts")
+                return streamers
+            
+            log_message("API returned no creators, using default list")
+            return DEFAULT_STREAMERS
+            
+        else:
+            log_message(f"Failed to fetch creators: HTTP {result['status']}, using default list")
+            return DEFAULT_STREAMERS
+            
+    except Exception as e:
+        log_message(f"Error fetching creators: {str(e)}, using default list")
+        return DEFAULT_STREAMERS
 
 def main():
     log_file = open("streamer_check_log.txt", "w")
