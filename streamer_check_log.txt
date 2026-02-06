@@ -1,0 +1,107 @@
+[2026-02-05T15:08:40.429392] ============================================================
+[2026-02-05T15:08:40.429427] Starting streamer status check
+[2026-02-05T15:08:40.429432] API Base: https://findtorontoevents.ca/fc
+[2026-02-05T15:08:40.429434] Checker: github-actions@findtorontoevents.ca
+[2026-02-05T15:08:40.429437] ============================================================
+[2026-02-05T15:08:40.631696] Checking 23 streamers
+[2026-02-05T15:08:40.631702] 
+[1/23] Checking Autsyn (kick)
+[2026-02-05T15:08:41.286830]   Status: offline (method: kick_api_v2_no_stream_allorigins)
+[2026-02-05T15:08:45.558796]   Failed to update database
+[2026-02-05T15:08:46.559024] 
+[2/23] Checking Autsyn (twitch)
+[2026-02-05T15:08:46.707281]   Status: offline (method: consensus_offline)
+[2026-02-05T15:08:50.911974]   Failed to update database
+[2026-02-05T15:08:51.912026] 
+[3/23] Checking Autsyn (youtube)
+[2026-02-05T15:08:52.739025]   Status: offline (method: consensus_offline)
+[2026-02-05T15:08:56.908706]   Failed to update database
+[2026-02-05T15:08:57.908867] 
+[4/23] Checking Autsyn (tiktok)
+[2026-02-05T15:08:58.041748]   Status: offline (method: fallback)
+[2026-02-05T15:09:02.233476]   Failed to update database
+[2026-02-05T15:09:03.233890] 
+[5/23] Checking Tony Robbins (kick)
+[2026-02-05T15:09:13.427391]   Status: offline (method: kick_html_no_live_indicators)
+[2026-02-05T15:09:17.644143]   Failed to update database
+[2026-02-05T15:09:18.644358] 
+[6/23] Checking Tony Robbins (twitch)
+[2026-02-05T15:09:18.786136]   Status: offline (method: consensus_offline)
+[2026-02-05T15:09:22.977748]   Failed to update database
+[2026-02-05T15:09:23.978145] 
+[7/23] Checking Tony Robbins (youtube)
+[2026-02-05T15:09:24.126024]   Status: offline (method: fallback)
+[2026-02-05T15:09:28.313850]   Failed to update database
+[2026-02-05T15:09:29.314240] 
+[8/23] Checking Tony Robbins (tiktok)
+[2026-02-05T15:09:29.736400]   Status: offline (method: consensus_offline)
+[2026-02-05T15:09:33.930744]   Failed to update database
+[2026-02-05T15:09:34.931179] 
+[9/23] Checking Chantellfloress (tiktok)
+[2026-02-05T15:09:35.082746]   Status: offline (method: fallback)
+[2026-02-05T15:09:39.281806]   Failed to update database
+[2026-02-05T15:09:40.282303] 
+[10/23] Checking WTFPreston (tiktok)
+[2026-02-05T15:09:40.408096]   Status: offline (method: fallback)
+[2026-02-05T15:09:44.645733]   Failed to update database
+[2026-02-05T15:09:45.646168] 
+[11/23] Checking WTFPreston (youtube)
+[2026-02-05T15:09:45.897383]   Status: offline (method: consensus_offline)
+[2026-02-05T15:09:50.139279]   Failed to update database
+[2026-02-05T15:09:51.139540] 
+[12/23] Checking Clavicular (kick)
+[2026-02-05T15:09:52.207222]   Status: offline (method: kick_api_v2_no_stream_allorigins)
+[2026-02-05T15:09:56.401380]   Failed to update database
+[2026-02-05T15:09:57.401626] 
+[13/23] Checking Clavicular (twitch)
+[2026-02-05T15:09:57.543157]   Status: offline (method: consensus_offline)
+[2026-02-05T15:10:01.742179]   Failed to update database
+[2026-02-05T15:10:02.742286] 
+[14/23] Checking The Benji Show (tiktok)
+[2026-02-05T15:10:02.871659]   Status: offline (method: fallback)
+[2026-02-05T15:10:07.047798]   Failed to update database
+[2026-02-05T15:10:08.048051] 
+[15/23] Checking Zarthestar (tiktok)
+[2026-02-05T15:10:08.187893]   Status: offline (method: fallback)
+[2026-02-05T15:10:12.395314]   Failed to update database
+[2026-02-05T15:10:13.395804] 
+[16/23] Checking Adin Ross (kick)
+[2026-02-05T15:10:14.329513]   Status: offline (method: kick_api_v2_no_stream_direct)
+[2026-02-05T15:10:18.515655]   Failed to update database
+[2026-02-05T15:10:19.515984] 
+[17/23] Checking Adin Ross (youtube)
+[2026-02-05T15:10:19.790719]   Status: offline (method: consensus_offline)
+[2026-02-05T15:10:23.979220]   Failed to update database
+[2026-02-05T15:10:24.979419] 
+[18/23] Checking Starfireara (tiktok)
+[2026-02-05T15:10:25.100386]   Status: offline (method: fallback)
+[2026-02-05T15:10:29.303457]   Failed to update database
+[2026-02-05T15:10:30.303596] 
+[19/23] Checking Chavcriss (tiktok)
+[2026-02-05T15:10:30.437307]   Status: offline (method: fallback)
+[2026-02-05T15:10:34.614399]   Failed to update database
+[2026-02-05T15:10:35.614483] 
+[20/23] Checking Chavcriss (youtube)
+[2026-02-05T15:10:35.749814]   Status: offline (method: fallback)
+[2026-02-05T15:10:39.950281]   Failed to update database
+[2026-02-05T15:10:40.950577] 
+[21/23] Checking Jubal Fresh (youtube)
+[2026-02-05T15:10:41.162049]   Status: offline (method: consensus_offline)
+[2026-02-05T15:10:45.398619]   Failed to update database
+[2026-02-05T15:10:46.399102] 
+[22/23] Checking Jubal Fresh (tiktok)
+[2026-02-05T15:10:46.506040]   Status: offline (method: fallback)
+[2026-02-05T15:10:50.675953]   Failed to update database
+[2026-02-05T15:10:51.676367] 
+[23/23] Checking Clip2prankmain (tiktok)
+[2026-02-05T15:10:51.813522]   Status: offline (method: fallback)
+[2026-02-05T15:10:56.009284]   Failed to update database
+[2026-02-05T15:10:57.010322] 
+============================================================
+[2026-02-05T15:10:57.010348] Check complete!
+[2026-02-05T15:10:57.010357] Total: 23
+[2026-02-05T15:10:57.010359] Live: 0
+[2026-02-05T15:10:57.010362] Offline: 23
+[2026-02-05T15:10:57.010363] Errors: 0
+[2026-02-05T15:10:57.010365] Updated: 0
+[2026-02-05T15:10:57.010367] ============================================================

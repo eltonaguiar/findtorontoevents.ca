@@ -82,6 +82,16 @@ if ($query && $query->num_rows > 0) {
             $deduped[] = $c;
         }
         $creators = $deduped;
+
+        // Exclude starfireara (data is incorrect)
+        $filtered_creators = array();
+        foreach ($creators as $c) {
+            $name = isset($c['name']) ? strtolower(trim($c['name'])) : '';
+            if ($name === 'starfireara') continue;
+            $filtered_creators[] = $c;
+        }
+        $creators = $filtered_creators;
+        $log .= "After starfireara exclusion: " . count($creators) . " creators\n";
         // Also dedupe by name so same person with different ids (e.g. duplicate Tony Robbins) appears once
         $seen_names = array();
         $by_name = array();
@@ -191,6 +201,9 @@ if ($guest_query) {
         $cid = isset($row['id']) ? $row['id'] : '';
         if ($cid !== '' && isset($seen_ids[$cid])) continue;
         if ($cid !== '') $seen_ids[$cid] = true;
+    // Skip starfireara (data is incorrect)
+        if (strtolower(trim($row['name'])) === 'starfireara') continue;
+        
         $creators[] = array(
             'id' => $row['id'],
             'name' => $row['name'],

@@ -4,8 +4,8 @@
 
 // Google OAuth Credentials
 // From: https://console.cloud.google.com/apis/credentials
-define('GOOGLE_CLIENT_ID', '975574174292-n332bled0ud1bc51v1hcqpnmp8dass12.apps.googleusercontent.com');
-define('GOOGLE_CLIENT_SECRET', ''); // <-- Fill in your Client Secret (needed for callback)
+define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID') ?: '');
+define('GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: '');
 
 // Database credentials (if needed)
 define('DB_HOST', 'mysql.50webs.com');

@@ -57,7 +57,7 @@ export async function getStreamerLastSeen(options?: {
   if (options?.live_only) params.append('live_only', '1');
   if (options?.since_minutes) params.append('since_minutes', String(options.since_minutes));
   
-  const url = `${API_BASE}/public/api/get_streamer_last_seen.php?${params.toString()}`;
+  const url = `${API_BASE}/api/get_streamer_last_seen.php?${params.toString()}`;
   
   const response = await fetch(url, {
     headers: {
@@ -92,7 +92,7 @@ export async function updateStreamerLastSeen(data: {
   record_id?: number;
   error?: string;
 }> {
-  const url = `${API_BASE}/public/api/update_streamer_last_seen.php`;
+  const url = `${API_BASE}/api/update_streamer_last_seen.php`;
   
   const payload = {
     ...data,
@@ -145,7 +145,7 @@ export async function batchUpdateStreamerLastSeen(
   }>;
   error?: string;
 }> {
-  const url = `${API_BASE}/public/api/batch_update_streamer_last_seen.php`;
+  const url = `${API_BASE}/api/batch_update_streamer_last_seen.php`;
   
   const response = await fetch(url, {
     method: 'POST',

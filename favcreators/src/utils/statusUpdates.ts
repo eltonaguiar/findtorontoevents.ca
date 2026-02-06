@@ -135,7 +135,7 @@ export async function getStatusUpdates(options?: {
   if (options?.since_hours) params.append('since_hours', String(options.since_hours));
   if (options?.limit) params.append('limit', String(options.limit));
 
-  const url = `${API_BASE}/public/api/status_updates.php?${params.toString()}`;
+  const url = `${API_BASE}/api/status_updates.php?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: { 'Accept': 'application/json' }
@@ -182,7 +182,7 @@ export async function saveStatusUpdate(data: {
   }>;
   errors?: Array<{ error: string }>;
 }> {
-  const url = `${API_BASE}/public/api/update_creator_status.php`;
+  const url = `${API_BASE}/api/update_creator_status.php`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -227,7 +227,7 @@ export async function batchSaveStatusUpdates(
   processed?: number;
   errors?: Array<{ error: string; index: number }>;
 }> {
-  const url = `${API_BASE}/public/api/update_creator_status.php`;
+  const url = `${API_BASE}/api/update_creator_status.php`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -274,7 +274,7 @@ export async function fetchPlatformStatus(
   if (options?.creator_id) params.append('creator_id', options.creator_id);
   if (options?.creator_name) params.append('creator_name', options.creator_name);
 
-  const url = `${API_BASE}/public/api/fetch_platform_status.php?${params.toString()}`;
+  const url = `${API_BASE}/api/fetch_platform_status.php?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: { 'Accept': 'application/json' }

@@ -1,0 +1,243 @@
+{
+  "checked_at": "2026-02-05T15:08:40.631699",
+  "checker": "github-actions@findtorontoevents.ca",
+  "streamers": [
+    {
+      "creator_id": "d76f1c8d-387b-48c9-8d48-6f8ba7c8626f",
+      "creator_name": "Autsyn",
+      "platform": "kick",
+      "username": "autsyn",
+      "is_live": false,
+      "method": "kick_api_v2_no_stream_allorigins",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "d76f1c8d-387b-48c9-8d48-6f8ba7c8626f",
+      "creator_name": "Autsyn",
+      "platform": "twitch",
+      "username": "autsyn",
+      "is_live": false,
+      "method": "consensus_offline",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "d76f1c8d-387b-48c9-8d48-6f8ba7c8626f",
+      "creator_name": "Autsyn",
+      "platform": "youtube",
+      "username": "autsyn",
+      "is_live": false,
+      "method": "consensus_offline",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "d76f1c8d-387b-48c9-8d48-6f8ba7c8626f",
+      "creator_name": "Autsyn",
+      "platform": "tiktok",
+      "username": "autsyn",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "39c7c909-42fc-464f-b3db-1e1646ccc3d0",
+      "creator_name": "Tony Robbins",
+      "platform": "kick",
+      "username": "tonyrobbins",
+      "is_live": false,
+      "method": "kick_html_no_live_indicators",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "39c7c909-42fc-464f-b3db-1e1646ccc3d0",
+      "creator_name": "Tony Robbins",
+      "platform": "twitch",
+      "username": "tonyrobbins",
+      "is_live": false,
+      "method": "consensus_offline",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "39c7c909-42fc-464f-b3db-1e1646ccc3d0",
+      "creator_name": "Tony Robbins",
+      "platform": "youtube",
+      "username": "tonyrobbins",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "39c7c909-42fc-464f-b3db-1e1646ccc3d0",
+      "creator_name": "Tony Robbins",
+      "platform": "tiktok",
+      "username": "tonyrobbins",
+      "is_live": false,
+      "method": "consensus_offline",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "chantellfloress-tiktok",
+      "creator_name": "Chantellfloress",
+      "platform": "tiktok",
+      "username": "chantellfloress",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "wtfpreston-1",
+      "creator_name": "WTFPreston",
+      "platform": "tiktok",
+      "username": "wtfprestonlive",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "wtfpreston-1",
+      "creator_name": "WTFPreston",
+      "platform": "youtube",
+      "username": "wtfprestonlive",
+      "is_live": false,
+      "method": "consensus_offline",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "clavicular-1",
+      "creator_name": "Clavicular",
+      "platform": "kick",
+      "username": "clavicular",
+      "is_live": false,
+      "method": "kick_api_v2_no_stream_allorigins",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "clavicular-1",
+      "creator_name": "Clavicular",
+      "platform": "twitch",
+      "username": "clavicular",
+      "is_live": false,
+      "method": "consensus_offline",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "thebenjishow-1",
+      "creator_name": "The Benji Show",
+      "platform": "tiktok",
+      "username": "thebenjishow",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "zarthestar-1",
+      "creator_name": "Zarthestar",
+      "platform": "tiktok",
+      "username": "zarthestarcomedy",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "3",
+      "creator_name": "Adin Ross",
+      "platform": "kick",
+      "username": "adinross",
+      "is_live": false,
+      "method": "kick_api_v2_no_stream_direct",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "3",
+      "creator_name": "Adin Ross",
+      "platform": "youtube",
+      "username": "adinross",
+      "is_live": false,
+      "method": "consensus_offline",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "6",
+      "creator_name": "Starfireara",
+      "platform": "tiktok",
+      "username": "starfireara",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "chavcriss-1",
+      "creator_name": "Chavcriss",
+      "platform": "tiktok",
+      "username": "chavcriss",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "chavcriss-1",
+      "creator_name": "Chavcriss",
+      "platform": "youtube",
+      "username": "chavcriss",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "jubalfresh-1",
+      "creator_name": "Jubal Fresh",
+      "platform": "youtube",
+      "username": "jubalfresh",
+      "is_live": false,
+      "method": "consensus_offline",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "jubalfresh-1",
+      "creator_name": "Jubal Fresh",
+      "platform": "tiktok",
+      "username": "jubalfresh",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    },
+    {
+      "creator_id": "clip2prankmain-1",
+      "creator_name": "Clip2prankmain",
+      "platform": "tiktok",
+      "username": "clip2prankmain",
+      "is_live": false,
+      "method": "fallback",
+      "success": true,
+      "updated": false
+    }
+  ],
+  "summary": {
+    "total": 23,
+    "live": 0,
+    "offline": 23,
+    "errors": 0,
+    "updated": 0
+  }
+}

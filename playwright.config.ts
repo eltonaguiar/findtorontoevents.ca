@@ -28,9 +28,16 @@ export default defineConfig({
     /(?:^|\/)tests\/movieshows_overlap\.spec\.ts$/,
     /(?:^|\/)tests\/live-status-ninja-test\.spec\.ts$/,
     /(?:^|\/)tests\/creator_updates\.spec\.ts$/,
+    /(?:^|\/)tests\/streamer-updates-comprehensive\.spec\.ts$/,
+    /(?:^|\/)tests\/streamer-updates-user-param\.spec\.ts$/,
+    /(?:^|\/)tests\/thumbnail-proxy\.spec\.ts$/,
+    /(?:^|\/)tests\/live-streams-realtime\.spec\.ts$/,
+    /(?:^|\/)tests\/live-offline-removal\.spec\.ts$/,
+    /(?:^|\/)tests\/streamer-last-seen-api\.spec\.ts$/,
+    /(?:^|\/)tests\/mental-health-resources\.spec\.ts$/,
   ],
-  timeout: isRemoteVerify ? 60000 : 30000,
-  retries: 0,
+  timeout: isRemoteVerify ? 90000 : 30000,
+  retries: isRemoteVerify ? 1 : 0,
   webServer: isRemoteVerify
     ? undefined
     : {

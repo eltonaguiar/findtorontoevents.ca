@@ -7,6 +7,7 @@ import EditCreatorModal from "./components/EditCreatorModal";
 import MyLinkLists from "./components/MyLinkLists";
 import LiveSummary from "./components/LiveSummary";
 import AdSense from "./components/AdSense";
+import BulkAvatarManager from "./components/BulkAvatarManager";
 import type { LiveCreator } from "./types";
 import { googleSearchYoutubeChannel } from "./utils/googleSearch";
 import {
@@ -747,6 +748,7 @@ function App() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkApplyCategory, setBulkApplyCategory] = useState("");
   const [editingCreator, setEditingCreator] = useState<Creator | null>(null);
+  const [showBulkAvatarManager, setShowBulkAvatarManager] = useState(false);
 
   // Admin: creators followed by all users (for impact visibility)
   type FollowedCreator = { creator_id: string; name: string; follower_count: number; in_guest_list: boolean };
@@ -1557,41 +1559,92 @@ function App() {
         }
 
         const anyAccountLive = updatedAccounts.some((acc) => acc.isLive === true);
-        updatedCreators.push({
+        const updatedCreator = {
           ...c,
           isLive: anyAccountLive,
           accounts: updatedAccounts,
           lastChecked: now,
-        });
+        };
+        updatedCreators.push(updatedCreator);
+
+        // UPDATE LIVE CREATORS LIST IN REAL-TIME
+        // Build live entries for this creator and update state immediately
+        if (anyAccountLive || updatedAccounts.some((acc) => acc.hasStory)) {
+          setLiveCreators((currentLiveCreators) => {
+            // Remove any existing entries for this creator to avoid duplicates
+            const filtered = currentLiveCreators.filter(
+              (lc) => lc.creator.id !== updatedCreator.id
+            );
+            
+            // Add new live entries for this creator
+            const newEntries: LiveCreator[] = [];
+            updatedCreator.accounts.forEach((account) => {
+              if (account.isLive) {
+                newEntries.push({
+                  creator: updatedCreator,
+                  platform: account.platform,
+                  accountUrl: account.url,
+                  status: 'live',
+                  startedAt: account.liveStartedAt,
+                });
+              }
+              if (account.hasStory) {
+                newEntries.push({
+                  creator: updatedCreator,
+                  platform: account.platform,
+                  accountUrl: account.url,
+                  status: 'story',
+                  storyCount: account.storyCount,
+                  postedAt: account.storyPostedAt,
+                });
+              }
+            });
+            
+            return [...filtered, ...newEntries];
+          });
+        } else {
+          // CREATOR IS OFFLINE - Remove from live creators list immediately
+          setLiveCreators((currentLiveCreators) => {
+            const filtered = currentLiveCreators.filter(
+              (lc) => lc.creator.id !== updatedCreator.id
+            );
+            // Only update if there was actually a change
+            if (filtered.length !== currentLiveCreators.length) {
+              console.log(`[Live Check] ${updatedCreator.name} went offline - removing from live list`);
+              return filtered;
+            }
+            return currentLiveCreators;
+          });
+        }
       }
 
-      // Build live creators list for LiveSummary
-      const newLiveCreators: LiveCreator[] = [];
-      updatedCreators.forEach(creator => {
-        creator.accounts.forEach(account => {
+      // Final update to ensure consistency after all creators processed
+      const finalLiveCreators: LiveCreator[] = [];
+      updatedCreators.forEach((creator) => {
+        creator.accounts.forEach((account) => {
           if (account.isLive) {
-            newLiveCreators.push({
+            finalLiveCreators.push({
               creator,
               platform: account.platform,
               accountUrl: account.url,
               status: 'live',
-              startedAt: account.liveStartedAt
+              startedAt: account.liveStartedAt,
             });
           }
           if (account.hasStory) {
-            newLiveCreators.push({
+            finalLiveCreators.push({
               creator,
               platform: account.platform,
               accountUrl: account.url,
               status: 'story',
               storyCount: account.storyCount,
-              postedAt: account.storyPostedAt
+              postedAt: account.storyPostedAt,
             });
           }
         });
       });
 
-      setLiveCreators(newLiveCreators);
+      setLiveCreators(finalLiveCreators);
 
       // Debug: Log what we're about to set
       const liveCount = updatedCreators.filter(c => c.isLive).length;
@@ -2590,6 +2643,23 @@ function App() {
     );
   };
 
+  // Handle bulk avatar updates from BulkAvatarManager
+  const handleBulkAvatarSave = (updates: { id: string; avatarUrl: string; source: string }[]) => {
+    if (updates.length === 0) return;
+    
+    const next = creators.map((c) => {
+      const update = updates.find(u => u.id === c.id);
+      if (update) {
+        return { ...c, avatarUrl: update.avatarUrl, selectedAvatarSource: update.source };
+      }
+      return c;
+    });
+    
+    setCreators(next);
+    void saveCreatorsToBackend(next);
+    console.log(`[BULK AVATAR] Updated ${updates.length} creators`);
+  };
+
   // Render view mode toggle
   const renderViewModeToggle = () => (
     <div
@@ -3004,11 +3074,27 @@ function App() {
           </div>
         </div>
       </header>
-      <div className="avatar-status" aria-live="polite">
+      <div className="avatar-status" aria-live="polite" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
         <span>Real avatars fetched:</span>
         <strong>{realAvatarCount}</strong>
         <span> of </span>
         <strong>{creators.length}</strong>
+        <button
+          onClick={() => setShowBulkAvatarManager(true)}
+          style={{
+            marginLeft: "12px",
+            padding: "6px 14px",
+            backgroundColor: "#6366f1",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "13px",
+            fontWeight: "500",
+          }}
+        >
+          🎨 Manage Avatars
+        </button>
       </div>
 
       {renderViewModeToggle()}
@@ -3713,6 +3799,14 @@ function App() {
             setEditingCreator(null);
           }}
           onClose={() => setEditingCreator(null)}
+        />
+      )}
+
+      {showBulkAvatarManager && (
+        <BulkAvatarManager
+          creators={creators}
+          onSave={handleBulkAvatarSave}
+          onClose={() => setShowBulkAvatarManager(false)}
         />
       )}
 
