@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe VR - Game Arena | Toronto Events</title>
+  <script src="/vr/https-redirect.js"></script>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+
+  <script>
+    AFRAME.registerComponent('look-at-camera', {
+      tick: function () {
+        var cam = this.el.sceneEl.camera;
+        if (cam) this.el.object3D.lookAt(cam.getWorldPosition(new THREE.Vector3()));
+      }
+    });
+  </script>
+
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Inter', -apple-system, sans-serif; }
+    #loading {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #0a0a1f 0%, #1a0a2e 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; color: white; transition: opacity 0.5s;
+    }
+    #loading h1 {
+      font-size: 2.5rem; margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    #loading p { color: #888; font-size: 1.1rem; }
+    .spinner {
+      width: 60px; height: 60px; border: 4px solid rgba(99,102,241,0.3);
+      border-top-color: #6366f1; border-radius: 50%;
+      animation: spin 1s linear infinite; margin-bottom: 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+
+    /* HUD */
+    #hud {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 200; display: flex; gap: 12px; align-items: center;
+    }
+    .hud-card {
+      background: rgba(10,10,30,0.88); backdrop-filter: blur(10px);
+      border: 1px solid rgba(99,102,241,0.4); border-radius: 14px;
+      padding: 10px 20px; color: white; text-align: center; font-size: 14px;
+    }
+    .hud-card.player-x { border-color: rgba(99,102,241,0.6); }
+    .hud-card.player-o { border-color: rgba(236,72,153,0.6); }
+    .hud-card.active { box-shadow: 0 0 20px rgba(99,102,241,0.4); }
+    .hud-card h3 { margin: 0; font-size: 13px; }
+    .hud-card .mark { font-size: 28px; font-weight: 800; }
+    .hud-card .mark.x { color: #6366f1; }
+    .hud-card .mark.o { color: #ec4899; }
+    .hud-vs { font-size: 18px; font-weight: 800; color: #666; }
+    #hud-status {
+      position: fixed; top: 90px; left: 50%; transform: translateX(-50%);
+      z-index: 200; background: rgba(10,10,30,0.88); backdrop-filter: blur(10px);
+      border: 1px solid rgba(168,85,247,0.3); border-radius: 12px;
+      padding: 8px 24px; color: #a855f7; font-size: 15px; font-weight: 600;
+      text-align: center; transition: all 0.3s;
+    }
+
+    /* Buttons */
+    .btn-bar {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 200; display: flex; gap: 10px;
+    }
+    .btn {
+      padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s; color: white;
+    }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #a855f7); }
+    .btn-primary:hover { box-shadow: 0 4px 15px rgba(99,102,241,0.4); transform: translateY(-1px); }
+    .btn-danger { background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); color: #ef4444; }
+    .btn-danger:hover { background: rgba(239,68,68,0.3); }
+    .btn-secondary { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+    /* Win overlay */
+    #win-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: white; opacity: 0; pointer-events: none; transition: opacity 0.4s;
+    }
+    #win-overlay.active { opacity: 1; pointer-events: all; }
+    #win-overlay h1 { font-size: 3rem; margin-bottom: 0.5rem; }
+    #win-overlay p { font-size: 1.2rem; color: #aaa; margin-bottom: 1.5rem; }
+    #win-overlay .btn-bar { position: static; transform: none; }
+
+    /* Toast */
+    #toast-container {
+      position: fixed; top: 130px; right: 16px; z-index: 9000;
+      display: flex; flex-direction: column; gap: 8px; max-width: 300px;
+    }
+    .toast {
+      background: rgba(10,10,30,0.9); border: 1px solid rgba(99,102,241,0.5);
+      border-radius: 12px; padding: 12px 16px; color: white;
+      animation: toastIn 0.3s ease-out; font-size: 13px;
+    }
+    @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } }
+    .toast-title { font-weight: 700; margin-bottom: 2px; }
+    .toast-msg { color: #aaa; font-size: 12px; }
+    .toast-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .toast-btn { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; }
+    .toast-btn.accept { background: #22c55e; color: white; }
+    .toast-btn.decline { background: rgba(255,255,255,0.1); color: #aaa; }
+  </style>
+</head>
+<body>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <h1>Tic-Tac-Toe</h1>
+    <p>Setting up the board...</p>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-card player-x active" id="hud-x">
+      <div class="mark x">X</div>
+      <h3 id="name-x">You</h3>
+    </div>
+    <div class="hud-vs">VS</div>
+    <div class="hud-card player-o" id="hud-o">
+      <div class="mark o">O</div>
+      <h3 id="name-o">AI</h3>
+    </div>
+  </div>
+  <div id="hud-status">Your turn - Click a cell!</div>
+
+  <!-- Buttons -->
+  <div class="btn-bar" id="game-btns">
+    <button class="btn btn-primary" onclick="resetGame()">New Game</button>
+    <button class="btn btn-danger" onclick="abandonMatch()">Abandon</button>
+    <a class="btn btn-secondary" href="/vr/game-arena/">Back to Arena</a>
+  </div>
+
+  <!-- Win overlay -->
+  <div id="win-overlay">
+    <h1 id="win-title">You Win!</h1>
+    <p id="win-subtitle">Great game!</p>
+    <div class="btn-bar">
+      <button class="btn btn-primary" onclick="resetGame()">Play Again</button>
+      <a class="btn btn-secondary" href="/vr/game-arena/">Back to Arena</a>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast-container"></div>
+
+  <!-- A-FRAME SCENE -->
+  <a-scene
+    renderer="antialias: true; colorManagement: true; sortTransparentObjects: true"
+    vr-mode-ui="enabled: true"
+    loading-screen="enabled: false"
+    cursor="rayOrigin: mouse; fuse: false"
+    raycaster="objects: .clickable"
+  >
+    <a-assets></a-assets>
+
+    <a-entity environment="
+      preset: starry;
+      groundColor: #0a0a1f;
+      groundTexture: none;
+      dressing: none;
+      skyType: atmosphere;
+      skyColor: #050510;
+      horizonColor: #0a0a2e;
+      fog: 0.3"></a-entity>
+
+    <!-- Floor -->
+    <a-cylinder position="0 -0.05 0" radius="12" height="0.1" color="#0a0a1f" opacity="0.9"></a-cylinder>
+    <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="4" radius-outer="4.1" color="#6366f1" opacity="0.4"
+            animation="property: rotation; to: -90 360 0; dur: 30000; loop: true; easing: linear"></a-ring>
+
+    <!-- ===== 3D TIC-TAC-TOE BOARD ===== -->
+    <a-entity id="ttt-board" position="0 1.5 -3">
+      <!-- Board frame - grid lines -->
+      <!-- Vertical lines -->
+      <a-box position="-0.55 0 0" width="0.06" height="3.4" depth="0.06" color="#6366f1" opacity="0.8"></a-box>
+      <a-box position="0.55 0 0" width="0.06" height="3.4" depth="0.06" color="#6366f1" opacity="0.8"></a-box>
+      <!-- Horizontal lines -->
+      <a-box position="0 -0.55 0" width="3.4" height="0.06" depth="0.06" color="#6366f1" opacity="0.8"></a-box>
+      <a-box position="0 0.55 0" width="3.4" height="0.06" depth="0.06" color="#6366f1" opacity="0.8"></a-box>
+      <!-- Back panel glow -->
+      <a-plane position="0 0 -0.1" width="3.6" height="3.6" color="#0a0a2e" opacity="0.6" material="shader: flat"></a-plane>
+
+      <!-- 9 Clickable cells (row 0 = top, row 2 = bottom) -->
+      <!-- Row 0 (top) -->
+      <a-plane class="clickable cell" data-cell="0" position="-1.1 1.1 0.01" width="1" height="1" color="#1a1a3e" opacity="0.5" material="shader: flat"></a-plane>
+      <a-plane class="clickable cell" data-cell="1" position="0 1.1 0.01" width="1" height="1" color="#1a1a3e" opacity="0.5" material="shader: flat"></a-plane>
+      <a-plane class="clickable cell" data-cell="2" position="1.1 1.1 0.01" width="1" height="1" color="#1a1a3e" opacity="0.5" material="shader: flat"></a-plane>
+      <!-- Row 1 (mid) -->
+      <a-plane class="clickable cell" data-cell="3" position="-1.1 0 0.01" width="1" height="1" color="#1a1a3e" opacity="0.5" material="shader: flat"></a-plane>
+      <a-plane class="clickable cell" data-cell="4" position="0 0 0.01" width="1" height="1" color="#1a1a3e" opacity="0.5" material="shader: flat"></a-plane>
+      <a-plane class="clickable cell" data-cell="5" position="1.1 0 0.01" width="1" height="1" color="#1a1a3e" opacity="0.5" material="shader: flat"></a-plane>
+      <!-- Row 2 (bottom) -->
+      <a-plane class="clickable cell" data-cell="6" position="-1.1 -1.1 0.01" width="1" height="1" color="#1a1a3e" opacity="0.5" material="shader: flat"></a-plane>
+      <a-plane class="clickable cell" data-cell="7" position="0 -1.1 0.01" width="1" height="1" color="#1a1a3e" opacity="0.5" material="shader: flat"></a-plane>
+      <a-plane class="clickable cell" data-cell="8" position="1.1 -1.1 0.01" width="1" height="1" color="#1a1a3e" opacity="0.5" material="shader: flat"></a-plane>
+
+      <!-- Cell marks container -->
+      <a-entity id="marks-container"></a-entity>
+
+      <!-- Win line (hidden initially) -->
+      <a-entity id="win-line" visible="false">
+        <a-box id="win-line-box" width="0.08" height="3.4" depth="0.08" color="#22c55e" opacity="0.9"
+               animation="property: material.opacity; from: 0.3; to: 0.9; dur: 500; dir: alternate; loop: true"></a-box>
+      </a-entity>
+    </a-entity>
+
+    <!-- Title -->
+    <a-entity position="0 4.2 -3" look-at-camera>
+      <a-text value="TIC-TAC-TOE" align="center" width="8" color="#6366f1" font="mozillavr"></a-text>
+    </a-entity>
+
+    <!-- Score panel -->
+    <a-entity position="3.5 2 -2.5" rotation="0 -30 0">
+      <a-plane width="2.5" height="2" color="#0a0a1f" opacity="0.9" material="shader: flat">
+        <a-plane width="2.3" height="1.8" color="#111128" opacity="0.95" position="0 0 0.01" material="shader: flat"></a-plane>
+      </a-plane>
+      <a-text value="SCORE" align="center" width="3" color="#a855f7" position="0 0.6 0.05" font="mozillavr"></a-text>
+      <a-text id="score-x-label" value="X (You): 0" align="left" width="2.5" color="#6366f1" position="-0.9 0.15 0.05"></a-text>
+      <a-text id="score-o-label" value="O (AI): 0" align="left" width="2.5" color="#ec4899" position="-0.9 -0.2 0.05"></a-text>
+      <a-text id="score-draw-label" value="Draws: 0" align="left" width="2.5" color="#888" position="-0.9 -0.55 0.05"></a-text>
+    </a-entity>
+
+    <!-- Decorative particles -->
+    <a-sphere position="-6 3 -6" radius="0.1" color="#6366f1" opacity="0.5"
+              animation="property: position; to: -6 5 -6; dur: 4000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="6 4 -4" radius="0.08" color="#ec4899" opacity="0.4"
+              animation="property: position; to: 6 6 -4; dur: 3500; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="0 2 -8" radius="0.12" color="#a855f7" opacity="0.3"
+              animation="property: position; to: 0 4 -8; dur: 5000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+
+    <!-- Lighting -->
+    <a-light type="ambient" color="#303060" intensity="0.4"></a-light>
+    <a-light type="point" position="0 5 -2" color="#6366f1" intensity="0.8" distance="15"></a-light>
+    <a-light type="point" position="-3 3 -3" color="#a855f7" intensity="0.4" distance="10"></a-light>
+    <a-light type="point" position="3 3 -3" color="#ec4899" intensity="0.4" distance="10"></a-light>
+
+    <!-- Camera Rig -->
+    <a-entity id="rig" position="0 1.6 2">
+      <a-camera look-controls wasd-controls="acceleration: 30" fov="80">
+        <a-ring cursor="fuse: true; fuseTimeout: 1500"
+                raycaster="objects: .clickable; far: 20"
+                radius-inner="0.005" radius-outer="0.012"
+                color="#6366f1" shader="flat" position="0 0 -1"
+                animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 200"
+                animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.5 0.5 0.5; dur: 1500; easing: linear"
+                animation__mouseleave="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 200"></a-ring>
+      </a-camera>
+      <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20; lineColor: #6366f1; lineOpacity: 0.5" cursor="rayOrigin: entity; fuse: false"></a-entity>
+      <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20; lineColor: #a855f7; lineOpacity: 0.5" cursor="rayOrigin: entity; fuse: false"></a-entity>
+    </a-entity>
+  </a-scene>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // ===== LOADING =====
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var el = document.getElementById('loading');
+        el.style.opacity = '0';
+        setTimeout(function () { el.classList.add('hidden'); }, 500);
+      }, 1000);
+    });
+
+    // ===== STATE =====
+    var STORAGE_KEY = 'gameArena';
+    var arenaState = (function() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { return {}; }
+    })();
+    var playerName = arenaState.playerName || 'You';
+
+    // Check for opponent from URL
+    var params = new URLSearchParams(window.location.search);
+    var opponentName = params.get('opponent') || 'AI';
+    var isAI = !params.get('opponent');
+
+    // Update HUD names
+    document.getElementById('name-x').textContent = playerName;
+    document.getElementById('name-o').textContent = opponentName;
+
+    // Game state
+    var board = [null, null, null, null, null, null, null, null, null];
+    var currentPlayer = 'X'; // X always goes first
+    var gameOver = false;
+    var scoreX = 0, scoreO = 0, scoreDraw = 0;
+
+    // Cell positions (matching A-Frame layout)
+    var CELL_POS = [
+      { x: -1.1, y: 1.1 }, { x: 0, y: 1.1 }, { x: 1.1, y: 1.1 },
+      { x: -1.1, y: 0 },   { x: 0, y: 0 },   { x: 1.1, y: 0 },
+      { x: -1.1, y: -1.1 }, { x: 0, y: -1.1 }, { x: 1.1, y: -1.1 }
+    ];
+
+    var WIN_LINES = [
+      [0,1,2], [3,4,5], [6,7,8], // rows
+      [0,3,6], [1,4,7], [2,5,8], // cols
+      [0,4,8], [2,4,6]            // diags
+    ];
+
+    // ===== CELL CLICK HANDLER =====
+    function setupCells() {
+      document.querySelectorAll('.cell').forEach(function(cell) {
+        cell.addEventListener('click', function() {
+          var idx = parseInt(cell.getAttribute('data-cell'));
+          handleMove(idx);
+        });
+        // Hover effect
+        cell.addEventListener('mouseenter', function() {
+          if (!gameOver && board[parseInt(cell.getAttribute('data-cell'))] === null && currentPlayer === 'X') {
+            cell.setAttribute('material', 'opacity', 0.8);
+            cell.setAttribute('color', '#252550');
+          }
+        });
+        cell.addEventListener('mouseleave', function() {
+          if (board[parseInt(cell.getAttribute('data-cell'))] === null) {
+            cell.setAttribute('material', 'opacity', 0.5);
+            cell.setAttribute('color', '#1a1a3e');
+          }
+        });
+      });
+    }
+
+    function handleMove(idx) {
+      if (gameOver || board[idx] !== null || currentPlayer !== 'X') return;
+
+      // Player move
+      placeMarker(idx, 'X');
+      board[idx] = 'X';
+
+      if (checkWin('X')) {
+        endGame('win', 'X');
+        return;
+      }
+      if (isBoardFull()) {
+        endGame('draw');
+        return;
+      }
+
+      // Switch to O
+      currentPlayer = 'O';
+      updateTurnHUD();
+      setStatus(opponentName + ' is thinking...');
+
+      // AI/simulated opponent move
+      setTimeout(function() {
+        if (gameOver) return;
+        var move = isAI ? getAIMove() : getAIMove(); // Both use AI logic for now
+        if (move !== -1) {
+          placeMarker(move, 'O');
+          board[move] = 'O';
+
+          if (checkWin('O')) {
+            endGame('loss', 'O');
+            return;
+          }
+          if (isBoardFull()) {
+            endGame('draw');
+            return;
+          }
+        }
+        currentPlayer = 'X';
+        updateTurnHUD();
+        setStatus('Your turn - Click a cell!');
+      }, 600 + Math.random() * 800);
+    }
+
+    // ===== PLACE 3D MARKER =====
+    function placeMarker(idx, mark) {
+      var container = document.getElementById('marks-container');
+      var pos = CELL_POS[idx];
+
+      if (mark === 'X') {
+        // Create 3D X using two crossed boxes
+        var xEntity = document.createElement('a-entity');
+        xEntity.setAttribute('position', pos.x + ' ' + pos.y + ' 0.1');
+        xEntity.innerHTML =
+          '<a-box width="0.08" height="0.7" depth="0.08" color="#6366f1" rotation="0 0 45" opacity="0.95"' +
+          '  animation="property: scale; from: 0 0 0; to: 1 1 1; dur: 300; easing: easeOutBack"></a-box>' +
+          '<a-box width="0.08" height="0.7" depth="0.08" color="#6366f1" rotation="0 0 -45" opacity="0.95"' +
+          '  animation="property: scale; from: 0 0 0; to: 1 1 1; dur: 300; easing: easeOutBack; delay: 100"></a-box>' +
+          '<a-light type="point" color="#6366f1" intensity="0.3" distance="2"></a-light>';
+        container.appendChild(xEntity);
+      } else {
+        // Create 3D O using torus
+        var oEntity = document.createElement('a-entity');
+        oEntity.setAttribute('position', pos.x + ' ' + pos.y + ' 0.1');
+        oEntity.innerHTML =
+          '<a-torus radius="0.28" radius-tubular="0.04" color="#ec4899" opacity="0.95" segments-radial="32" segments-tubular="16"' +
+          '  animation="property: scale; from: 0 0 0; to: 1 1 1; dur: 300; easing: easeOutBack"></a-torus>' +
+          '<a-light type="point" color="#ec4899" intensity="0.3" distance="2"></a-light>';
+        container.appendChild(oEntity);
+      }
+
+      // Mark cell as taken (change color)
+      var cell = document.querySelector('.cell[data-cell="' + idx + '"]');
+      if (cell) {
+        cell.setAttribute('color', mark === 'X' ? '#1a1a4e' : '#2e1a2e');
+        cell.setAttribute('material', 'opacity', 0.3);
+      }
+    }
+
+    // ===== AI (Minimax) =====
+    function getAIMove() {
+      // Check for winning move
+      for (var i = 0; i < 9; i++) {
+        if (board[i] === null) {
+          board[i] = 'O';
+          if (checkWinFor('O')) { board[i] = null; return i; }
+          board[i] = null;
+        }
+      }
+      // Block player win
+      for (var i = 0; i < 9; i++) {
+        if (board[i] === null) {
+          board[i] = 'X';
+          if (checkWinFor('X')) { board[i] = null; return i; }
+          board[i] = null;
+        }
+      }
+      // Take center
+      if (board[4] === null) return 4;
+      // Take corner
+      var corners = [0, 2, 6, 8];
+      var available = corners.filter(function(c) { return board[c] === null; });
+      if (available.length > 0) return available[Math.floor(Math.random() * available.length)];
+      // Take any
+      var empty = [];
+      for (var i = 0; i < 9; i++) { if (board[i] === null) empty.push(i); }
+      return empty.length > 0 ? empty[Math.floor(Math.random() * empty.length)] : -1;
+    }
+
+    function checkWinFor(mark) {
+      return WIN_LINES.some(function(line) {
+        return board[line[0]] === mark && board[line[1]] === mark && board[line[2]] === mark;
+      });
+    }
+
+    function checkWin(mark) {
+      for (var i = 0; i < WIN_LINES.length; i++) {
+        var line = WIN_LINES[i];
+        if (board[line[0]] === mark && board[line[1]] === mark && board[line[2]] === mark) {
+          showWinLine(line);
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function isBoardFull() {
+      return board.every(function(c) { return c !== null; });
+    }
+
+    // ===== WIN LINE VISUALIZATION =====
+    function showWinLine(line) {
+      var p0 = CELL_POS[line[0]];
+      var p2 = CELL_POS[line[2]];
+      var cx = (p0.x + p2.x) / 2;
+      var cy = (p0.y + p2.y) / 2;
+      var dx = p2.x - p0.x;
+      var dy = p2.y - p0.y;
+      var len = Math.sqrt(dx * dx + dy * dy) + 0.5;
+      var angle = Math.atan2(dx, dy) * (180 / Math.PI);
+
+      var winLine = document.getElementById('win-line');
+      var box = document.getElementById('win-line-box');
+      winLine.setAttribute('position', cx + ' ' + cy + ' 0.15');
+      box.setAttribute('height', len);
+      winLine.setAttribute('rotation', '0 0 ' + (-angle));
+      winLine.setAttribute('visible', 'true');
+    }
+
+    // ===== END GAME =====
+    function endGame(result, winner) {
+      gameOver = true;
+      var overlay = document.getElementById('win-overlay');
+      var title = document.getElementById('win-title');
+      var sub = document.getElementById('win-subtitle');
+
+      if (result === 'win') {
+        title.textContent = 'You Win!';
+        title.style.color = '#22c55e';
+        sub.textContent = 'X wins the round!';
+        scoreX++;
+        recordMatch('win');
+      } else if (result === 'loss') {
+        title.textContent = opponentName + ' Wins!';
+        title.style.color = '#ef4444';
+        sub.textContent = 'O wins the round!';
+        scoreO++;
+        recordMatch('loss');
+      } else {
+        title.textContent = 'Draw!';
+        title.style.color = '#f59e0b';
+        sub.textContent = 'Nobody wins this round.';
+        scoreDraw++;
+        recordMatch('draw');
+      }
+
+      updateScorePanel();
+      setStatus(result === 'win' ? 'Victory!' : result === 'loss' ? 'Defeat!' : 'Draw!');
+
+      setTimeout(function() {
+        overlay.classList.add('active');
+      }, 800);
+    }
+
+    function recordMatch(result) {
+      try {
+        var s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        s.wins = (s.wins || 0) + (result === 'win' ? 1 : 0);
+        s.losses = (s.losses || 0) + (result === 'loss' ? 1 : 0);
+        s.draws = (s.draws || 0) + (result === 'draw' ? 1 : 0);
+        if (!s.matches) s.matches = [];
+        s.matches.push({ game: 'Tic-Tac-Toe', opponent: opponentName, result: result, time: Date.now() });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+      } catch(e) {}
+    }
+
+    function updateScorePanel() {
+      var sx = document.getElementById('score-x-label');
+      var so = document.getElementById('score-o-label');
+      var sd = document.getElementById('score-draw-label');
+      if (sx) sx.setAttribute('value', 'X (' + playerName + '): ' + scoreX);
+      if (so) so.setAttribute('value', 'O (' + opponentName + '): ' + scoreO);
+      if (sd) sd.setAttribute('value', 'Draws: ' + scoreDraw);
+    }
+
+    // ===== RESET =====
+    window.resetGame = function() {
+      board = [null, null, null, null, null, null, null, null, null];
+      currentPlayer = 'X';
+      gameOver = false;
+
+      // Clear marks
+      var container = document.getElementById('marks-container');
+      container.innerHTML = '';
+
+      // Reset cells
+      document.querySelectorAll('.cell').forEach(function(cell) {
+        cell.setAttribute('color', '#1a1a3e');
+        cell.setAttribute('material', 'opacity', 0.5);
+      });
+
+      // Hide win line
+      document.getElementById('win-line').setAttribute('visible', 'false');
+
+      // Hide overlay
+      document.getElementById('win-overlay').classList.remove('active');
+
+      updateTurnHUD();
+      setStatus('Your turn - Click a cell!');
+    };
+
+    window.abandonMatch = function() {
+      if (confirm('Abandon this match? It will count as a loss.')) {
+        recordMatch('loss');
+        scoreO++;
+        updateScorePanel();
+        window.location.href = '/vr/game-arena/';
+      }
+    };
+
+    // ===== HUD HELPERS =====
+    function updateTurnHUD() {
+      var hudX = document.getElementById('hud-x');
+      var hudO = document.getElementById('hud-o');
+      if (currentPlayer === 'X') {
+        hudX.classList.add('active');
+        hudO.classList.remove('active');
+        hudX.style.boxShadow = '0 0 20px rgba(99,102,241,0.4)';
+        hudO.style.boxShadow = 'none';
+      } else {
+        hudO.classList.add('active');
+        hudX.classList.remove('active');
+        hudO.style.boxShadow = '0 0 20px rgba(236,72,153,0.4)';
+        hudX.style.boxShadow = 'none';
+      }
+    }
+
+    function setStatus(text) {
+      document.getElementById('hud-status').textContent = text;
+    }
+
+    // ===== INCOMING CHALLENGE TOAST =====
+    var BOT_NAMES = ['MapleLeaf99','PuckMaster','CityExplorer','NightOwlTO','LakeShoreRun','QueenWestAce'];
+    function simulateChallenge() {
+      var delay = 25000 + Math.random() * 40000;
+      setTimeout(function() {
+        var challenger = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
+        var c = document.getElementById('toast-container');
+        var t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = '<div class="toast-title">' + challenger + ' wants to play!</div>'
+          + '<div class="toast-msg">Tic-Tac-Toe challenge</div>'
+          + '<div class="toast-actions">'
+          + '<button class="toast-btn accept" onclick="window.location.href=\'/vr/game-arena/tic-tac-toe.html?opponent=' + encodeURIComponent(challenger) + '\'">Accept</button>'
+          + '<button class="toast-btn decline" onclick="this.closest(\'.toast\').remove()">Decline</button>'
+          + '</div>';
+        c.appendChild(t);
+        setTimeout(function() { if (t.parentNode) { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(function(){ t.remove(); }, 300); } }, 10000);
+        simulateChallenge();
+      }, delay);
+    }
+
+    // ===== INIT =====
+    updateScorePanel();
+    setupCells();
+    simulateChallenge();
+  })();
+  </script>
+</body>
+</html>

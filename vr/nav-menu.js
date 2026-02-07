@@ -22,7 +22,7 @@
     { id: 'stocks',   name: 'Trading Floor',          emoji: '\uD83D\uDCC8', url: '/vr/stocks-zone.html',  color: '#22c55e' },
     { id: 'wellness', name: 'Wellness Garden',        emoji: '\uD83C\uDF3F', url: '/vr/wellness/',         color: '#f59e0b' },
     { id: 'weather',  name: 'Weather Observatory',    emoji: '\u26C5',       url: '/vr/weather-zone.html', color: '#06b6d4' },
-    { id: 'tictactoe', name: 'TIC TAC TOE_READY',      emoji: '\uD83C\uDFAE', url: '/vr/tictactoe.html',    color: '#ec4899' },
+    { id: 'gamearena', name: 'Game Arena',              emoji: '\uD83C\uDFAE', url: '/vr/game-arena/',       color: '#a855f7' },
     { id: 'tutorial', name: 'Tutorial',               emoji: '\u2753',       url: '/vr/tutorial/',         color: '#f59e0b' },
     { id: 'antrush',  name: 'Ant Rush AR',            emoji: '\uD83D\uDC1C', url: '/vr/ant-rush/',         color: '#ff6b35' }
   ];
@@ -46,7 +46,7 @@
     stocks:   [{ label: 'Refresh Prices',    action: 'refresh' }],
     wellness: [{ label: 'Breathing Exercise', action: 'breathe' },   { label: 'Ambient Sounds',  action: 'ambient' }],
     weather:  [{ label: 'Refresh Weather',   action: 'refresh' }],
-    tictactoe: [{ label: 'New Game',          action: 'newGame' }],
+    gamearena: [{ label: 'New Game',          action: 'newGame' }, { label: 'Soccer Shootout', action: 'soccer' }],
     tutorial: [{ label: 'Restart Tutorial',  action: 'resetPos' }],
     antrush:  [{ label: 'Quick Mode',          action: 'quickMode' }, { label: 'Bed Challenge', action: 'bedChallenge' }]
   };
