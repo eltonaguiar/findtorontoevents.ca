@@ -302,8 +302,12 @@ Based on real Meta Quest 3 user testing feedback. Prioritized by severity.
 | 12 | Theatre Environments | 2-3 days | FUTURE |
 | 13 | Universal Nav Bar | 1 hour | ✅ DONE |
 | 14 | Accessibility (comfort vignette + F1 help) | 2-3 hours | ✅ DONE |
-| 15 | Audio System | 1-2 hours | FUTURE |
+| 15 | Audio System (spatial hover/click/enter cues) | 1-2 hours | ✅ DONE |
 | 16 | Stocks Zone Overhaul (A-Frame 1.6, rig, controls) | 30 min | ✅ DONE |
+| 17 | Hub Zone Tooltips (floating descriptions on hover) | 30 min | ✅ DONE |
+| 18 | Hub Portal Loading Feedback (flash + spinner overlay) | 20 min | ✅ DONE |
+| 19 | Stocks Interactive Pedestals + Detail Popup | 1 hour | ✅ DONE |
+| 20 | Tutorial Zone Controller Support (laser + locomotion) | 20 min | ✅ DONE |
 
 ---
 
@@ -321,4 +325,4 @@ Each zone file just needs: `<script src="/vr/vr-controls.js"></script>`
 
 ---
 
-*Last updated: 2026-02-07 — Session 3: Stocks zone overhaul, comfort vignette, F1 help overlay added to all zones*
+*Last updated: 2026-02-07 — Session 4: Zone tooltips, spatial audio, stock pedestals+popup, tutorial controllers, portal loading feedback*
