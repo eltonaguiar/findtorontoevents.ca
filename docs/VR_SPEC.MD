@@ -101,6 +101,7 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | `vr-controls.js` | Locomotion component, teleport arc visualization, rig height correction, gaze cursor |
 | `presence.js` | Cross-tab user counter via BroadcastChannel + localStorage heartbeats |
 | `scene-enhancements.js` | Set 8: 3D scene polish — portal particles, hover pulse, energy waves, screen glow, dust motes, price sparks, fireflies, sky tint, ambient motes, data badges |
+| `completeness.js` | Set 9: Production readiness — session continuity, error recovery, accessibility, onboarding, performance LOD, calendar minimap, watch history, forecast timeline, device adaptive, changelog |
 
 ## Testing & Deployment
 
@@ -139,3 +140,13 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | ENH-025 | Time-of-Day Sky Tint (ambient color shifts by clock) | Done |
 | ENH-026 | Ambient Floating Motes (zone-colored luminous dust, all zones) | Done |
 | ENH-027 | Hub Portal Data Badges (live stats floating below portals) | Done |
+| ENH-028 | Session Continuity (resume last zone on return) | Done |
+| ENH-029 | Error Recovery (resilient fetch, offline indicator, retry queue) | Done |
+| ENH-030 | Accessibility Layer (ARIA, skip link, reduced motion, high contrast, Alt+A panel) | Done |
+| ENH-031 | First-Visit Onboarding (contextual zone tips, auto-dismiss) | Done |
+| ENH-032 | Performance LOD (FPS monitor, auto quality, particle toggling) | Done |
+| ENH-033 | Events Calendar Minimap (month grid with event density dots) | Done |
+| ENH-034 | Movies Watch History (tracked trailers, history panel) | Done |
+| ENH-035 | Weather Forecast Timeline (24h hourly temperature bar from Open-Meteo) | Done |
+| ENH-036 | Device Adaptive UI (auto-detect Quest/desktop/mobile, scale controls) | Done |
+| ENH-037 | What's New Changelog (version-tracked, auto-show on updates) | Done |

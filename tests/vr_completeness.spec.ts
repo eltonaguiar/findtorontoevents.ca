@@ -79,10 +79,20 @@ test.describe('Error Recovery (#2)', () => {
     expect(isOnline).toBe(true);
   });
 
-  test('Connection indicator element exists', async ({ page }) => {
+  test('Connection indicator created on status change', async ({ page }) => {
     await ready(page, '/vr/');
+    // Simulate offline/online to trigger indicator creation
+    await page.evaluate(() => window.dispatchEvent(new Event('offline')));
+    await page.waitForTimeout(300);
     const hasConn = await page.evaluate(() => !!document.getElementById('vr9-conn'));
     expect(hasConn).toBe(true);
+    const text = await page.evaluate(() => document.getElementById('vr9-conn')?.textContent || '');
+    expect(text).toContain('Offline');
+    // Simulate coming back online
+    await page.evaluate(() => window.dispatchEvent(new Event('online')));
+    await page.waitForTimeout(300);
+    const text2 = await page.evaluate(() => document.getElementById('vr9-conn')?.textContent || '');
+    expect(text2).toContain('restored');
   });
 });
 
