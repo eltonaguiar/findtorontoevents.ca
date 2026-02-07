@@ -110,6 +110,14 @@
                   position="0 0 -0.5">
         </a-entity>
       </a-camera>
+      <a-entity id="left-hand"
+                laser-controls="hand: left; model: false"
+                raycaster="objects: .clickable; far: 20; lineColor: #00d4ff; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+      <a-entity id="right-hand"
+                laser-controls="hand: right; model: false"
+                raycaster="objects: .clickable; far: 20; lineColor: #a855f7; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
     </a-entity>
 
     <!-- ===== STEP 1: LOOK AROUND — colored panels on walls ===== -->
@@ -503,6 +511,51 @@
     ]);
   </script>
 
+  <!-- Comfort vignette + F1 help -->
+  <script src="/vr/vr-comfort.js"></script>
+  <!-- Quest Thumbstick Locomotion -->
+  <script>
+  (function () {
+    var rig, camera, moveSpeed = 0.06, turnCooldown = false;
+    function init() {
+      rig = document.getElementById('rig');
+      camera = document.querySelector('a-camera');
+      if (rig) requestAnimationFrame(step);
+    }
+    function step() {
+      var pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      var left = null, right = null;
+      for (var i = 0; i < pads.length; i++) {
+        var p = pads[i];
+        if (!p) continue;
+        if (p.hand === 'left') left = p;
+        if (p.hand === 'right') right = p;
+      }
+      if (left && left.axes.length >= 2) {
+        var x = left.axes[0] || 0, y = left.axes[1] || 0;
+        if (Math.abs(x) > 0.1 || Math.abs(y) > 0.1) {
+          var yaw = camera && camera.object3D ? camera.object3D.rotation.y : 0;
+          var dx = Math.sin(yaw) * -y + Math.cos(yaw) * x;
+          var dz = Math.cos(yaw) * -y - Math.sin(yaw) * x;
+          var pos = rig.getAttribute('position');
+          rig.setAttribute('position', { x: pos.x + dx * moveSpeed, y: pos.y, z: pos.z + dz * moveSpeed });
+        }
+      }
+      if (right && right.axes.length >= 2) {
+        var turn = right.axes[0] || 0;
+        if (!turnCooldown && Math.abs(turn) > 0.7) {
+          var rot = rig.getAttribute('rotation');
+          rig.setAttribute('rotation', { x: rot.x, y: rot.y + (turn > 0 ? -30 : 30), z: rot.z });
+          turnCooldown = true;
+          setTimeout(function () { turnCooldown = false; }, 300);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+  })();
+  </script>
   <!-- Shared scripts -->
   <script src="/vr/presence.js"></script>
   <script src="/vr/controller-support.js"></script>
@@ -516,5 +569,6 @@
   <script src="/vr/personalization.js"></script>
   <script src="/vr/advanced-ux.js"></script>
   <script src="/vr/comfort-intelligence.js"></script>
+  <script src="/vr/content-depth.js"></script>
 </body>
 </html>
