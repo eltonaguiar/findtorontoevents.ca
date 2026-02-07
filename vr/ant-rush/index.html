@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Ant Rush AR – Clean Before They Swarm!</title>
+  <meta name="description" content="AR game: race to clean your space before virtual ants take over! WebXR passthrough for Meta Quest 3 and mobile.">
+
+  <!-- Three.js for 3D rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #ff6b35;
+      --primary-dark: #e85a24;
+      --danger: #ff3333;
+      --success: #33cc66;
+      --bg-dark: #1a1a2e;
+      --bg-card: #16213e;
+      --text: #eee;
+      --text-dim: #aaa;
+      --radius: 12px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ─── MENU SCREEN ─── */
+    #menu-screen {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 50%, #1a1a2e 100%);
+      padding: 20px;
+      transition: opacity 0.4s;
+    }
+    #menu-screen.hidden { opacity: 0; pointer-events: none; }
+
+    .menu-logo {
+      font-size: 2.8rem; font-weight: 900; text-align: center;
+      background: linear-gradient(135deg, var(--primary), #ffcc00);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 8px;
+    }
+    .menu-subtitle {
+      color: var(--text-dim); font-size: 1rem; text-align: center; margin-bottom: 32px;
+    }
+
+    .mode-cards {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      max-width: 720px; width: 100%;
+    }
+
+    .mode-card {
+      background: var(--bg-card);
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      width: 320px; max-width: 90vw;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      text-align: center;
+    }
+    .mode-card:hover, .mode-card:focus {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 12px 40px rgba(255,107,53,0.2);
+    }
+    .mode-card h2 { font-size: 1.4rem; margin-bottom: 8px; }
+    .mode-card .icon { font-size: 3rem; margin-bottom: 12px; display: block; }
+    .mode-card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.4; }
+
+    .back-link {
+      margin-top: 28px; color: var(--text-dim); text-decoration: none;
+      font-size: 0.9rem; opacity: 0.7; transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ─── QUICK MODE SETUP ─── */
+    #quick-setup {
+      position: fixed; inset: 0; z-index: 100;
+      display: none; flex-direction: column; align-items: center;
+      justify-content: flex-start;
+      background: var(--bg-dark);
+      padding: 20px; overflow-y: auto;
+    }
+    #quick-setup.active { display: flex; }
+
+    .setup-header {
+      font-size: 1.6rem; font-weight: 800; margin: 16px 0 4px;
+      background: linear-gradient(135deg, var(--primary), #ffcc00);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .setup-desc {
+      color: var(--text-dim); font-size: 0.9rem; text-align: center;
+      max-width: 480px; margin-bottom: 20px; line-height: 1.4;
+    }
+
+    .upload-row {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 16px; width: 100%; max-width: 600px;
+    }
+
+    .upload-box {
+      flex: 1; min-width: 200px; max-width: 280px;
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: var(--radius);
+      padding: 16px; text-align: center;
+      cursor: pointer; position: relative;
+      transition: border-color 0.2s, background 0.2s;
+      background: var(--bg-card);
+    }
+    .upload-box:hover { border-color: var(--primary); background: rgba(255,107,53,0.05); }
+    .upload-box.has-image { border-color: var(--success); border-style: solid; }
+    .upload-box input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-box .upload-icon { font-size: 2.4rem; margin-bottom: 8px; display: block; }
+    .upload-box .upload-label { font-weight: 600; font-size: 0.95rem; }
+    .upload-box .upload-hint { color: var(--text-dim); font-size: 0.8rem; margin-top: 4px; }
+    .upload-box img.preview {
+      max-width: 100%; max-height: 140px; border-radius: 8px;
+      margin-top: 8px; object-fit: cover;
+    }
+
+    .time-input-group {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .time-input-group label { font-weight: 600; font-size: 0.95rem; }
+    .time-input-group input[type="number"] {
+      width: 80px; padding: 10px 12px; border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.15);
+      background: var(--bg-card); color: var(--text);
+      font-size: 1.1rem; font-weight: 700; text-align: center;
+    }
+    .time-input-group input:focus { outline: none; border-color: var(--primary); }
+    .time-input-group span { color: var(--text-dim); font-size: 0.9rem; }
+
+    .btn {
+      padding: 14px 32px; border: none; border-radius: 10px;
+      font-size: 1.1rem; font-weight: 700; cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff; box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 28px rgba(255,107,53,0.5); }
+    .btn-primary:disabled {
+      opacity: 0.4; cursor: not-allowed; box-shadow: none;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08); color: var(--text);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.14); }
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+    /* ─── BED CHALLENGE SETUP ─── */
+    #bed-setup {
+      position: fixed; inset: 0; z-index: 100;
+      display: none; flex-direction: column; align-items: center;
+      justify-content: center;
+      background: var(--bg-dark); padding: 20px;
+    }
+    #bed-setup.active { display: flex; }
+
+    .difficulty-cards {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      margin: 20px 0;
+    }
+    .diff-card {
+      background: var(--bg-card); border: 2px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius); padding: 16px 20px; width: 160px;
+      text-align: center; cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .diff-card:hover, .diff-card.selected {
+      border-color: var(--primary); transform: translateY(-2px);
+    }
+    .diff-card .diff-icon { font-size: 2rem; display: block; margin-bottom: 6px; }
+    .diff-card .diff-name { font-weight: 700; }
+    .diff-card .diff-desc { color: var(--text-dim); font-size: 0.8rem; margin-top: 4px; }
+
+    /* ─── GAME HUD ─── */
+    #game-hud {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: none; padding: 12px 16px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    #game-hud.active { display: flex; }
+    #game-hud > * { pointer-events: auto; }
+
+    .hud-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      width: 100%;
+    }
+
+    .hud-timer {
+      font-size: 2rem; font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .hud-timer.warning { color: #ffcc00; }
+    .hud-timer.critical { color: var(--danger); animation: pulse 0.6s infinite alternate; }
+
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
+
+    .hud-score {
+      text-align: right;
+    }
+    .hud-score .label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+    .hud-score .value { font-size: 1.4rem; font-weight: 800; }
+
+    .ant-bar-container {
+      width: 100%; margin-top: 8px;
+    }
+    .ant-bar-label {
+      display: flex; justify-content: space-between; font-size: 0.75rem;
+      color: var(--text-dim); margin-bottom: 4px;
+    }
+    .ant-bar {
+      height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;
+      overflow: hidden;
+    }
+    .ant-bar-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--success), #ffcc00, var(--danger));
+      transition: width 0.3s;
+    }
+
+    /* ─── GAME BUTTONS (bottom) ─── */
+    #game-actions {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      display: none; padding: 16px;
+      background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+      justify-content: center; gap: 12px;
+    }
+    #game-actions.active { display: flex; }
+
+    .action-btn {
+      padding: 12px 20px; border: none; border-radius: 50px;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .action-btn:active { transform: scale(0.95); }
+    .action-btn.check {
+      background: linear-gradient(135deg, var(--success), #22aa55);
+      color: #fff; box-shadow: 0 4px 16px rgba(51,204,102,0.3);
+    }
+    .action-btn.quit {
+      background: rgba(255,255,255,0.1); color: var(--text);
+    }
+
+    /* ─── RESULT SCREEN ─── */
+    #result-screen {
+      position: fixed; inset: 0; z-index: 200;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.85); padding: 20px;
+    }
+    #result-screen.active { display: flex; }
+
+    .result-icon { font-size: 5rem; margin-bottom: 12px; }
+    .result-title { font-size: 2rem; font-weight: 900; margin-bottom: 8px; }
+    .result-subtitle { color: var(--text-dim); font-size: 1rem; margin-bottom: 6px; text-align: center; }
+    .result-stats {
+      display: flex; gap: 24px; margin: 20px 0;
+    }
+    .stat-box { text-align: center; }
+    .stat-box .stat-val { font-size: 1.8rem; font-weight: 900; }
+    .stat-box .stat-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; }
+
+    /* ─── PHOTO CHECK MODAL ─── */
+    #photo-check-modal {
+      position: fixed; inset: 0; z-index: 150;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.9); padding: 20px;
+    }
+    #photo-check-modal.active { display: flex; }
+
+    .photo-check-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; }
+    .photo-check-desc { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 16px; text-align: center; }
+
+    .photo-capture-area {
+      width: 300px; height: 300px; max-width: 80vw; max-height: 40vh;
+      border: 3px dashed var(--primary); border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative; background: #000;
+      margin-bottom: 16px;
+    }
+    .photo-capture-area video {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .photo-capture-area canvas {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+
+    .similarity-result {
+      font-size: 1.2rem; font-weight: 700; margin: 12px 0;
+      text-align: center;
+    }
+    .similarity-bar {
+      width: 260px; height: 12px; background: rgba(255,255,255,0.1);
+      border-radius: 6px; overflow: hidden; margin-bottom: 16px;
+    }
+    .similarity-bar-fill {
+      height: 100%; border-radius: 6px;
+      background: linear-gradient(90deg, var(--danger), #ffcc00, var(--success));
+      transition: width 0.5s;
+    }
+
+    /* ─── CANVAS for AR fallback ─── */
+    #ar-canvas {
+      position: fixed; inset: 0; z-index: 10;
+      display: none; width: 100%; height: 100%;
+    }
+    #ar-canvas.active { display: block; }
+
+    #camera-feed {
+      position: fixed; inset: 0; z-index: 5;
+      display: none; width: 100%; height: 100%; object-fit: cover;
+    }
+    #camera-feed.active { display: block; }
+
+    /* ─── Loading / Transition ─── */
+    .loading-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.8);
+    }
+    .loading-overlay.active { display: flex; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid rgba(255,255,255,0.15);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 480px) {
+      .menu-logo { font-size: 2rem; }
+      .mode-card { padding: 16px 14px; width: 100%; }
+      .hud-timer { font-size: 1.5rem; }
+      .upload-box { min-width: 140px; }
+    }
+
+    /* ─── Hidden utility ─── */
+    .hidden-input { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MENU SCREEN                                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="menu-screen">
+  <div class="menu-logo">ANT RUSH AR</div>
+  <div class="menu-subtitle">Clean your space before the ants take over!</div>
+
+  <div class="mode-cards">
+    <div class="mode-card" id="card-bed" tabindex="0" role="button">
+      <span class="icon">🛏️</span>
+      <h2>Bed Challenge</h2>
+      <p>Make your bed and fold sheets before ants swarm it. Classic mode with escalating difficulty!</p>
+    </div>
+    <div class="mode-card" id="card-quick" tabindex="0" role="button">
+      <span class="icon">📸</span>
+      <h2>Quick Mode</h2>
+      <p>Upload a "before" &amp; "after" photo of any messy area. Race to match your target before time runs out!</p>
+    </div>
+  </div>
+
+  <a href="/vr/" class="back-link">&larr; Back to VR Hub</a>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- BED CHALLENGE SETUP                                        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="bed-setup">
+  <div class="setup-header">Bed Challenge</div>
+  <div class="setup-desc">
+    Choose difficulty. Ants spawn faster at higher levels. Make your bed before they consume it!
+  </div>
+
+  <div class="difficulty-cards">
+    <div class="diff-card selected" data-difficulty="easy">
+      <span class="diff-icon">🐜</span>
+      <div class="diff-name">Easy</div>
+      <div class="diff-desc">Slow spawns, 3 min</div>
+    </div>
+    <div class="diff-card" data-difficulty="medium">
+      <span class="diff-icon">🐜🐜</span>
+      <div class="diff-name">Medium</div>
+      <div class="diff-desc">Moderate spawns, 2 min</div>
+    </div>
+    <div class="diff-card" data-difficulty="hard">
+      <span class="diff-icon">🐜🐜🐜</span>
+      <div class="diff-name">Hard</div>
+      <div class="diff-desc">Fast spawns, 90 sec</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="bed-back">Back</button>
+    <button class="btn btn-primary" id="bed-start">Start AR Game</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- QUICK MODE SETUP                                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="quick-setup">
+  <div class="setup-header">Quick Mode</div>
+  <div class="setup-desc">
+    Upload a photo of the messy area (current state) and a photo of what it should look like when done.
+    Estimate how long you need — ants will spawn to match your pace!
+  </div>
+
+  <div class="upload-row">
+    <label class="upload-box" id="box-before">
+      <span class="upload-icon">📷</span>
+      <div class="upload-label">Before (Messy)</div>
+      <div class="upload-hint">Tap to upload or take photo</div>
+      <input type="file" accept="image/*" capture="environment" id="input-before" class="hidden-input">
+    </label>
+    <label class="upload-box" id="box-after">
+      <span class="upload-icon">✨</span>
+      <div class="upload-label">After (Target)</div>
+      <div class="upload-hint">Tap to upload or take photo</div>
+      <input type="file" accept="image/*" capture="environment" id="input-after" class="hidden-input">
+    </label>
+  </div>
+
+  <div class="time-input-group">
+    <label for="est-time">Estimated time:</label>
+    <input type="number" id="est-time" min="1" max="30" value="3">
+    <span>minutes</span>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="quick-back">Back</button>
+    <button class="btn btn-primary" id="quick-start" disabled>Start Quick Game</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- GAME HUD                                                   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="game-hud">
+  <div class="hud-top">
+    <div class="hud-timer" id="hud-timer">3:00</div>
+    <div class="hud-score">
+      <div class="label">Ants</div>
+      <div class="value" id="hud-ant-count">0</div>
+    </div>
+  </div>
+  <div class="ant-bar-container">
+    <div class="ant-bar-label">
+      <span>Ant Invasion</span>
+      <span id="ant-pct">0%</span>
+    </div>
+    <div class="ant-bar">
+      <div class="ant-bar-fill" id="ant-bar-fill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- GAME ACTIONS (bottom bar)                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="game-actions">
+  <button class="action-btn check" id="btn-check-progress">
+    <span>📸</span> Check Progress
+  </button>
+  <button class="action-btn quit" id="btn-quit-game">
+    <span>✕</span> Quit
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PHOTO CHECK MODAL                                          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="photo-check-modal">
+  <div class="photo-check-title">Check Your Progress</div>
+  <div class="photo-check-desc" id="check-desc">Take a photo of your current progress to compare against the target.</div>
+
+  <div class="photo-capture-area" id="capture-area">
+    <video id="check-video" autoplay playsinline muted></video>
+    <canvas id="check-canvas" style="display:none"></canvas>
+  </div>
+
+  <div class="similarity-result" id="similarity-text" style="display:none"></div>
+  <div class="similarity-bar" style="display:none" id="similarity-bar-wrap">
+    <div class="similarity-bar-fill" id="similarity-fill" style="width:0%"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="btn-check-cancel">Cancel</button>
+    <button class="btn btn-primary" id="btn-check-snap">Snap Photo</button>
+    <button class="btn btn-primary" id="btn-check-done" style="display:none">Continue</button>
+  </div>
+
+  <!-- File input fallback for devices without camera API -->
+  <input type="file" accept="image/*" capture="environment" id="check-file-input" class="hidden-input">
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- RESULT SCREEN                                              -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="result-screen">
+  <div class="result-icon" id="result-icon">🎉</div>
+  <div class="result-title" id="result-title">You Win!</div>
+  <div class="result-subtitle" id="result-subtitle">You cleaned up before the ants took over!</div>
+  <div class="result-stats">
+    <div class="stat-box">
+      <div class="stat-val" id="stat-time">0:00</div>
+      <div class="stat-label">Time</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="stat-ants">0</div>
+      <div class="stat-label">Peak Ants</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="stat-score">0</div>
+      <div class="stat-label">Score</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="btn-result-menu">Menu</button>
+    <button class="btn btn-primary" id="btn-result-retry">Play Again</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- LOADING OVERLAY                                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="loading-overlay" id="loading-overlay">
+  <div style="text-align:center">
+    <div class="spinner"></div>
+    <div style="margin-top:16px; font-weight:600;" id="loading-text">Starting AR...</div>
+  </div>
+</div>
+
+<!-- Camera feed for mobile fallback -->
+<video id="camera-feed" autoplay playsinline muted></video>
+
+<!-- Three.js canvas -->
+<canvas id="ar-canvas"></canvas>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- GAME ENGINE                                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  // ──────────────────────────────────────────────
+  // DOM refs
+  // ──────────────────────────────────────────────
+  const $ = (s) => document.querySelector(s);
+  const menuScreen    = $('#menu-screen');
+  const bedSetup      = $('#bed-setup');
+  const quickSetup    = $('#quick-setup');
+  const gameHud       = $('#game-hud');
+  const gameActions   = $('#game-actions');
+  const resultScreen  = $('#result-screen');
+  const photoModal    = $('#photo-check-modal');
+  const loadingOv     = $('#loading-overlay');
+  const arCanvas      = $('#ar-canvas');
+  const cameraFeed    = $('#camera-feed');
+
+  // ──────────────────────────────────────────────
+  // Game State
+  // ──────────────────────────────────────────────
+  const state = {
+    mode: null,          // 'bed' | 'quick'
+    difficulty: 'easy',  // bed mode
+    estMinutes: 3,       // quick mode
+    beforeImg: null,     // quick mode: Image element
+    afterImg: null,      // quick mode: Image element
+    running: false,
+    paused: false,
+    timeLeft: 180,       // seconds
+    totalTime: 180,
+    antCount: 0,
+    maxAnts: 500,
+    antCoverage: 0,      // 0-100
+    peakAnts: 0,
+    elapsedSec: 0,
+    spawnRate: 1,        // ants per second (increases)
+    spawnAccum: 0,
+    lastSimilarity: 0,
+    winThreshold: 72,    // similarity % to win in quick mode
+    gameOver: false,
+    xrSession: null,
+    useWebXR: false,
+    bedDoneClicks: 0,    // bed mode: clicks to "finish"
+  };
+
+  // Difficulty presets for bed mode
+  const DIFFICULTY = {
+    easy:   { time: 180, spawnBase: 0.8, spawnAccel: 0.004, maxAnts: 400 },
+    medium: { time: 120, spawnBase: 1.5, spawnAccel: 0.008, maxAnts: 500 },
+    hard:   { time: 90,  spawnBase: 2.5, spawnAccel: 0.015, maxAnts: 600 },
+  };
+
+  // ──────────────────────────────────────────────
+  // Three.js Setup
+  // ──────────────────────────────────────────────
+  let renderer, scene, camera;
+  let antMesh;           // InstancedMesh
+  let antData = [];      // per-ant state
+  const ANT_POOL = 800;  // max instances
+  const tempMatrix = new THREE.Matrix4();
+  const tempPos = new THREE.Vector3();
+  const tempQuat = new THREE.Quaternion();
+  const tempScale = new THREE.Vector3();
+  let clock = new THREE.Clock();
+
+  function initThree() {
+    renderer = new THREE.WebGLRenderer({
+      canvas: arCanvas,
+      alpha: true,
+      antialias: true,
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.xr.enabled = true;
+    renderer.setClearColor(0x000000, 0);
+
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100);
+    camera.position.set(0, 1.2, 0);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(2, 4, 2);
+    scene.add(dirLight);
+
+    // Ant geometry: small elongated ellipsoid
+    const antGeo = createAntGeometry();
+    const antMat = new THREE.MeshStandardMaterial({
+      color: 0x2a1506,
+      roughness: 0.7,
+      metalness: 0.1,
+    });
+
+    antMesh = new THREE.InstancedMesh(antGeo, antMat, ANT_POOL);
+    antMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    antMesh.count = 0;
+    // Hide all instances initially
+    const hideMatrix = new THREE.Matrix4().makeScale(0, 0, 0);
+    for (let i = 0; i < ANT_POOL; i++) {
+      antMesh.setMatrixAt(i, hideMatrix);
+    }
+    antMesh.instanceMatrix.needsUpdate = true;
+    scene.add(antMesh);
+
+    window.addEventListener('resize', onResize);
+  }
+
+  function createAntGeometry() {
+    // Ant body: 3 merged spheres (head, thorax, abdomen)
+    const group = new THREE.Group();
+    const headGeo = new THREE.SphereGeometry(0.003, 6, 4);
+    const thoraxGeo = new THREE.SphereGeometry(0.004, 6, 4);
+    const abdomenGeo = new THREE.SphereGeometry(0.005, 6, 4);
+
+    // Merge into one BufferGeometry for instancing
+    // For simplicity, just use a scaled sphere + a capsule-like shape
+    const merged = new THREE.BufferGeometry();
+
+    // Create a simple ant shape using a capsule
+    const capsule = new THREE.CapsuleGeometry(0.003, 0.008, 4, 6);
+    return capsule;
+  }
+
+  function onResize() {
+    if (!renderer || state.useWebXR) return;
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  // ──────────────────────────────────────────────
+  // Ant System
+  // ──────────────────────────────────────────────
+  // Play area: ants spawn on a virtual surface roughly 1.5m x 2m (bed-sized), placed in front
+  const PLAY_AREA = { x: 1.5, z: 2.0, y: 0.7 }; // width, depth, height from ground
+
+  function spawnAnt() {
+    if (antData.length >= ANT_POOL) return;
+
+    // Spawn at random edge of the play area
+    const edge = Math.floor(Math.random() * 4);
+    let x, z;
+    switch (edge) {
+      case 0: x = -PLAY_AREA.x / 2; z = (Math.random() - 0.5) * PLAY_AREA.z; break;
+      case 1: x = PLAY_AREA.x / 2;  z = (Math.random() - 0.5) * PLAY_AREA.z; break;
+      case 2: x = (Math.random() - 0.5) * PLAY_AREA.x; z = -PLAY_AREA.z / 2; break;
+      case 3: x = (Math.random() - 0.5) * PLAY_AREA.x; z = PLAY_AREA.z / 2;  break;
+    }
+
+    const ant = {
+      x: x,
+      y: PLAY_AREA.y + (Math.random() - 0.5) * 0.05,
+      z: z - 1.5,  // offset: area is ~1.5m in front of user
+      vx: (Math.random() - 0.5) * 0.06,
+      vz: (Math.random() - 0.5) * 0.06,
+      rotation: Math.random() * Math.PI * 2,
+      speed: 0.02 + Math.random() * 0.04,
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: 2 + Math.random() * 3,
+      scale: 0.7 + Math.random() * 0.6,
+      alive: true,
+      age: 0,
+    };
+
+    // Direct toward center
+    const cx = 0, cz = -1.5;
+    const dx = cx - ant.x, dz = cz - ant.z;
+    const dist = Math.sqrt(dx * dx + dz * dz) || 1;
+    ant.vx = (dx / dist) * ant.speed * (0.5 + Math.random() * 0.5);
+    ant.vz = (dz / dist) * ant.speed * (0.5 + Math.random() * 0.5);
+    ant.rotation = Math.atan2(ant.vx, ant.vz);
+
+    antData.push(ant);
+  }
+
+  function updateAnts(dt) {
+    for (let i = 0; i < antData.length; i++) {
+      const ant = antData[i];
+      if (!ant.alive) continue;
+
+      ant.age += dt;
+
+      // Wobble movement (ants don't walk straight)
+      ant.wobble += ant.wobbleSpeed * dt;
+      const wobbleOffset = Math.sin(ant.wobble) * 0.01;
+
+      ant.x += ant.vx * dt + wobbleOffset * Math.cos(ant.rotation);
+      ant.z += ant.vz * dt + wobbleOffset * Math.sin(ant.rotation);
+
+      // Slight vertical bobbing
+      ant.y = PLAY_AREA.y + Math.sin(ant.wobble * 2) * 0.002;
+
+      // Randomly change direction slightly
+      if (Math.random() < 0.02) {
+        ant.vx += (Math.random() - 0.5) * 0.02;
+        ant.vz += (Math.random() - 0.5) * 0.02;
+        // Re-clamp speed
+        const spd = Math.sqrt(ant.vx * ant.vx + ant.vz * ant.vz);
+        if (spd > ant.speed * 1.5) {
+          ant.vx = (ant.vx / spd) * ant.speed;
+          ant.vz = (ant.vz / spd) * ant.speed;
+        }
+        ant.rotation = Math.atan2(ant.vx, ant.vz);
+      }
+
+      // Contain within extended area
+      const bound = 1.5;
+      if (ant.x < -bound) ant.vx = Math.abs(ant.vx);
+      if (ant.x > bound)  ant.vx = -Math.abs(ant.vx);
+      if (ant.z < -3)     ant.vz = Math.abs(ant.vz);
+      if (ant.z > 0)      ant.vz = -Math.abs(ant.vz);
+
+      // Update instanced mesh
+      tempPos.set(ant.x, ant.y, ant.z);
+      tempQuat.setFromAxisAngle(new THREE.Vector3(0, 1, 0), ant.rotation);
+      tempScale.set(ant.scale, ant.scale, ant.scale);
+      tempMatrix.compose(tempPos, tempQuat, tempScale);
+      antMesh.setMatrixAt(i, tempMatrix);
+    }
+
+    // Hide unused instances
+    const hideMatrix = new THREE.Matrix4().makeScale(0, 0, 0);
+    for (let i = antData.length; i < antMesh.count; i++) {
+      antMesh.setMatrixAt(i, hideMatrix);
+    }
+
+    antMesh.count = Math.max(antData.length, antMesh.count);
+    antMesh.instanceMatrix.needsUpdate = true;
+  }
+
+  // ──────────────────────────────────────────────
+  // Game Loop
+  // ──────────────────────────────────────────────
+  let gameLoopId = null;
+  let lastTimestamp = 0;
+
+  function gameLoop(timestamp) {
+    if (!state.running) return;
+    gameLoopId = requestAnimationFrame(gameLoop);
+
+    const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
+    lastTimestamp = timestamp;
+
+    if (state.paused || state.gameOver) return;
+
+    state.elapsedSec += dt;
+
+    // Timer
+    state.timeLeft = Math.max(0, state.totalTime - state.elapsedSec);
+    updateTimerDisplay();
+
+    // Spawn ants
+    const spawnMultiplier = 1 + (state.elapsedSec / state.totalTime) * 2;
+    state.spawnAccum += state.spawnRate * spawnMultiplier * dt;
+    while (state.spawnAccum >= 1) {
+      state.spawnAccum -= 1;
+      spawnAnt();
+      state.antCount = antData.length;
+    }
+
+    // Update ant positions
+    updateAnts(dt);
+
+    // Ant coverage
+    state.antCoverage = Math.min(100, (antData.length / state.maxAnts) * 100);
+    state.peakAnts = Math.max(state.peakAnts, antData.length);
+    updateHudCounts();
+
+    // Game over conditions
+    if (state.antCoverage >= 100) {
+      endGame(false);
+    }
+    if (state.timeLeft <= 0 && state.mode === 'bed') {
+      // In bed mode, time running out = lose
+      endGame(false);
+    }
+
+    // Render
+    if (!state.useWebXR) {
+      renderer.render(scene, camera);
+    }
+  }
+
+  function startGameLoop() {
+    state.running = true;
+    state.gameOver = false;
+    state.elapsedSec = 0;
+    state.antCount = 0;
+    state.peakAnts = 0;
+    state.antCoverage = 0;
+    state.spawnAccum = 0;
+    state.lastSimilarity = 0;
+    state.bedDoneClicks = 0;
+    antData = [];
+    antMesh.count = 0;
+    clock.start();
+    lastTimestamp = performance.now();
+    gameLoopId = requestAnimationFrame(gameLoop);
+  }
+
+  function stopGameLoop() {
+    state.running = false;
+    if (gameLoopId) cancelAnimationFrame(gameLoopId);
+  }
+
+  // ──────────────────────────────────────────────
+  // HUD updates
+  // ──────────────────────────────────────────────
+  function updateTimerDisplay() {
+    const t = Math.ceil(state.timeLeft);
+    const m = Math.floor(t / 60);
+    const s = t % 60;
+    const el = $('#hud-timer');
+    el.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+
+    const pct = state.timeLeft / state.totalTime;
+    el.classList.toggle('warning', pct < 0.4 && pct > 0.15);
+    el.classList.toggle('critical', pct <= 0.15);
+  }
+
+  function updateHudCounts() {
+    $('#hud-ant-count').textContent = antData.length;
+    const pct = Math.round(state.antCoverage);
+    $('#ant-pct').textContent = pct + '%';
+    $('#ant-bar-fill').style.width = pct + '%';
+  }
+
+  // ──────────────────────────────────────────────
+  // WebXR / Camera AR
+  // ──────────────────────────────────────────────
+  async function startAR() {
+    showLoading('Starting AR...');
+
+    if (!renderer) initThree();
+
+    // Try WebXR first (Meta Quest, etc.)
+    if (navigator.xr) {
+      try {
+        const supported = await navigator.xr.isSessionSupported('immersive-ar');
+        if (supported) {
+          await startWebXR();
+          hideLoading();
+          return;
+        }
+      } catch (e) {
+        console.warn('WebXR AR not available:', e);
+      }
+    }
+
+    // Fallback: camera feed + overlay
+    await startCameraAR();
+    hideLoading();
+  }
+
+  async function startWebXR() {
+    state.useWebXR = true;
+
+    const session = await navigator.xr.requestSession('immersive-ar', {
+      requiredFeatures: ['local-floor'],
+      optionalFeatures: ['hit-test', 'plane-detection', 'hand-tracking'],
+    });
+
+    state.xrSession = session;
+    renderer.xr.setReferenceSpaceType('local-floor');
+    await renderer.xr.setSession(session);
+
+    arCanvas.classList.add('active');
+
+    session.addEventListener('end', () => {
+      state.useWebXR = false;
+      state.xrSession = null;
+      if (state.running) {
+        endGame(false);
+      }
+    });
+
+    // Render loop is driven by XR
+    renderer.setAnimationLoop((timestamp, frame) => {
+      if (state.running && !state.paused && !state.gameOver) {
+        const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
+        lastTimestamp = timestamp;
+
+        state.elapsedSec += dt;
+        state.timeLeft = Math.max(0, state.totalTime - state.elapsedSec);
+        updateTimerDisplay();
+
+        const spawnMultiplier = 1 + (state.elapsedSec / state.totalTime) * 2;
+        state.spawnAccum += state.spawnRate * spawnMultiplier * dt;
+        while (state.spawnAccum >= 1) {
+          state.spawnAccum -= 1;
+          spawnAnt();
+          state.antCount = antData.length;
+        }
+
+        updateAnts(dt);
+        state.antCoverage = Math.min(100, (antData.length / state.maxAnts) * 100);
+        state.peakAnts = Math.max(state.peakAnts, antData.length);
+        updateHudCounts();
+
+        if (state.antCoverage >= 100) endGame(false);
+        if (state.timeLeft <= 0 && state.mode === 'bed') endGame(false);
+      }
+
+      renderer.render(scene, camera);
+    });
+  }
+
+  async function startCameraAR() {
+    state.useWebXR = false;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+      cameraFeed.srcObject = stream;
+      cameraFeed.classList.add('active');
+    } catch (e) {
+      console.warn('Camera not available, using solid background:', e);
+      document.body.style.background = '#111';
+    }
+
+    arCanvas.classList.add('active');
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  function stopAR() {
+    if (state.xrSession) {
+      state.xrSession.end().catch(() => {});
+      state.xrSession = null;
+      renderer.setAnimationLoop(null);
+    }
+    state.useWebXR = false;
+
+    // Stop camera
+    if (cameraFeed.srcObject) {
+      cameraFeed.srcObject.getTracks().forEach(t => t.stop());
+      cameraFeed.srcObject = null;
+    }
+    cameraFeed.classList.remove('active');
+    arCanvas.classList.remove('active');
+  }
+
+  // ──────────────────────────────────────────────
+  // Photo Comparison (Quick Mode)
+  // ──────────────────────────────────────────────
+  let checkStream = null;
+
+  async function openPhotoCheck() {
+    state.paused = true;
+    photoModal.classList.add('active');
+
+    const video = $('#check-video');
+    const canvas = $('#check-canvas');
+    const snapBtn = $('#btn-check-snap');
+    const doneBtn = $('#btn-check-done');
+    const simText = $('#similarity-text');
+    const simBar = $('#similarity-bar-wrap');
+    const simFill = $('#similarity-fill');
+
+    // Reset UI
+    video.style.display = 'block';
+    canvas.style.display = 'none';
+    snapBtn.style.display = '';
+    doneBtn.style.display = 'none';
+    simText.style.display = 'none';
+    simBar.style.display = 'none';
+
+    // Try to get camera for check
+    try {
+      checkStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      });
+      video.srcObject = checkStream;
+    } catch (e) {
+      // Fallback to file input
+      console.warn('Camera for check not available, using file input');
+      video.style.display = 'none';
+      $('#check-desc').textContent = 'Select a photo of your current progress:';
+      $('#check-file-input').click();
+    }
+  }
+
+  function snapCheckPhoto() {
+    const video = $('#check-video');
+    const canvas = $('#check-canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Stop camera
+    if (checkStream) {
+      checkStream.getTracks().forEach(t => t.stop());
+      checkStream = null;
+    }
+
+    video.style.display = 'none';
+    canvas.style.display = 'block';
+    $('#btn-check-snap').style.display = 'none';
+
+    processCheckPhoto(canvas);
+  }
+
+  function processCheckPhoto(canvas) {
+    if (!state.afterImg) {
+      closePhotoCheck();
+      return;
+    }
+
+    const similarity = computeSimilarity(canvas, state.afterImg);
+    state.lastSimilarity = similarity;
+
+    const simText = $('#similarity-text');
+    const simBar = $('#similarity-bar-wrap');
+    const simFill = $('#similarity-fill');
+    const doneBtn = $('#btn-check-done');
+
+    simText.style.display = '';
+    simBar.style.display = '';
+    doneBtn.style.display = '';
+
+    const pctStr = Math.round(similarity) + '%';
+    simFill.style.width = pctStr;
+
+    if (similarity >= state.winThreshold) {
+      simText.textContent = `Match: ${pctStr} — That looks great!`;
+      simText.style.color = '#33cc66';
+    } else if (similarity >= 50) {
+      simText.textContent = `Match: ${pctStr} — Getting closer, keep going!`;
+      simText.style.color = '#ffcc00';
+    } else {
+      simText.textContent = `Match: ${pctStr} — Needs more work!`;
+      simText.style.color = '#ff6b35';
+    }
+  }
+
+  function computeSimilarity(canvas, targetImg) {
+    // Downscale both to small size for fast comparison
+    const SIZE = 64;
+    const tmpCanvas1 = document.createElement('canvas');
+    const tmpCanvas2 = document.createElement('canvas');
+    tmpCanvas1.width = tmpCanvas2.width = SIZE;
+    tmpCanvas1.height = tmpCanvas2.height = SIZE;
+    const ctx1 = tmpCanvas1.getContext('2d');
+    const ctx2 = tmpCanvas2.getContext('2d');
+
+    // Draw captured photo
+    ctx1.drawImage(canvas, 0, 0, SIZE, SIZE);
+    // Draw target
+    ctx2.drawImage(targetImg, 0, 0, SIZE, SIZE);
+
+    const data1 = ctx1.getImageData(0, 0, SIZE, SIZE).data;
+    const data2 = ctx2.getImageData(0, 0, SIZE, SIZE).data;
+
+    // Compute structural similarity using color histogram comparison
+    // + pixel-level comparison with tolerance
+    let histSim = histogramSimilarity(data1, data2);
+    let pixelSim = pixelSimilarity(data1, data2);
+
+    // Weighted blend
+    return histSim * 0.4 + pixelSim * 0.6;
+  }
+
+  function histogramSimilarity(data1, data2) {
+    // Build 16-bin histograms for R, G, B
+    const bins = 16;
+    const h1 = new Float32Array(bins * 3);
+    const h2 = new Float32Array(bins * 3);
+    const total = data1.length / 4;
+
+    for (let i = 0; i < data1.length; i += 4) {
+      const r1 = Math.floor(data1[i] / 16);
+      const g1 = Math.floor(data1[i+1] / 16);
+      const b1 = Math.floor(data1[i+2] / 16);
+      h1[r1]++; h1[bins + g1]++; h1[bins * 2 + b1]++;
+
+      const r2 = Math.floor(data2[i] / 16);
+      const g2 = Math.floor(data2[i+1] / 16);
+      const b2 = Math.floor(data2[i+2] / 16);
+      h2[r2]++; h2[bins + g2]++; h2[bins * 2 + b2]++;
+    }
+
+    // Normalize
+    for (let i = 0; i < h1.length; i++) { h1[i] /= total; h2[i] /= total; }
+
+    // Bhattacharyya coefficient
+    let bc = 0;
+    for (let i = 0; i < h1.length; i++) {
+      bc += Math.sqrt(h1[i] * h2[i]);
+    }
+    // Normalize to 0-100
+    return Math.min(100, (bc / 3) * 100);
+  }
+
+  function pixelSimilarity(data1, data2) {
+    let matchCount = 0;
+    const tolerance = 40; // per-channel tolerance for lighting changes
+    const total = data1.length / 4;
+
+    for (let i = 0; i < data1.length; i += 4) {
+      const dr = Math.abs(data1[i] - data2[i]);
+      const dg = Math.abs(data1[i+1] - data2[i+1]);
+      const db = Math.abs(data1[i+2] - data2[i+2]);
+
+      if (dr <= tolerance && dg <= tolerance && db <= tolerance) {
+        matchCount++;
+      }
+    }
+
+    return (matchCount / total) * 100;
+  }
+
+  function closePhotoCheck() {
+    photoModal.classList.remove('active');
+    if (checkStream) {
+      checkStream.getTracks().forEach(t => t.stop());
+      checkStream = null;
+    }
+
+    // Check if user won
+    if (state.lastSimilarity >= state.winThreshold) {
+      endGame(true);
+    } else {
+      state.paused = false;
+    }
+  }
+
+  // Handle file input fallback for photo check
+  $('#check-file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    img.onload = function() {
+      const canvas = $('#check-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 640;
+      canvas.height = 480;
+      ctx.drawImage(img, 0, 0, 640, 480);
+
+      $('#check-video').style.display = 'none';
+      canvas.style.display = 'block';
+      $('#btn-check-snap').style.display = 'none';
+
+      processCheckPhoto(canvas);
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(file);
+    e.target.value = '';
+  });
+
+  // ──────────────────────────────────────────────
+  // Game Start / End
+  // ──────────────────────────────────────────────
+  async function startGame() {
+    // Configure based on mode
+    if (state.mode === 'bed') {
+      const diff = DIFFICULTY[state.difficulty];
+      state.totalTime = diff.time;
+      state.timeLeft = diff.time;
+      state.spawnRate = diff.spawnBase;
+      state.maxAnts = diff.maxAnts;
+    } else if (state.mode === 'quick') {
+      state.estMinutes = parseFloat($('#est-time').value) || 3;
+      const totalSec = state.estMinutes * 60;
+      // Give user 20% more time than estimated to be fair
+      state.totalTime = totalSec * 1.2;
+      state.timeLeft = state.totalTime;
+      // Spawn rate: calibrated so ants reach ~80% at estimated time
+      // If user estimated 3 min, ants should reach ~80% max at 3 min
+      state.maxAnts = 500;
+      state.spawnRate = (state.maxAnts * 0.5) / totalSec;
+    }
+
+    // Hide setup screens
+    menuScreen.classList.add('hidden');
+    bedSetup.classList.remove('active');
+    quickSetup.classList.remove('active');
+
+    // Start AR
+    await startAR();
+
+    // Show HUD
+    gameHud.classList.add('active');
+    gameActions.classList.add('active');
+
+    // Show/hide check button depending on mode
+    $('#btn-check-progress').style.display = state.mode === 'quick' ? '' : '';
+    // In bed mode, the "check" button serves as "I'm done!" button
+    if (state.mode === 'bed') {
+      $('#btn-check-progress').innerHTML = '<span>✅</span> I\'m Done!';
+    } else {
+      $('#btn-check-progress').innerHTML = '<span>📸</span> Check Progress';
+    }
+
+    // Start game loop
+    startGameLoop();
+  }
+
+  function endGame(won) {
+    state.gameOver = true;
+    stopGameLoop();
+    stopAR();
+
+    gameHud.classList.remove('active');
+    gameActions.classList.remove('active');
+    photoModal.classList.remove('active');
+
+    const elapsed = state.elapsedSec;
+    const mins = Math.floor(elapsed / 60);
+    const secs = Math.floor(elapsed % 60);
+    const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+    // Score: based on time remaining and ant count
+    const timeBonus = Math.max(0, Math.round((state.timeLeft / state.totalTime) * 500));
+    const antPenalty = Math.round(state.peakAnts * 0.5);
+    const score = won ? Math.max(0, 1000 + timeBonus - antPenalty) : Math.round(antPenalty * 0.1);
+
+    $('#result-icon').textContent = won ? '🎉' : '🐜';
+    $('#result-title').textContent = won ? 'You Win!' : 'Ant Takeover!';
+    $('#result-subtitle').textContent = won
+      ? 'Amazing! You cleaned up before the ants took over!'
+      : 'The ants have consumed everything! Try again?';
+    $('#stat-time').textContent = timeStr;
+    $('#stat-ants').textContent = state.peakAnts;
+    $('#stat-score').textContent = score;
+
+    resultScreen.classList.add('active');
+  }
+
+  function resetToMenu() {
+    stopGameLoop();
+    stopAR();
+    state.running = false;
+    state.gameOver = false;
+
+    resultScreen.classList.remove('active');
+    gameHud.classList.remove('active');
+    gameActions.classList.remove('active');
+    photoModal.classList.remove('active');
+    bedSetup.classList.remove('active');
+    quickSetup.classList.remove('active');
+    menuScreen.classList.remove('hidden');
+  }
+
+  // ──────────────────────────────────────────────
+  // Loading helpers
+  // ──────────────────────────────────────────────
+  function showLoading(text) {
+    $('#loading-text').textContent = text || 'Loading...';
+    loadingOv.classList.add('active');
+  }
+  function hideLoading() {
+    loadingOv.classList.remove('active');
+  }
+
+  // ──────────────────────────────────────────────
+  // Image upload handling (Quick Mode)
+  // ──────────────────────────────────────────────
+  function setupImageUpload(inputId, boxId, stateKey) {
+    const input = $(`#${inputId}`);
+    const box = $(`#${boxId}`);
+
+    input.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const img = new Image();
+      img.onload = function() {
+        state[stateKey] = img;
+        box.classList.add('has-image');
+
+        // Show preview
+        let preview = box.querySelector('img.preview');
+        if (!preview) {
+          preview = document.createElement('img');
+          preview.className = 'preview';
+          box.appendChild(preview);
+        }
+        preview.src = img.src;
+
+        // Hide upload hint
+        const hint = box.querySelector('.upload-hint');
+        const icon = box.querySelector('.upload-icon');
+        if (hint) hint.textContent = 'Tap to change';
+        if (icon) icon.textContent = '✅';
+
+        updateQuickStartButton();
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  function updateQuickStartButton() {
+    const btn = $('#quick-start');
+    btn.disabled = !(state.beforeImg && state.afterImg);
+  }
+
+  // ──────────────────────────────────────────────
+  // Event Listeners
+  // ──────────────────────────────────────────────
+
+  // Menu → Mode select
+  $('#card-bed').addEventListener('click', () => {
+    menuScreen.classList.add('hidden');
+    bedSetup.classList.add('active');
+    state.mode = 'bed';
+  });
+  $('#card-quick').addEventListener('click', () => {
+    menuScreen.classList.add('hidden');
+    quickSetup.classList.add('active');
+    state.mode = 'quick';
+  });
+
+  // Bed setup
+  document.querySelectorAll('.diff-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.diff-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      state.difficulty = card.dataset.difficulty;
+    });
+  });
+  $('#bed-back').addEventListener('click', resetToMenu);
+  $('#bed-start').addEventListener('click', startGame);
+
+  // Quick setup
+  setupImageUpload('input-before', 'box-before', 'beforeImg');
+  setupImageUpload('input-after', 'box-after', 'afterImg');
+  $('#quick-back').addEventListener('click', resetToMenu);
+  $('#quick-start').addEventListener('click', startGame);
+
+  // Game actions
+  $('#btn-check-progress').addEventListener('click', () => {
+    if (state.mode === 'quick') {
+      openPhotoCheck();
+    } else {
+      // Bed mode: "I'm done" → end game as win
+      state.bedDoneClicks++;
+      endGame(true);
+    }
+  });
+  $('#btn-quit-game').addEventListener('click', () => {
+    endGame(false);
+  });
+
+  // Photo check modal
+  $('#btn-check-snap').addEventListener('click', snapCheckPhoto);
+  $('#btn-check-cancel').addEventListener('click', closePhotoCheck);
+  $('#btn-check-done').addEventListener('click', closePhotoCheck);
+
+  // Result screen
+  $('#btn-result-menu').addEventListener('click', resetToMenu);
+  $('#btn-result-retry').addEventListener('click', () => {
+    resultScreen.classList.remove('active');
+    startGame();
+  });
+
+  // Keyboard: Enter on cards
+  document.querySelectorAll('.mode-card').forEach(card => {
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') card.click();
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // Init
+  // ──────────────────────────────────────────────
+  // Pre-init Three.js lazily on first game start (not on page load)
+  console.log('[AntRush] Ready. Choose a game mode to begin.');
+
+})();
+</script>
+
+</body>
+</html>
