@@ -108,6 +108,7 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | `comfort-intelligence.js` | Set 13: Comfort & Intelligence — multi-language i18n, zen mode, smart recommendations, custom hotkeys, zone transitions, daily challenges, comfort settings v2, content bookmarks, session replay, particle density control |
 | `content-depth.js` | Set 14: Content Depth — scratchpad, event RSVP, genre filter, creator comparison, sector map, weather alerts, breathing exercise, news ticker, cross-zone timeline, ambient lighting sync |
 | `polish-productivity.js` | Set 15: Polish & Productivity — keyboard map, color blind modes, pomodoro timer, content tagging, multi-tab sync, QR sharing, command palette, history graph, auto-save, haptic feedback |
+| `social-rich.js` | Set 16: Social Identity & Rich Content — avatar/profile, leaderboard, event reminders, movie trivia, stock news feed, wellness journal, weather outfit, creator quiz, hub world map, progress milestones |
 
 ## Testing & Deployment
 
@@ -216,3 +217,13 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | ENH-095 | Content History Graph (canvas bar chart of zone exploration time) | Done |
 | ENH-096 | Auto-Save State (60s periodic snapshots, restore points, 20 max) | Done |
 | ENH-097 | Haptic Feedback Patterns (6 patterns, auto-click vibrate, toggleable) | Done |
+| ENH-098 | Avatar/Profile System (name, avatar emoji, profile card editor) | Done |
+| ENH-099 | Leaderboard (achievement/session score ranking, top-10 display) | Done |
+| ENH-100 | Event Reminders (per-event countdown, 1-hour alert, events zone) | Done |
+| ENH-101 | Movie Trivia Quiz (8 questions, shuffled answers, score tracker) | Done |
+| ENH-102 | Stock News Feed (8 headlines, sentiment indicators, auto-display) | Done |
+| ENH-103 | Wellness Journal (mood emoji + notes, history, 100-entry limit) | Done |
+| ENH-104 | Weather Outfit Suggestion (clothing recs from Open-Meteo temp) | Done |
+| ENH-105 | Creator Discovery Quiz (3-question personality match, result persistence) | Done |
+| ENH-106 | Hub World Map (canvas globe, 6 city markers, equirectangular projection) | Done |
+| ENH-107 | Progress Milestones (6 tiers 10-150, badge toasts, usage counting) | Done |
