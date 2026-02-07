@@ -107,6 +107,7 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | `advanced-ux.js` | Set 12: Advanced UX & Immersion — data export/import, mini-map radar, dynamic weather FX, photo mode, events countdown, movie autoplay queue, creator spotlight, voice commands, usage analytics, spatial ambient audio |
 | `comfort-intelligence.js` | Set 13: Comfort & Intelligence — multi-language i18n, zen mode, smart recommendations, custom hotkeys, zone transitions, daily challenges, comfort settings v2, content bookmarks, session replay, particle density control |
 | `content-depth.js` | Set 14: Content Depth — scratchpad, event RSVP, genre filter, creator comparison, sector map, weather alerts, breathing exercise, news ticker, cross-zone timeline, ambient lighting sync |
+| `polish-productivity.js` | Set 15: Polish & Productivity — keyboard map, color blind modes, pomodoro timer, content tagging, multi-tab sync, QR sharing, command palette, history graph, auto-save, haptic feedback |
 
 ## Testing & Deployment
 
@@ -205,3 +206,13 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | ENH-085 | Hub News Ticker (scrolling headline banner, 10 headlines, auto-scroll) | Done |
 | ENH-086 | Cross-Zone Timeline (unified chronological view from all data sources) | Done |
 | ENH-087 | Ambient Lighting Sync (zone-matched A-Frame light + CSS tint overlay) | Done |
+| ENH-088 | Keyboard Map Overlay (? key, 13 shortcuts, visual dialog) | Done |
+| ENH-089 | Color Blind Modes (deuteranopia/protanopia/tritanopia SVG filters, cycle) | Done |
+| ENH-090 | Focus Timer Pomodoro (25/5 work-break, session counter, start/stop) | Done |
+| ENH-091 | Content Tagging System (universal tags, search by tag, tag cloud) | Done |
+| ENH-092 | Multi-Tab Sync (BroadcastChannel state sync, zone broadcasts) | Done |
+| ENH-093 | QR Code Sharing (generate QR for current URL, visual dialog) | Done |
+| ENH-094 | Command Palette (Ctrl+Shift+P, 20 commands, fuzzy search, instant exec) | Done |
+| ENH-095 | Content History Graph (canvas bar chart of zone exploration time) | Done |
+| ENH-096 | Auto-Save State (60s periodic snapshots, restore points, 20 max) | Done |
+| ENH-097 | Haptic Feedback Patterns (6 patterns, auto-click vibrate, toggleable) | Done |
