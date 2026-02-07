@@ -1,0 +1,34 @@
+{
+  "name": "vr-chat-server",
+  "version": "1.0.0",
+  "description": "WebSocket Chat Server for findtorontoevents.ca VR platform",
+  "main": "chat-server.js",
+  "scripts": {
+    "start": "node chat-server.js",
+    "dev": "nodemon chat-server.js",
+    "test": "node test-server.js"
+  },
+  "dependencies": {
+    "socket.io": "^4.7.4",
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.1",
+    "peer": "^1.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "websocket",
+    "chat",
+    "vr",
+    "webrtc",
+    "socket.io"
+  ],
+  "author": "findtorontoevents.ca",
+  "license": "MIT"
+}

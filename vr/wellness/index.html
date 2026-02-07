@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mental Health & Accountability Garden - VR Experience</title>
+  
+  <!-- A-Frame WebXR Framework (1.6.0 has animation built-in; do NOT load aframe-animation-component separately) -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  
+  <!-- Environment Component for beautiful natural scenes -->
+  <script src="https://unpkg.com/aframe-environment-component@1.3.7/dist/aframe-environment-component.min.js"></script>
+  
+  <!-- look-at component: register manually to avoid stale-selector warnings -->
+  <script>
+    AFRAME.registerComponent('billboard', {
+      tick: function () {
+        var cam = this.el.sceneEl.camera;
+        if (cam) this.el.object3D.lookAt(cam.getWorldPosition(new THREE.Vector3()));
+      }
+    });
+  </script>
+
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; }
+    
+    /* Loading overlay */
+    #loading {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a0a1a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      color: white;
+      transition: opacity 0.5s;
+    }
+    
+    #loading h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    #loading p { color: #888; }
+    
+    .spinner {
+      width: 50px; height: 50px;
+      border: 3px solid rgba(16, 185, 129, 0.3);
+      border-top-color: #10b981;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Instructions overlay */
+    #instructions {
+      position: fixed;
+      bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 2rem;
+      z-index: 100;
+      pointer-events: none;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .hidden { display: none !important; }
+    
+    /* Start button for audio */
+    #start-experience {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: white;
+      border: none;
+      padding: 1.5rem 3rem;
+      font-size: 1.25rem;
+      border-radius: 1rem;
+      cursor: pointer;
+      z-index: 10000;
+      box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    #start-experience:hover {
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow: 0 15px 50px rgba(16, 185, 129, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <h1>🌿 Mental Health Garden</h1>
+    <p>Loading your peaceful sanctuary...</p>
+  </div>
+
+  <!-- Start Button for Audio Context -->
+  <button id="start-experience">Enter Garden Experience</button>
+
+  <!-- Instructions -->
+  <div id="instructions" class="hidden">
+    <p>👆 Look and click to interact • 🎯 Point at breathing sphere to start • 🏃 Teleport to move</p>
+  </div>
+
+  <!-- A-Frame Scene -->
+  <a-scene 
+    renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true; alpha: true"
+    vr-mode-ui="enabled: true"
+    loading-screen="dotsColor: #10b981; backgroundColor: #0f0f0f"
+    webxr="optionalFeatures: ['dom-overlay', 'hand-tracking', 'local-floor', 'hit-test', 'layers']; referenceSpaceType: local-floor"
+    background="transparent: true">
+    
+    <!-- Passthrough Notification (visible when in AR) -->
+    <a-entity id="passthrough-ui" position="0 2.5 -5" visible="false" billboard>
+      <a-plane width="3.5" height="0.6" color="#000" opacity="0.7" material="transparent: true; shader: flat">
+        <a-text value="🥽 Mixed Reality Mode - Garden in Your Room" align="center" width="4" color="#10b981" position="0 0 0.01"></a-text>
+      </a-plane>
+    </a-entity>
+    
+    <!-- Asset Management -->
+    <a-assets timeout="10000">
+      <!--
+        Audio is optional. Pixabay direct-download links 403 from browsers.
+        We use silent placeholders so the sound components don't error out.
+        If you have your own hosted audio files, replace these data URIs.
+      -->
+      
+      <!-- Fonts -->
+      <a-mixin id="text-heading" text="align: center; width: 4; color: #ffffff; shader: msdf; font: https://raw.githubusercontent.com/etiennepinchon/aframe-fonts/master/fonts/roboto/Roboto-Bold.json"></a-mixin>
+      <a-mixin id="text-body" text="align: center; width: 2.5; color: #e0e0e0; shader: msdf; font: https://raw.githubusercontent.com/etiennepinchon/aframe-fonts/master/fonts/roboto/Roboto-Regular.json"></a-mixin>
+    </a-assets>
+
+    <!-- Environment: Beautiful Forest/Garden -->
+    <a-entity environment="
+      preset: forest;
+      groundColor: #1a3d1a;
+      groundTexture: walkernoise;
+      dressing: trees;
+      dressingAmount: 50;
+      dressingColor: #0d5c0d;
+      skyType: atmosphere;
+      skyColor: #87CEEB;
+      horizonColor: #E0F6FF;
+      lightPosition: -1 2 1;
+      fog: 0.6"></a-entity>
+
+    <!-- Additional Nature Elements -->
+    <!-- Flowers/Ground Cover -->
+    <a-entity id="flowers" position="0 0.1 0">
+      <a-sphere position="-3 0.2 -4" radius="0.15" color="#FF69B4" opacity="0.8"></a-sphere>
+      <a-sphere position="2 0.2 -6" radius="0.15" color="#FFB6C1" opacity="0.8"></a-sphere>
+      <a-sphere position="-5 0.2 -2" radius="0.15" color="#FFA07A" opacity="0.8"></a-sphere>
+      <a-sphere position="4 0.2 -3" radius="0.15" color="#FF1493" opacity="0.8"></a-sphere>
+      <a-sphere position="-2 0.2 -8" radius="0.15" color="#DA70D6" opacity="0.8"></a-sphere>
+      <a-sphere position="6 0.2 -5" radius="0.15" color="#EE82EE" opacity="0.8"></a-sphere>
+    </a-entity>
+
+    <!-- Water Feature - Small Pond -->
+    <a-circle position="8 0.05 5" radius="2" rotation="-90 0 0" color="#4FC3F7" opacity="0.7" 
+              material="transparent: true; metalness: 0.8; roughness: 0.1"
+              animation="property: material.opacity; from: 0.6; to: 0.8; dir: alternate; dur: 3000; loop: true">
+    </a-circle>
+    
+    <!-- Water particles/fountain effect -->
+    <a-entity position="8 0.5 5">
+      <a-sphere radius="0.1" color="#81D4FA" opacity="0.6"
+                animation="property: position; to: 0 1.5 0; dur: 2000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+      <a-sphere radius="0.08" color="#B3E5FC" opacity="0.5" position="0.3 0 0.2"
+                animation="property: position; to: 0.5 1.2 0.4; dur: 1800; loop: true; dir: alternate; easing: easeInOutSine; delay: 200"></a-sphere>
+      <a-sphere radius="0.06" color="#E1F5FE" opacity="0.4" position="-0.2 0 0.3"
+                animation="property: position; to: -0.4 1 0.6; dur: 2200; loop: true; dir: alternate; easing: easeInOutSine; delay: 400"></a-sphere>
+    </a-entity>
+
+    <!-- Stone Path -->
+    <a-entity id="path">
+      <a-cylinder position="0 0.02 0" radius="0.8" height="0.05" color="#9E9E9E" roughness="0.9"></a-cylinder>
+      <a-cylinder position="0 0.02 -2" radius="0.7" height="0.05" color="#BDBDBD" roughness="0.9"></a-cylinder>
+      <a-cylinder position="-1.5 0.02 -3.5" radius="0.75" height="0.05" color="#9E9E9E" roughness="0.9"></a-cylinder>
+      <a-cylinder position="1.5 0.02 -4" radius="0.65" height="0.05" color="#BDBDBD" roughness="0.9"></a-cylinder>
+    </a-entity>
+
+    <!-- ===== BREATHING EXERCISE SPHERE ===== -->
+    <a-entity id="breathing-zone" position="-4 1.5 -6">
+      <!-- Platform -->
+      <a-cylinder radius="2" height="0.1" color="#2d5a3d" position="0 -1.4 0"></a-cylinder>
+      
+      <!-- Title -->
+      <a-entity position="0 1.5 0" billboard>
+        <a-text value="Breathe" mixin="text-heading" position="0 0.8 0" scale="1.5 1.5 1.5"
+                color="#10b981"></a-text>
+        <a-text value="Click sphere to start\n4-7-8 breathing" mixin="text-body" position="0 0.2 0" scale="0.8 0.8 0.8"></a-text>
+      </a-entity>
+      
+      <!-- Breathing Sphere -->
+      <a-entity id="breath-sphere-container" position="0 0 0">
+        <!-- Outer glow -->
+        <a-sphere id="breath-sphere-glow" radius="0.8" color="#10b981" opacity="0.3"
+                  material="transparent: true; side: back"
+                  animation__breath="property: scale; from: 1 1 1; to: 1.8 1.8 1.8; dur: 4000; dir: alternate; loop: false; startEvents: startBreath"
+                  animation__color="property: color; from: #10b981; to: #06b6d4; dur: 4000; dir: alternate; loop: false; startEvents: startBreath">
+        </a-sphere>
+        
+        <!-- Main sphere -->
+        <a-sphere id="breath-sphere" radius="0.6" color="#10b981"
+                  material="metalness: 0.3; roughness: 0.4; emissive: #10b981; emissiveIntensity: 0.3"
+                  class="clickable"
+                  animation__click="property: scale; from: 1 1 1; to: 0.9 0.9 0.9; dur: 150; startEvents: click; dir: alternate"
+                  animation__hover="property: position; from: 0 0 0; to: 0 0.1 0; dur: 2000; dir: alternate; loop: true; easing: easeInOutSine">
+          
+          <!-- Breathing instruction text inside sphere -->
+          <a-text id="breath-instruction" value="Click to\nStart" align="center" width="3" color="white"
+                  position="0 0 0.35" scale="0.5 0.5 0.5" billboard></a-text>
+        </a-sphere>
+        
+        <!-- Particle ring -->
+        <a-ring radius-inner="0.9" radius-outer="0.95" color="#10b981" opacity="0.5" rotation="-90 0 0"
+                animation="property: rotation; to: -90 360 0; dur: 10000; loop: true; easing: linear">
+        </a-ring>
+      </a-entity>
+      
+      <!-- Breathing phase indicators -->
+      <a-entity id="breath-phases" position="0 -1 0" visible="false">
+        <a-box position="-1.5 0 0" width="0.8" height="0.3" depth="0.1" color="#333" opacity="0.8">
+          <a-text value="Inhale\n4s" align="center" width="2" color="#10b981" position="0 0 0.06"></a-text>
+        </a-box>
+        <a-box position="0 0 0" width="0.8" height="0.3" depth="0.1" color="#333" opacity="0.8">
+          <a-text value="Hold\n7s" align="center" width="2" color="#f59e0b" position="0 0 0.06"></a-text>
+        </a-box>
+        <a-box position="1.5 0 0" width="0.8" height="0.3" depth="0.1" color="#333" opacity="0.8">
+          <a-text value="Exhale\n8s" align="center" width="2" color="#06b6d4" position="0 0 0.06"></a-text>
+        </a-box>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== ACCOUNTABILITY COACH PANEL ===== -->
+    <a-entity id="coach-zone" position="4 1.5 -6">
+      <!-- Platform -->
+      <a-cylinder radius="2.2" height="0.1" color="#3d3d5a" position="0 -1.4 0"></a-cylinder>
+      
+      <!-- Title -->
+      <a-entity position="0 1.8 0" billboard>
+        <a-text value="Accountability Coach" mixin="text-heading" position="0 0.5 0" scale="1.3 1.3 1.3"
+                color="#a855f7"></a-text>
+      </a-entity>
+      
+      <!-- Coach Avatar/Icon -->
+      <a-entity position="0 0.5 0">
+        <a-cylinder radius="0.3" height="0.6" color="#a855f7" position="0 0 0"
+                    animation="property: rotation; to: 0 360 0; dur: 20000; loop: true; easing: linear">
+          <a-sphere radius="0.25" color="#c084fc" position="0 0.45 0"></a-sphere>
+          <a-ring radius-inner="0.35" radius-outer="0.4" color="#d8b4fe" rotation="90 0 0" position="0 0 0"></a-ring>
+        </a-cylinder>
+      </a-entity>
+      
+      <!-- Stats Panels -->
+      <a-entity id="stats-panels" position="0 -0.3 0">
+        <!-- Current Goal -->
+        <a-box position="-1.2 0 0" width="1.8" height="1" depth="0.15" color="#1a1a2e" opacity="0.9"
+               class="clickable"
+               animation__hover="property: position; from: -1.2 0 0; to: -1.2 0 0.1; dur: 300; startEvents: mouseenter; pauseEvents: mouseleave">
+          <a-text value="Current Goal" align="center" width="2.5" color="#a855f7" position="0 0.3 0.08" scale="0.7 0.7 0.7"></a-text>
+          <a-text id="goal-text" value="Exercise 30 min\ndaily" align="center" width="2" color="white" position="0 -0.05 0.08" scale="0.6 0.6 0.6"></a-text>
+          <a-circle radius="0.15" color="#22c55e" position="0 -0.25 0.08">
+            <a-text value="3" align="center" width="3" color="white" position="0 0 0.02" scale="0.5 0.5 0.5"></a-text>
+          </a-circle>
+        </a-box>
+        
+        <!-- Streak Counter -->
+        <a-box position="1.2 0 0" width="1.8" height="1" depth="0.15" color="#1a1a2e" opacity="0.9"
+               class="clickable"
+               animation__hover="property: position; from: 1.2 0 0; to: 1.2 0 0.1; dur: 300; startEvents: mouseenter; pauseEvents: mouseleave">
+          <a-text value="Streak" align="center" width="2.5" color="#f59e0b" position="0 0.3 0.08" scale="0.7 0.7 0.7"></a-text>
+          <a-text id="streak-text" value="12 Days" align="center" width="3" color="white" position="0 0 0.08" scale="1.2 1.2 1.2"></a-text>
+          <a-text value="Keep it up!" align="center" width="2" color="#f59e0b" position="0 -0.3 0.08" scale="0.5 0.5 0.5"></a-text>
+        </a-box>
+        
+        <!-- Check-in Button -->
+        <a-box position="0 -0.8 0" width="2" height="0.5" depth="0.2" color="#22c55e"
+               class="clickable"
+               animation__hover="property: scale; from: 1 1 1; to: 1.05 1.05 1.05; dur: 200; startEvents: mouseenter; pauseEvents: mouseleave"
+               animation__click="property: scale; from: 1 1 1; to: 0.95 0.95 0.95; dur: 100; startEvents: click; dir: alternate">
+          <a-text value="DAILY CHECK-IN" align="center" width="3" color="white" position="0 0 0.11" scale="0.8 0.8 0.8"></a-text>
+        </a-box>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== MOTIVATIONAL CONTENT WALL ===== -->
+    <a-entity id="motivation-zone" position="0 1.5 -10">
+      <!-- Platform -->
+      <a-cylinder radius="2.5" height="0.1" color="#2d3a1a" position="0 -1.4 0"></a-cylinder>
+      
+      <!-- Title -->
+      <a-entity position="0 1.8 0" billboard>
+        <a-text value="Daily Inspiration" mixin="text-heading" position="0 0.5 0" scale="1.3 1.3 1.3"
+                color="#f59e0b"></a-text>
+      </a-entity>
+      
+      <!-- Quote Display -->
+      <a-entity position="0 0.3 0">
+        <a-rounded position="0 0 0" width="4" height="2.5" radius="0.2" color="#1a1a2e" opacity="0.9">
+        </a-rounded>
+        <a-plane width="4" height="2.5" color="#1a1a2e" opacity="0.95">
+          <a-text id="quote-text" 
+                  value='"The only way to do great work is to love what you do."\n\n- Steve Jobs' 
+                  align="center" width="3" color="white" position="0 0 0.01" scale="0.7 0.7 0.7"
+                  wrap-count="40"></a-text>
+        </a-plane>
+        
+        <!-- Navigation -->
+        <a-entity position="0 -1.5 0">
+          <a-triangle position="-0.8 0 0" color="#f59e0b" scale="0.3 0.3 0.3" rotation="0 0 -90"
+                      class="clickable"
+                      animation__hover="property: scale; from: 0.3 0.3 0.3; to: 0.35 0.35 0.35; dur: 200; startEvents: mouseenter; pauseEvents: mouseleave"
+                      id="prev-quote"></a-triangle>
+          <a-text value="More Quotes" align="center" width="2" color="#888" position="0 0 0" scale="0.5 0.5 0.5"></a-text>
+          <a-triangle position="0.8 0 0" color="#f59e0b" scale="0.3 0.3 0.3" rotation="0 0 90"
+                      class="clickable"
+                      animation__hover="property: scale; from: 0.3 0.3 0.3; to: 0.35 0.35 0.35; dur: 200; startEvents: mouseenter; pauseEvents: mouseleave"
+                      id="next-quote"></a-triangle>
+        </a-entity>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== MEDITATION/STILLNESS SPOT ===== -->
+    <a-entity id="meditation-spot" position="-8 0.1 -2">
+      <a-circle radius="1.5" rotation="-90 0 0" color="#10b981" opacity="0.3"
+                animation="property: material.opacity; from: 0.2; to: 0.4; dir: alternate; dur: 4000; loop: true">
+      </a-circle>
+      <a-entity position="0 0.5 0">
+        <a-text value="Meditation Spot" align="center" width="3" color="#10b981" position="0 0 0"></a-text>
+        <a-text value="Stand here for\nmindful moments" align="center" width="2" color="#888" position="0 -0.3 0" scale="0.6 0.6 0.6"></a-text>
+      </a-entity>
+      
+      <!-- Floating orbs -->
+      <a-sphere position="-0.5 0.8 -0.5" radius="0.1" color="#10b981" opacity="0.6"
+                animation="property: position; to: -0.5 1.2 -0.5; dur: 3000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+      <a-sphere position="0.4 0.6 0.3" radius="0.08" color="#06b6d4" opacity="0.6"
+                animation="property: position; to: 0.4 1 0.3; dur: 2500; loop: true; dir: alternate; easing: easeInOutSine; delay: 500"></a-sphere>
+      <a-sphere position="0 0.9 -0.3" radius="0.06" color="#a855f7" opacity="0.6"
+                animation="property: position; to: 0 1.3 -0.3; dur: 3500; loop: true; dir: alternate; easing: easeInOutSine; delay: 1000"></a-sphere>
+    </a-entity>
+
+    <!-- ===== GRATITUDE WALL ===== -->
+    <a-entity id="gratitude-zone" position="8 1.5 -2">
+      <a-cylinder radius="2" height="0.1" color="#4a3728" position="0 -1.4 0"></a-cylinder>
+      
+      <a-entity position="0 1.5 0" billboard>
+        <a-text value="Gratitude Tree" mixin="text-heading" position="0 0.5 0" scale="1.3 1.3 1.3"
+                color="#d4a574"></a-text>
+      </a-entity>
+      
+      <!-- Tree trunk -->
+      <a-cylinder position="0 0 0" radius="0.3" height="1.5" color="#8B4513"></a-cylinder>
+      
+      <!-- Tree leaves -->
+      <a-entity position="0 0.8 0">
+        <a-sphere radius="0.8" color="#228B22" opacity="0.9"></a-sphere>
+        <a-sphere position="-0.5 0.3 0.2" radius="0.5" color="#32CD32" opacity="0.8"></a-sphere>
+        <a-sphere position="0.5 0.2 -0.3" radius="0.5" color="#32CD32" opacity="0.8"></a-sphere>
+        <a-sphere position="0 0.4 -0.4" radius="0.5" color="#228B22" opacity="0.8"></a-sphere>
+      </a-entity>
+      
+      <!-- Gratitude leaves -->
+      <a-entity id="gratitude-leaves">
+        <a-sphere position="-0.3 1.5 0.3" radius="0.1" color="#FFD700" opacity="0.9"
+                  class="clickable"
+                  animation="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dur: 500; startEvents: mouseenter; pauseEvents: mouseleave">
+          <a-text value="Family" align="center" width="2" color="#333" position="0 0 0.11" scale="0.3 0.3 0.3"></a-text>
+        </a-sphere>
+        <a-sphere position="0.4 1.3 0.2" radius="0.1" color="#FFA500" opacity="0.9"
+                  class="clickable"
+                  animation="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dur: 500; startEvents: mouseenter; pauseEvents: mouseleave">
+          <a-text value="Health" align="center" width="2" color="#333" position="0 0 0.11" scale="0.3 0.3 0.3"></a-text>
+        </a-sphere>
+        <a-sphere position="0 1.6 -0.3" radius="0.1" color="#FF69B4" opacity="0.9"
+                  class="clickable"
+                  animation="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dur: 500; startEvents: mouseenter; pauseEvents: mouseleave">
+          <a-text value="Growth" align="center" width="2" color="#333" position="0 0 0.11" scale="0.3 0.3 0.3"></a-text>
+        </a-sphere>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== RETURN TO HUB PORTAL ===== -->
+    <a-entity id="hub-portal" position="0 0.1 8">
+      <a-ring radius-inner="0.8" radius-outer="1" color="#00d4ff" rotation="-90 0 0"
+              animation="property: rotation; to: -90 360 0; dur: 10000; loop: true; easing: linear">
+      </a-ring>
+      <a-cylinder position="0 0.05 0" radius="1" height="0.1" color="#00d4ff" opacity="0.3"
+                  class="clickable"
+                  animation__hover="property: scale; from: 1 1 1; to: 1.1 1.1 1.1; dur: 300; startEvents: mouseenter; pauseEvents: mouseleave">
+      </a-cylinder>
+      <a-text value="Return to Hub" align="center" width="3" color="#00d4ff" position="0 2 0" billboard></a-text>
+      <a-entity position="0 1 0">
+        <a-cone radius-bottom="0.2" radius-top="0" height="0.4" color="#00d4ff" rotation="180 0 0"></a-cone>
+      </a-entity>
+    </a-entity>
+
+    <!-- Lighting -->
+    <a-light type="ambient" color="#ffffff" intensity="0.4"></a-light>
+    <a-light type="directional" position="-1 2 1" color="#fff9e6" intensity="0.8" cast-shadow="true"></a-light>
+    <a-light type="point" position="-4 2 -6" color="#10b981" intensity="0.5" distance="5"></a-light>
+    <a-light type="point" position="4 2 -6" color="#a855f7" intensity="0.5" distance="5"></a-light>
+
+    <!-- Camera with Cursor -->
+    <a-entity id="rig" position="0 1.6 0">
+      <a-camera look-controls wasd-controls="acceleration: 50">
+        <a-cursor id="cursor"
+                  color="#00d4ff"
+                  fuse="true"
+                  fuse-timeout="1500"
+                  raycaster="objects: .clickable"
+                  animation__click="property: scale; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150; startEvents: click"
+                  animation__fusing="property: scale; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500; startEvents: fusing"
+                  animation__mouseleave="property: scale; to: 1 1 1; dur: 500; startEvents: mouseleave">
+        </a-cursor>
+
+        <!-- Quest hand tracking / controllers -->
+        <a-entity id="left-hand"
+          hand-tracking-controls="hand: left; modelColor: #10b981; modelOpacity: 0.6"
+          laser-controls="hand: left; model: false"
+          raycaster="objects: .clickable; far: 20; lineColor: #10b981; lineOpacity: 0.4"
+          cursor="rayOrigin: entity; fuse: false"
+        ></a-entity>
+        <a-entity id="right-hand"
+          hand-tracking-controls="hand: right; modelColor: #06b6d4; modelOpacity: 0.6"
+          laser-controls="hand: right; model: false"
+          raycaster="objects: .clickable; far: 20; lineColor: #06b6d4; lineOpacity: 0.4"
+          cursor="rayOrigin: entity; fuse: false"
+        ></a-entity>
+      </a-camera>
+    </a-entity>
+
+    <!-- Audio entities (sounds are optional; audio files not bundled to avoid 403 from CDNs) -->
+    <!-- To add sounds: host .mp3 files on your server, add <audio> tags in <a-assets>, and uncomment these: -->
+    <!-- <a-entity id="audio-nature" sound="src: #ambient-nature; loop: true; volume: 0.3; positional: false"></a-entity> -->
+    <!-- <a-entity id="audio-water" sound="src: #water-sounds; loop: true; volume: 0.22; positional: true" position="8 0 5"></a-entity> -->
+    <!-- <a-entity id="audio-birds" sound="src: #birds; loop: true; volume: 0.18; positional: true" position="-3 2 -4"></a-entity> -->
+    <!-- <a-entity id="audio-chime" sound="src: #chime; volume: 0.5; positional: false"></a-entity> -->
+
+  </a-scene>
+
+  <script>
+    // ===== QUOTES DATABASE =====
+    const quotes = [
+      { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+      { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+      { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
+      { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+      { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+      { text: "Your limitation—it's only your imagination.", author: "Unknown" },
+      { text: "Push yourself, because no one else is going to do it for you.", author: "Unknown" },
+      { text: "Great things never came from comfort zones.", author: "Unknown" },
+      { text: "Dream it. Wish it. Do it.", author: "Unknown" },
+      { text: "Success doesn't just find you. You have to go out and get it.", author: "Unknown" },
+      { text: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Unknown" },
+      { text: "Dream bigger. Do bigger.", author: "Unknown" }
+    ];
+    
+    let currentQuoteIndex = 0;
+    let breathingActive = false;
+    let breathingPhase = 0; // 0: inhale, 1: hold, 2: exhale
+    
+    // ===== LOADING =====
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loading').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('loading').classList.add('hidden');
+        }, 500);
+      }, 2000);
+    });
+    
+    // ===== START EXPERIENCE =====
+    document.getElementById('start-experience').addEventListener('click', function() {
+      this.style.display = 'none';
+      document.getElementById('instructions').classList.remove('hidden');
+      
+      // Try to play ambient sounds (gracefully skip if not loaded)
+      function tryPlay(id) {
+        try {
+          var el = document.getElementById(id);
+          if (el && el.components && el.components.sound) el.components.sound.playSound();
+        } catch (_) { /* audio not available */ }
+      }
+      tryPlay('audio-nature');
+      tryPlay('audio-water');
+      tryPlay('audio-birds');
+      
+      // Hide instructions after 10 seconds
+      setTimeout(() => {
+        document.getElementById('instructions').classList.add('hidden');
+      }, 10000);
+    });
+    
+    // ===== BREATHING EXERCISE =====
+    document.getElementById('breath-sphere').addEventListener('click', function() {
+      if (!breathingActive) {
+        startBreathingExercise();
+      } else {
+        stopBreathingExercise();
+      }
+    });
+    
+    function startBreathingExercise() {
+      breathingActive = true;
+      document.getElementById('breath-phases').setAttribute('visible', 'true');
+      document.getElementById('breath-instruction').setAttribute('value', 'Inhale...');
+      
+      const sphere = document.getElementById('breath-sphere-glow');
+      sphere.emit('startBreath');
+      
+      // Play chime
+      tryPlay('audio-chime');
+      
+      // Breathing cycle
+      runBreathingCycle();
+    }
+    
+    function runBreathingCycle() {
+      if (!breathingActive) return;
+      
+      const phases = [
+        { name: 'Inhale...', duration: 4000, color: '#10b981' },
+        { name: 'Hold...', duration: 7000, color: '#f59e0b' },
+        { name: 'Exhale...', duration: 8000, color: '#06b6d4' }
+      ];
+      
+      const phase = phases[breathingPhase];
+      document.getElementById('breath-instruction').setAttribute('value', phase.name);
+      document.getElementById('breath-sphere').setAttribute('color', phase.color);
+      
+      // Highlight active phase
+      const phaseBoxes = document.querySelectorAll('#breath-phases a-box');
+      phaseBoxes.forEach((box, i) => {
+        if (i === breathingPhase) {
+          box.setAttribute('scale', '1.1 1.1 1.1');
+          box.setAttribute('color', '#444');
+        } else {
+          box.setAttribute('scale', '1 1 1');
+          box.setAttribute('color', '#333');
+        }
+      });
+      
+      setTimeout(() => {
+        breathingPhase = (breathingPhase + 1) % 3;
+        if (breathingActive) {
+          runBreathingCycle();
+        }
+      }, phase.duration);
+    }
+    
+    function stopBreathingExercise() {
+      breathingActive = false;
+      breathingPhase = 0;
+      document.getElementById('breath-phases').setAttribute('visible', 'false');
+      document.getElementById('breath-instruction').setAttribute('value', 'Click to\nStart');
+      document.getElementById('breath-sphere').setAttribute('color', '#10b981');
+    }
+    
+    // ===== QUOTE NAVIGATION =====
+    document.getElementById('next-quote').addEventListener('click', function() {
+      currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+      updateQuote();
+    });
+    
+    document.getElementById('prev-quote').addEventListener('click', function() {
+      currentQuoteIndex = (currentQuoteIndex - 1 + quotes.length) % quotes.length;
+      updateQuote();
+    });
+    
+    function updateQuote() {
+      const quote = quotes[currentQuoteIndex];
+      const quoteText = `"${quote.text}"\n\n- ${quote.author}`;
+      document.getElementById('quote-text').setAttribute('value', quoteText);
+    }
+    
+    // ===== CHECK-IN BUTTON =====
+    document.querySelector('#stats-panels a-box[color="#22c55e"]').addEventListener('click', function() {
+      tryPlay('audio-chime');
+      
+      // Visual feedback
+      this.setAttribute('color', '#16a34a');
+      document.querySelector('#stats-panels a-text').setAttribute('value', 'Checked In!');
+      
+      setTimeout(() => {
+        this.setAttribute('color', '#22c55e');
+        document.querySelector('#stats-panels a-text').setAttribute('value', 'DAILY CHECK-IN');
+      }, 2000);
+    });
+    
+    // ===== GRATITUDE LEAVES =====
+    document.querySelectorAll('#gratitude-leaves a-sphere').forEach(leaf => {
+      leaf.addEventListener('click', function() {
+        tryPlay('audio-chime');
+        
+        // Glow effect
+        this.setAttribute('emissive', '#FFD700');
+        this.setAttribute('emissiveIntensity', '0.5');
+        
+        setTimeout(() => {
+          this.setAttribute('emissive', 'none');
+        }, 1000);
+      });
+    });
+    
+    // ===== HUB PORTAL =====
+    document.querySelector('#hub-portal a-cylinder').addEventListener('click', function() {
+      window.location.href = '/vr/';
+    });
+    
+    // ===== TELEPORTATION POINTS =====
+    const teleportPoints = [
+      { position: '-4 1.6 -5', target: 'breathing' },
+      { position: '4 1.6 -5', target: 'coach' },
+      { position: '0 1.6 -8', target: 'motivation' },
+      { position: '-8 1.6 -1', target: 'meditation' },
+      { position: '8 1.6 -1', target: 'gratitude' }
+    ];
+    
+    // Add teleport indicators
+    teleportPoints.forEach((point, i) => {
+      const indicator = document.createElement('a-sphere');
+      indicator.setAttribute('position', point.position.split(' ')[0] + ' 0.1 ' + point.position.split(' ')[2]);
+      indicator.setAttribute('radius', '0.3');
+      indicator.setAttribute('color', '#00d4ff');
+      indicator.setAttribute('opacity', '0.3');
+      indicator.setAttribute('class', 'clickable');
+      indicator.setAttribute('animation', 'property: position; dir: alternate; dur: 2000; loop: true; to: ' + point.position.split(' ')[0] + ' 0.3 ' + point.position.split(' ')[2]);
+      
+      indicator.addEventListener('click', function() {
+        const camera = document.querySelector('a-camera');
+        camera.setAttribute('position', point.position);
+      });
+      
+      document.querySelector('a-scene').appendChild(indicator);
+    });
+    
+    // Keyboard controls for mouse users - Quick navigation
+    document.addEventListener('keydown', (e) => {
+      const camera = document.querySelector('a-camera');
+      
+      switch(e.key) {
+        case '1': camera.setAttribute('position', '-4 1.6 -5'); break; // Breathing
+        case '2': camera.setAttribute('position', '4 1.6 -5'); break;  // Coach
+        case '3': camera.setAttribute('position', '0 1.6 -8'); break;  // Quotes
+        case '4': camera.setAttribute('position', '-8 1.6 -1'); break; // Meditation
+        case '5': camera.setAttribute('position', '8 1.6 -1'); break;  // Gratitude
+        case '0': camera.setAttribute('position', '0 1.6 0'); break;   // Center
+        
+        // Spacebar to toggle breathing exercise
+        case ' ':
+          e.preventDefault();
+          document.getElementById('breath-sphere').dispatchEvent(new Event('click'));
+          break;
+          
+        // Arrow keys for quote navigation
+        case 'ArrowRight':
+          document.getElementById('next-quote').dispatchEvent(new Event('click'));
+          break;
+        case 'ArrowLeft':
+          document.getElementById('prev-quote').dispatchEvent(new Event('click'));
+          break;
+          
+        // C for check-in
+        case 'c':
+        case 'C':
+          document.querySelector('#stats-panels a-box[color="#22c55e"]').dispatchEvent(new Event('click'));
+          break;
+          
+        // H for hub
+        case 'h':
+        case 'H':
+          window.location.href = '/vr/';
+          break;
+      }
+    });
+    
+    // Update instructions to show keyboard shortcuts
+    document.getElementById('instructions').innerHTML = 
+      '<p><strong>🖱️ Mouse:</strong> Click to interact &nbsp;|&nbsp; <strong>⌨️ Keys:</strong> 1-5 jump zones, Space=breathing, ←→ quotes, C=check-in, H=hub</p>';
+  </script>
+  <!-- Shared presence tracker + keyboard shortcuts -->
+  <script src="/vr/presence.js"></script>
+  <!-- VR Controller Support -->
+  <script src="/vr/controller-support.js"></script>
+  
+  <!-- VR Navigation Menu -->
+  <script src="/vr/nav-menu.js"></script>
+  <!-- VR Quick Wins -->
+  <script src="/vr/quick-wins.js"></script>
+
+  <!-- Comfort vignette + F1 help -->
+  <script src="/vr/vr-comfort.js"></script>
+  <!-- Quest Thumbstick Locomotion -->
+  <script>
+  (function () {
+    var rig, camera, moveSpeed = 0.06, turnCooldown = false;
+    function init() {
+      rig = document.getElementById('rig') || document.getElementById('camera-rig');
+      camera = document.querySelector('a-camera');
+      if (rig) requestAnimationFrame(step);
+    }
+    function step() {
+      var pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      var left = null, right = null;
+      for (var i = 0; i < pads.length; i++) {
+        var p = pads[i];
+        if (!p) continue;
+        if (p.hand === 'left') left = p;
+        if (p.hand === 'right') right = p;
+      }
+      if (left && left.axes.length >= 2) {
+        var x = left.axes[0] || 0, y = left.axes[1] || 0;
+        if (Math.abs(x) > 0.1 || Math.abs(y) > 0.1) {
+          var yaw = camera && camera.object3D ? camera.object3D.rotation.y : 0;
+          var dx = Math.sin(yaw) * -y + Math.cos(yaw) * x;
+          var dz = Math.cos(yaw) * -y - Math.sin(yaw) * x;
+          var pos = rig.getAttribute('position');
+          rig.setAttribute('position', { x: pos.x + dx * moveSpeed, y: pos.y, z: pos.z + dz * moveSpeed });
+        }
+      }
+      if (right && right.axes.length >= 2) {
+        var turn = right.axes[0] || 0;
+        if (!turnCooldown && Math.abs(turn) > 0.7) {
+          var rot = rig.getAttribute('rotation');
+          rig.setAttribute('rotation', { x: rot.x, y: rot.y + (turn > 0 ? -30 : 30), z: rot.z });
+          turnCooldown = true;
+          setTimeout(function () { turnCooldown = false; }, 300);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+  })();
+  </script>
+</body>
+</html>

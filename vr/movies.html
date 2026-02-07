@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VR Movie Theater - Toronto Events</title>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+    /* Loading overlay */
+    #loading-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a2a 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #fff; transition: opacity 1s;
+    }
+    #loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    #loading-overlay h1 {
+      font-size: 2.5rem; margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #4ecdc4, #00d4ff);
+      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    #loading-overlay p { color: #94a3b8; font-size: 1rem; }
+    .loading-spinner {
+      width: 40px; height: 40px; border: 3px solid rgba(78,205,196,0.2);
+      border-top-color: #4ecdc4; border-radius: 50%; margin-top: 20px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* YouTube overlay player */
+    #yt-overlay {
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(0,0,0,0.95); display: none;
+      align-items: center; justify-content: center; flex-direction: column;
+    }
+    #yt-overlay.active { display: flex; }
+    #yt-container {
+      width: 90vw; max-width: 960px; aspect-ratio: 16/9;
+      background: #000; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 0 60px rgba(78,205,196,0.3);
+    }
+    #yt-container iframe { width: 100%; height: 100%; border: none; }
+    #yt-close {
+      margin-top: 16px; padding: 12px 32px; background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+      color: #fff; font-size: 16px; cursor: pointer; transition: all 0.2s;
+    }
+    #yt-close:hover { background: rgba(255,255,255,0.2); }
+    #yt-movie-title {
+      color: #4ecdc4; font-size: 1.2rem; margin-bottom: 12px; text-align: center;
+    }
+
+    /* HUD - movie info panel */
+    #movie-hud {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
+      padding: 20px 24px 24px; transform: translateY(100%); transition: transform 0.4s ease;
+      pointer-events: none;
+    }
+    #movie-hud.visible { transform: translateY(0); pointer-events: auto; }
+    #movie-hud h2 { color: #fff; font-size: 1.4rem; margin-bottom: 4px; }
+    #movie-hud .meta { color: #94a3b8; font-size: 0.9rem; margin-bottom: 8px; }
+    #movie-hud .meta span { margin-right: 12px; }
+    #movie-hud .meta .rating { color: #fbbf24; }
+    #movie-hud .desc { color: #cbd5e1; font-size: 0.85rem; max-height: 60px; overflow: hidden; margin-bottom: 12px; }
+    #movie-hud .actions { display: flex; gap: 10px; }
+    #movie-hud .actions button {
+      padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s;
+    }
+    #play-trailer-btn {
+      background: linear-gradient(135deg, #4ecdc4, #00b4d8); color: #000;
+    }
+    #play-trailer-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(78,205,196,0.4); }
+    #close-hud-btn { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2) !important; }
+
+    /* Category selector bar */
+    #category-bar {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 100;
+      display: flex; gap: 8px; padding: 6px; background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(12px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1);
+    }
+    #category-bar button {
+      padding: 8px 16px; border-radius: 18px; border: none; font-size: 13px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s;
+      background: transparent; color: #94a3b8;
+    }
+    #category-bar button.active { background: #4ecdc4; color: #000; }
+    #category-bar button:hover:not(.active) { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* Back to hub link */
+    #back-link {
+      position: fixed; top: 16px; left: 16px; z-index: 100;
+      color: #4ecdc4; text-decoration: none; font-size: 14px; font-weight: 600;
+      padding: 8px 16px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      border-radius: 20px; border: 1px solid rgba(78,205,196,0.3); transition: all 0.2s;
+    }
+    #back-link:hover { background: rgba(78,205,196,0.15); }
+
+    /* Status text */
+    #status-text {
+      position: fixed; bottom: 16px; right: 16px; z-index: 100;
+      color: #64748b; font-size: 12px;
+    }
+
+    /* Scroll hint */
+    #scroll-hint {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 90;
+      color: #64748b; font-size: 13px; animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+    /* ===== Now Playing bar ===== */
+    #now-playing-bar {
+      position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 100;
+      display: none; align-items: center; gap: 12px;
+      padding: 8px 18px; background: rgba(0,0,0,0.82); backdrop-filter: blur(14px);
+      border-radius: 22px; border: 1px solid rgba(78,205,196,0.3);
+      color: #fff; font-size: 13px; white-space: nowrap;
+    }
+    #now-playing-bar.active { display: flex; }
+    .np-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #4ecdc4;
+      background: rgba(78,205,196,0.15); padding: 2px 8px; border-radius: 8px;
+      animation: pulse 2s ease infinite;
+    }
+    #np-title { color: #e2e8f0; font-weight: 600; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+    .np-actions { display: flex; gap: 6px; }
+    .np-actions button {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; border-radius: 8px; padding: 4px 10px; font-size: 13px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .np-actions button:hover { background: rgba(255,255,255,0.2); }
+    .np-actions button.disabled { opacity: 0.35; cursor: default; }
+
+    /* ===== Hover action popup ===== */
+    #hover-popup {
+      position: fixed; z-index: 200; display: none;
+      background: rgba(10,10,20,0.95); backdrop-filter: blur(16px);
+      border: 1px solid rgba(78,205,196,0.3); border-radius: 12px;
+      padding: 12px 14px; min-width: 180px; pointer-events: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      transition: opacity 0.15s;
+    }
+    #hover-popup.visible { display: block; }
+    #hover-title {
+      color: #e2e8f0; font-size: 13px; font-weight: 600; margin-bottom: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;
+    }
+    #hover-year { color: #64748b; font-size: 11px; margin-bottom: 8px; }
+    .hover-actions { display: flex; flex-direction: column; gap: 6px; }
+    .hover-actions button {
+      padding: 8px 14px; border-radius: 8px; border: none; font-size: 13px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: left;
+    }
+    #hover-instant-btn, #hover-playnow-btn {
+      background: linear-gradient(135deg, #4ecdc4, #00b4d8); color: #000;
+    }
+    #hover-instant-btn:hover, #hover-playnow-btn:hover {
+      transform: scale(1.02); box-shadow: 0 0 16px rgba(78,205,196,0.4);
+    }
+    #hover-queue-btn {
+      background: rgba(168,85,247,0.2); color: #c084fc; border: 1px solid rgba(168,85,247,0.3) !important;
+    }
+    #hover-queue-btn:hover { background: rgba(168,85,247,0.35); }
+
+    /* ===== Queue panel ===== */
+    #queue-panel {
+      position: fixed; top: 0; right: -320px; width: 300px; height: 100vh; z-index: 150;
+      background: rgba(10,10,20,0.95); backdrop-filter: blur(16px);
+      border-left: 1px solid rgba(78,205,196,0.2);
+      transition: right 0.3s ease; overflow-y: auto; padding: 20px 16px;
+    }
+    #queue-panel.open { right: 0; }
+    .qp-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+      padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .qp-header h3 { color: #fff; font-size: 16px; margin: 0; flex: 1; }
+    .qp-header button {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+      color: #94a3b8; border-radius: 6px; padding: 4px 10px; font-size: 12px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .qp-header button:hover { background: rgba(255,255,255,0.2); color: #fff; }
+    .queue-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px;
+      background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 8px;
+      border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; cursor: pointer;
+    }
+    .queue-item:hover { background: rgba(255,255,255,0.1); border-color: rgba(78,205,196,0.3); }
+    .queue-item img { width: 60px; height: 34px; object-fit: cover; border-radius: 4px; }
+    .queue-item .qi-info { flex: 1; min-width: 0; }
+    .queue-item .qi-title { color: #e2e8f0; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .queue-item .qi-meta { color: #64748b; font-size: 11px; }
+    .queue-item .qi-remove {
+      background: none; border: none; color: #64748b; font-size: 16px;
+      cursor: pointer; padding: 4px; transition: color 0.2s;
+    }
+    .queue-item .qi-remove:hover { color: #ef4444; }
+    #queue-empty { color: #475569; font-size: 13px; text-align: center; padding: 40px 0; }
+
+    /* Queue toggle floating button */
+    #queue-toggle-btn {
+      position: fixed; top: 16px; right: 16px; z-index: 100;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      border: 1px solid rgba(168,85,247,0.3); border-radius: 20px;
+      color: #c084fc; font-size: 13px; font-weight: 600; cursor: pointer;
+      padding: 8px 16px; transition: all 0.2s; display: none;
+    }
+    #queue-toggle-btn.has-items { display: flex; align-items: center; gap: 6px; }
+    #queue-toggle-btn:hover { background: rgba(168,85,247,0.15); }
+    #queue-badge {
+      background: #a855f7; color: #fff; font-size: 11px; font-weight: 700;
+      border-radius: 50%; min-width: 18px; height: 18px; display: flex;
+      align-items: center; justify-content: center; padding: 0 4px;
+    }
+
+    /* Toast notification */
+    #toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+      z-index: 300; background: rgba(10,10,20,0.95); backdrop-filter: blur(12px);
+      border: 1px solid rgba(78,205,196,0.3); border-radius: 10px;
+      color: #e2e8f0; font-size: 13px; padding: 10px 20px;
+      opacity: 0; pointer-events: none; transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    #toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* VR DOM Overlay — video player inside headset */
+    #vr-dom-overlay {
+      position: fixed; inset: 0; z-index: 20000;
+      background: rgba(0,0,0,0.92);
+      display: none;
+      align-items: center; justify-content: center; flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    #vr-dom-overlay.active { display: flex; }
+    #vr-overlay-inner {
+      width: 92vw; max-width: 1000px;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+    }
+    #vr-overlay-title {
+      color: #4ecdc4; font-size: 1.4rem; font-weight: 700;
+      text-align: center; text-shadow: 0 0 20px rgba(78,205,196,0.4);
+    }
+    #vr-overlay-player {
+      width: 100%; aspect-ratio: 16/9;
+      background: #000; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 0 60px rgba(78,205,196,0.25);
+    }
+    #vr-overlay-player iframe { width: 100%; height: 100%; border: none; }
+    #vr-overlay-controls {
+      display: flex; gap: 12px; align-items: center; justify-content: center;
+    }
+    #vr-overlay-controls button {
+      padding: 14px 32px; border-radius: 10px; font-size: 16px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s; border: none;
+    }
+    #vr-overlay-close {
+      background: rgba(255,255,255,0.12); color: #fff;
+    }
+    #vr-overlay-close:hover { background: rgba(239,68,68,0.7); }
+    #vr-overlay-next {
+      background: rgba(168,85,247,0.3); color: #c084fc;
+    }
+    #vr-overlay-next:hover { background: rgba(168,85,247,0.5); }
+  </style>
+</head>
+<body>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay">
+    <h1>VR Cinema</h1>
+    <p>Loading movie trailers...</p>
+    <div class="loading-spinner"></div>
+  </div>
+
+    <!-- YouTube player overlay (desktop fallback) -->
+  <div id="yt-overlay">
+    <div id="yt-movie-title"></div>
+    <div id="yt-container"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;align-items:center;">
+      <button id="yt-close" onclick="closeYouTubePlayer()">Close Player</button>
+      <button id="yt-next" onclick="playNext()" style="display:none;padding:12px 24px;background:rgba(168,85,247,0.3);border:1px solid rgba(168,85,247,0.4);border-radius:8px;color:#c084fc;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;">Next in Queue &#9197;</button>
+    </div>
+  </div>
+
+  <!-- VR DOM Overlay — YouTube player visible inside the headset (ENH-004) -->
+  <div id="vr-dom-overlay">
+    <div id="vr-overlay-inner">
+      <div id="vr-overlay-title"></div>
+      <div id="vr-overlay-player"></div>
+      <div id="vr-overlay-controls">
+        <button id="vr-overlay-close" onclick="closeVROverlay()">Close</button>
+        <button id="vr-overlay-next" onclick="skipToNext()" style="display:none">Next in Queue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VR Theater Screen Video Player controls (desktop fallback) -->
+  <div id="vr-video-controls" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;display:none;gap:10px;">
+    <button onclick="toggleVRVideoPause()" style="padding:12px 24px;background:rgba(78,205,196,0.9);border:none;border-radius:8px;color:#000;font-weight:600;cursor:pointer;">Pause/Play</button>
+    <button onclick="stopVRVideo()" style="padding:12px 24px;background:rgba(239,68,68,0.9);border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;">Stop</button>
+    <button onclick="skipToNext()" style="padding:12px 24px;background:rgba(168,85,247,0.9);border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;">Next</button>
+  </div>
+
+  <!-- Now Playing bar -->
+  <div id="now-playing-bar">
+    <span class="np-label">NOW PLAYING</span>
+    <span id="np-title"></span>
+    <div class="np-actions">
+      <button onclick="skipToNext()" id="np-next-btn" title="Next in Queue">&#9197;</button>
+      <button onclick="toggleQueuePanel()" title="View Queue">&#128203; <span id="np-queue-count">0</span></button>
+    </div>
+  </div>
+
+  <!-- Hover action popup -->
+  <div id="hover-popup">
+    <div id="hover-title"></div>
+    <div id="hover-year"></div>
+    <div class="hover-actions">
+      <button id="hover-instant-btn" onclick="instantPlayHovered()">&#9654; Instant Play</button>
+      <button id="hover-playnow-btn" onclick="playNowHovered()" style="display:none">&#9654; Play Now</button>
+      <button id="hover-queue-btn" onclick="queueHovered()" style="display:none">+ Add to Queue</button>
+    </div>
+  </div>
+
+  <!-- Queue panel -->
+  <div id="queue-panel">
+    <div class="qp-header">
+      <h3>Up Next</h3>
+      <button onclick="clearQueue()">Clear All</button>
+      <button onclick="toggleQueuePanel()">&#10005;</button>
+    </div>
+    <div id="queue-list"></div>
+    <div id="queue-empty">Queue is empty. Hover a poster and click "+ Add to Queue".</div>
+  </div>
+
+  <!-- Queue toggle floating button -->
+  <button id="queue-toggle-btn" onclick="toggleQueuePanel()">&#128203; Queue <span id="queue-badge">0</span></button>
+
+  <!-- Toast notification -->
+  <div id="toast"></div>
+
+  <!-- Back to hub -->
+  <a id="back-link" href="/vr/">&#8592; Hub</a>
+
+  <!-- Category filter -->
+  <div id="category-bar">
+    <button class="active" data-filter="all">All</button>
+    <button data-filter="movie">Movies</button>
+    <button data-filter="tv">TV Shows</button>
+  </div>
+
+  <!-- TikTok Mode Toggle -->
+  <a href="movies-tiktok.html" id="tiktok-toggle" style="
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    z-index: 100;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #ff0050, #ff3366);
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(255,0,80,0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  ">
+    <span style="font-size: 16px;">&#9654;</span> TikTok Mode
+  </a>
+
+  <!-- Movie info HUD -->
+  <div id="movie-hud">
+    <h2 id="hud-title"></h2>
+    <div class="meta">
+      <span id="hud-year"></span>
+      <span id="hud-type"></span>
+      <span class="rating" id="hud-rating"></span>
+      <span id="hud-genre"></span>
+    </div>
+    <div class="desc" id="hud-desc"></div>
+    <div class="actions">
+      <button id="play-trailer-btn" onclick="playSelectedTrailer()">Play Trailer</button>
+      <button id="queue-trailer-btn" onclick="queueSelected()" style="display:none;background:rgba(168,85,247,0.25);color:#c084fc;border:1px solid rgba(168,85,247,0.35) !important;">+ Queue</button>
+      <button id="close-hud-btn" onclick="closeHud()">Close</button>
+    </div>
+  </div>
+
+  <div id="status-text"></div>
+  <div id="scroll-hint">Hover a poster for instant play &bull; Click to select</div>
+
+  <!-- ============ A-FRAME SCENE ============ -->
+  <a-scene
+    vr-mode-ui="enabled: true"
+    renderer="antialias: true; colorManagement: true; sortTransparentObjects: true; alpha: true"
+    loading-screen="enabled: false"
+    cursor="rayOrigin: mouse; fuse: false"
+    raycaster="objects: .clickable"
+    webxr="optionalFeatures: dom-overlay, hand-tracking, local-floor, hit-test, layers; overlayElement: #vr-dom-overlay; referenceSpaceType: local-floor"
+    background="transparent: true">
+    
+    <!-- Passthrough Notification -->
+    <a-entity id="passthrough-ui" position="0 5 -10" visible="false">
+      <a-plane width="4" height="0.6" color="#000" opacity="0.7" material="transparent: true; shader: flat">
+        <a-text value="🥽 Passthrough Active - Theater in Your Room" align="center" width="4" color="#4ecdc4" position="0 0 0.01"></a-text>
+      </a-plane>
+    </a-entity>
+    <a-assets timeout="15000">
+    </a-assets>
+
+    <!-- ===== CINEMA ROOM ===== -->
+
+    <!-- Floor -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="30" height="40" color="#0a0a0f"></a-plane>
+
+    <!-- Ceiling -->
+    <a-plane position="0 8 -10" rotation="90 0 0" width="30" height="40" color="#050508"></a-plane>
+
+    <!-- Back wall (behind camera) -->
+    <a-plane position="0 4 5" width="30" height="8" color="#0a0a12"></a-plane>
+
+    <!-- Front wall (behind screen) -->
+    <a-plane position="0 4 -18" width="30" height="8" color="#050510"></a-plane>
+
+    <!-- Left wall -->
+    <a-plane position="-12 4 -6" rotation="0 90 0" width="24" height="8" color="#08080f"></a-plane>
+
+    <!-- Right wall -->
+    <a-plane position="12 4 -6" rotation="0 -90 0" width="24" height="8" color="#08080f"></a-plane>
+
+    <!-- ===== MAIN CINEMA SCREEN ===== -->
+    <a-entity id="main-screen" position="0 3.5 -16">
+      <!-- Screen border / frame -->
+      <a-box width="12.4" height="7.2" depth="0.1" position="0 0 -0.1" color="#111"></a-box>
+      <!-- Screen surface -->
+      <a-plane id="screen-surface" width="12" height="7" color="#111118"></a-plane>
+      <!-- Screen glow -->
+      <a-plane id="screen-glow" width="13" height="8" position="0 0 -0.15" color="#4ecdc4" opacity="0.08"></a-plane>
+
+      <!-- Default screen text -->
+      <a-entity id="screen-default-text">
+        <a-text value="VR CINEMA" position="0 1.5 0.01" align="center" color="#4ecdc4" width="8"></a-text>
+        <a-text value="Select a movie poster to begin" position="0 0.3 0.01" align="center" color="#64748b" width="5"></a-text>
+        <a-text value="Click any poster on the walls" position="0 -0.5 0.01" align="center" color="#475569" width="4"></a-text>
+      </a-entity>
+
+      <!-- Selected movie info on screen (hidden by default) -->
+      <a-entity id="screen-movie-info" visible="false">
+        <a-text id="screen-title" value="" position="0 2 0.01" align="center" color="#fff" width="8" wrap-count="30"></a-text>
+        <a-text id="screen-meta" value="" position="0 1 0.01" align="center" color="#4ecdc4" width="5"></a-text>
+        <a-text id="screen-desc" value="" position="0 -0.5 0.01" align="center" color="#94a3b8" width="7" wrap-count="60" baseline="top"></a-text>
+        <!-- Play button on screen -->
+        <a-box id="screen-play-btn" position="0 -2.5 0.05" width="3" height="0.8" depth="0.05"
+               class="clickable" color="#4ecdc4"
+               animation="property: scale; from: 1 1 1; to: 1.05 1.05 1.05; dur: 800; loop: true; dir: alternate">
+        </a-box>
+        <a-text value="PLAY TRAILER" position="0 -2.5 0.1" align="center" color="#000" width="4" font="mozillavr"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== MOVIE POSTER GALLERIES ===== -->
+
+    <!-- Left gallery wall -->
+    <a-entity id="gallery-left" position="-11.5 0 0"></a-entity>
+
+    <!-- Right gallery wall -->
+    <a-entity id="gallery-right" position="11.5 0 0"></a-entity>
+
+    <!-- Front gallery (flanking the screen) -->
+    <a-entity id="gallery-front" position="0 0 -17"></a-entity>
+
+    <!-- ===== CINEMA SEATS (ambient decoration) ===== -->
+    <a-entity id="seats" position="0 0 0">
+      <!-- Row 1 -->
+      <a-box position="-3 0.35 -2" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="-1 0.35 -2" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="1 0.35 -2" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="3 0.35 -2" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <!-- Row 2 -->
+      <a-box position="-4 0.35 -5" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="-2 0.35 -5" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="0 0.35 -5" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="2 0.35 -5" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="4 0.35 -5" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <!-- Row 3 -->
+      <a-box position="-3 0.35 -8" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="-1 0.35 -8" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="1 0.35 -8" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+      <a-box position="3 0.35 -8" width="1.2" height="0.7" depth="0.8" color="#1a1020"></a-box>
+    </a-entity>
+
+    <!-- ===== AMBIENT LIGHTING ===== -->
+    <a-light type="ambient" color="#222244" intensity="0.6"></a-light>
+    <a-light type="point" position="0 4 -14" color="#4ecdc4" intensity="0.5" distance="15"></a-light>
+    <a-light type="point" position="-10 5 -3" color="#ffffff" intensity="0.5" distance="12"></a-light>
+    <a-light type="point" position="10 5 -3" color="#ffffff" intensity="0.5" distance="12"></a-light>
+    <a-light type="point" position="-5 7.5 -6" color="#4ecdc4" intensity="0.2" distance="14"></a-light>
+    <a-light type="point" position="5 7.5 -6" color="#a855f7" intensity="0.2" distance="14"></a-light>
+    <a-light type="point" position="0 7.5 -10" color="#00d4ff" intensity="0.15" distance="14"></a-light>
+
+    <!-- ===== DECORATIVE ELEMENTS ===== -->
+    <a-box position="-6 0.02 -6" width="0.05" height="0.02" depth="20" color="#4ecdc4" opacity="0.3"></a-box>
+    <a-box position="6 0.02 -6" width="0.05" height="0.02" depth="20" color="#4ecdc4" opacity="0.3"></a-box>
+
+    <!-- Category labels on walls -->
+    <a-text value="MOVIES" position="-11.4 5.5 -3" rotation="0 90 0" color="#4ecdc4" width="4" font="mozillavr" id="left-wall-label"></a-text>
+    <a-text value="TV SHOWS" position="11.4 5.5 -3" rotation="0 -90 0" color="#a855f7" width="4" font="mozillavr" id="right-wall-label"></a-text>
+
+    <!-- ===== CAMERA RIG ===== -->
+    <a-entity id="rig" position="0 1.6 2">
+      <a-camera look-controls wasd-controls="acceleration: 15" fov="80">
+        <!-- Gaze cursor for VR headset (only visible in VR) -->
+        <a-entity cursor="fuse: true; fuseTimeout: 1500"
+                  raycaster="objects: .clickable; far: 30"
+                  geometry="primitive: ring; radiusInner: 0.005; radiusOuter: 0.012"
+                  material="shader: flat; color: #4ecdc4"
+                  position="0 0 -1"
+                  animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 200"
+                  animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.5 0.5 0.5; dur: 1500; easing: linear"
+                  animation__mouseleave="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 200">
+        </a-entity>
+      </a-camera>
+      <a-entity id="left-hand"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 30; lineColor: #4ecdc4; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+      <a-entity id="right-hand"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 30; lineColor: #a855f7; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    /* ============================================
+       VR MOVIE THEATER - PHASE 3
+       Fetches movies from MOVIESHOWS API and
+       displays them as interactive posters in
+       an immersive cinema environment.
+       ============================================ */
+
+    // --- Config ---
+    // On the live site (findtorontoevents.ca), same-origin API calls work.
+    // On localhost, the APIs are not available so we fall back to demo data.
+    var IS_LIVE = window.location.hostname === 'findtorontoevents.ca';
+    var API_URLS = IS_LIVE
+      ? ['/MOVIESHOWS3/api/get-movies.php', '/movieshows2/api/get-movies.php']
+      : [];  // Don't attempt cross-origin fetches from localhost
+
+    // --- State ---
+    var allMovies = [];
+    var filteredMovies = [];
+    var selectedMovie = null;
+    var currentFilter = 'all';
+    var posterEntities = [];
+
+    // --- Instant Play & Queue State ---
+    var playQueue = [];
+    var isPlaying = false;
+    var nowPlayingMovie = null;
+    var hoveredMovieIndex = null;
+    var ytPlayer = null;
+    var ytAPIReady = false;
+    var mouseX = 0, mouseY = 0;
+
+    // Track mouse position for hover popup placement
+    document.addEventListener('mousemove', function(e) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    // --- Helpers for A-Frame material (avoid string parsing issues in 1.6) ---
+    function setMat(el, props) {
+      // Use three-argument form for each property to avoid string parse issues
+      var keys = Object.keys(props);
+      for (var i = 0; i < keys.length; i++) {
+        el.setAttribute('material', keys[i], props[keys[i]]);
+      }
+    }
+
+    // --- A-Frame Components ---
+
+    // Poster click component - attached to the poster a-box itself
+    AFRAME.registerComponent('poster-click', {
+      schema: { movieIndex: { type: 'int', default: 0 } },
+      init: function() {
+        var self = this;
+        this.el.addEventListener('click', function(evt) {
+          evt.stopPropagation();
+          selectMovie(self.data.movieIndex);
+        });
+        this.el.addEventListener('mouseenter', function() {
+          // Show hover action popup
+          clearTimeout(window._hoverHideTimeout);
+          showHoverPopup(self.data.movieIndex);
+          // Scale up parent entity for hover effect
+          var parent = self.el.parentNode;
+          if (parent && parent.setAttribute) {
+            parent.setAttribute('animation__hover', 'property: scale; to: 1.08 1.08 1.08; dur: 200; easing: easeOutQuad');
+          }
+        });
+        this.el.addEventListener('mouseleave', function() {
+          // Delay hide so user can move mouse to the popup
+          window._hoverHideTimeout = setTimeout(hideHoverPopup, 350);
+          var parent = self.el.parentNode;
+          if (parent && parent.setAttribute) {
+            parent.setAttribute('animation__hover', 'property: scale; to: 1 1 1; dur: 200; easing: easeOutQuad');
+          }
+        });
+      }
+    });
+
+    // Screen play button click
+    AFRAME.registerComponent('play-btn-click', {
+      init: function() {
+        var self = this;
+        this.el.addEventListener('click', function(evt) {
+          evt.stopPropagation();
+          playSelectedTrailer();
+        });
+      }
+    });
+
+    // Attach play-btn-click to the screen play button once scene loads
+    document.querySelector('a-scene').addEventListener('loaded', function() {
+      var playBtn = document.getElementById('screen-play-btn');
+      if (playBtn) {
+        playBtn.setAttribute('play-btn-click', '');
+      }
+    });
+
+    // --- YouTube thumbnail helper ---
+    function ytThumb(videoId) {
+      // hqdefault.jpg (480x360) is the most reliable - always exists
+      return 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg';
+    }
+
+    // --- Fetch Movies ---
+    async function fetchMovies() {
+      for (var i = 0; i < API_URLS.length; i++) {
+        try {
+          var response = await fetch(API_URLS[i]);
+          if (!response.ok) continue;
+          var data = await response.json();
+          if (data.success && data.movies && data.movies.length > 0) {
+            document.getElementById('status-text').textContent = data.movies.length + ' titles loaded';
+            return data.movies;
+          }
+        } catch (e) {
+          console.log('API attempt ' + (i + 1) + ' failed:', e.message);
+        }
+      }
+
+      // Fallback: demo data so VR experience still works
+      if (!IS_LIVE) {
+        console.log('Using demo data (local development)');
+      } else {
+        console.warn('All APIs failed, using demo data');
+      }
+      document.getElementById('status-text').textContent = IS_LIVE ? 'Demo mode (API unavailable)' : 'Demo mode (local)';
+      return generateDemoMovies();
+    }
+
+    function generateDemoMovies() {
+      return [
+        { id: 1, title: 'Inception', type: 'movie', genre: 'Sci-Fi', description: 'A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.', release_year: 2010, imdb_rating: '8.8', trailer_id: 'YoHD9XEInc0', thumbnail: null },
+        { id: 2, title: 'The Dark Knight', type: 'movie', genre: 'Action', description: 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.', release_year: 2008, imdb_rating: '9.0', trailer_id: 'EXeTwQWrcwY', thumbnail: null },
+        { id: 3, title: 'Interstellar', type: 'movie', genre: 'Sci-Fi', description: 'When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot is tasked with piloting a spacecraft along with a team of researchers to find a new planet for humans.', release_year: 2014, imdb_rating: '8.7', trailer_id: 'zSWdZVtXT7E', thumbnail: null },
+        { id: 4, title: 'Breaking Bad', type: 'tv', genre: 'Drama', description: 'A chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine with a former student to secure his family\'s future.', release_year: 2008, imdb_rating: '9.5', trailer_id: 'HhesaQXLuRY', thumbnail: null },
+        { id: 5, title: 'Stranger Things', type: 'tv', genre: 'Sci-Fi', description: 'When a young boy disappears, his mother, a police chief and his friends must confront terrifying supernatural forces in order to get him back.', release_year: 2016, imdb_rating: '8.7', trailer_id: 'b9EkMc79ZSU', thumbnail: null },
+        { id: 6, title: 'Dune: Part Two', type: 'movie', genre: 'Sci-Fi', description: 'Paul Atreides unites with the Fremen while on a warpath of revenge against the conspirators who destroyed his family, facing a choice between the love of his life and the fate of the universe.', release_year: 2024, imdb_rating: '8.5', trailer_id: 'Way9Dexny3w', thumbnail: null },
+        { id: 7, title: 'The Last of Us', type: 'tv', genre: 'Drama', description: 'After a global pandemic destroys civilization, a hardened survivor takes charge of a 14-year-old girl who may be humanity\'s last hope.', release_year: 2023, imdb_rating: '8.8', trailer_id: 'uLtkt8BonwM', thumbnail: null },
+        { id: 8, title: 'Oppenheimer', type: 'movie', genre: 'Drama', description: 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.', release_year: 2023, imdb_rating: '8.5', trailer_id: 'uYPbbksJxIg', thumbnail: null },
+        { id: 9, title: 'The Bear', type: 'tv', genre: 'Comedy-Drama', description: 'A young chef from the fine dining world returns to Chicago to run his family\'s Italian beef sandwich shop after a heartbreaking death in his family.', release_year: 2022, imdb_rating: '8.6', trailer_id: 'y-cqqAJIXhs', thumbnail: null },
+        { id: 10, title: 'Blade Runner 2049', type: 'movie', genre: 'Sci-Fi', description: 'Young Blade Runner K\'s discovery of a long-buried secret leads him on a quest to find Rick Deckard, a former Blade Runner who has been missing for thirty years.', release_year: 2017, imdb_rating: '8.0', trailer_id: 'gCcx85zbxz4', thumbnail: null },
+        { id: 11, title: 'Severance', type: 'tv', genre: 'Thriller', description: 'Mark leads a team of office workers whose memories have been surgically divided between their work and personal lives, until a mysterious colleague appears outside of work.', release_year: 2022, imdb_rating: '8.7', trailer_id: 'xEQP4VVuyrY', thumbnail: null },
+        { id: 12, title: 'Everything Everywhere All at Once', type: 'movie', genre: 'Action-Comedy', description: 'A middle-aged Chinese immigrant is swept up into an insane adventure in which she alone can save existence by exploring other universes and connecting with the lives she could have led.', release_year: 2022, imdb_rating: '7.8', trailer_id: 'wxN1T1qdQ2I', thumbnail: null },
+        { id: 13, title: 'House of the Dragon', type: 'tv', genre: 'Fantasy', description: 'An internal succession war within House Targaryen at the height of its power, 172 years before the birth of Daenerys Targaryen.', release_year: 2022, imdb_rating: '8.4', trailer_id: 'DotnJ7tTA34', thumbnail: null },
+        { id: 14, title: 'The Batman', type: 'movie', genre: 'Action', description: 'When a sadistic serial killer begins murdering key political figures in Gotham, Batman is forced to investigate the city\'s hidden corruption.', release_year: 2022, imdb_rating: '7.8', trailer_id: 'mqqft2x_Aa4', thumbnail: null }
+      ];
+    }
+
+    // --- Build Gallery ---
+    function buildGallery(movies) {
+      clearGallery();
+      filteredMovies = movies;
+
+      var moviesList = movies.filter(function(m) { return m.type === 'movie'; });
+      var tvList = movies.filter(function(m) { return m.type === 'tv'; });
+
+      // Place movies on left wall, TV on right wall
+      placePostersOnWall('gallery-left', moviesList, 'left', 0);
+      placePostersOnWall('gallery-right', tvList, 'right', moviesList.length);
+    }
+
+    function clearGallery() {
+      ['gallery-left', 'gallery-right', 'gallery-front'].forEach(function(id) {
+        var el = document.getElementById(id);
+        while (el.firstChild) { el.removeChild(el.firstChild); }
+      });
+      posterEntities = [];
+    }
+
+    function placePostersOnWall(parentId, movies, side, globalOffset) {
+      var parent = document.getElementById(parentId);
+      var postersPerRow = 5;
+      var posterW = 1.4;
+      var posterH = 2.0;
+      var gapZ = 2.8;
+      var gapY = 2.8;
+      var startZ = 2;
+
+      movies.forEach(function(movie, i) {
+        var row = Math.floor(i / postersPerRow);
+        var col = i % postersPerRow;
+
+        // Wrapper entity for positioning
+        var wrapper = document.createElement('a-entity');
+        var z = -startZ - col * gapZ;
+        var y = 1.5 + row * gapY;
+        var rotY = side === 'left' ? 90 : -90;
+        wrapper.setAttribute('position', '0 ' + y + ' ' + z);
+        wrapper.setAttribute('rotation', '0 ' + rotY + ' 0');
+
+        // Poster frame (background glow)
+        var frame = document.createElement('a-plane');
+        frame.setAttribute('width', String(posterW + 0.15));
+        frame.setAttribute('height', String(posterH + 0.15));
+        frame.setAttribute('position', '0 0 -0.02');
+        frame.setAttribute('class', 'poster-frame');
+        var frameColor = side === 'left' ? '#4ecdc4' : '#a855f7';
+        frame.setAttribute('color', frameColor);
+        frame.setAttribute('opacity', '0.6');
+        wrapper.appendChild(frame);
+
+        // Poster image - THIS is the clickable element
+        var poster = document.createElement('a-plane');
+        poster.setAttribute('width', String(posterW));
+        poster.setAttribute('height', String(posterH));
+        poster.setAttribute('class', 'clickable');
+        poster.setAttribute('poster-click', 'movieIndex: ' + (globalOffset + i));
+
+        // Set texture: prefer thumbnail, fallback to YouTube thumb
+        var imgUrl = movie.thumbnail || (movie.trailer_id ? ytThumb(movie.trailer_id) : null);
+        if (imgUrl) {
+          // Load image into an <img> asset and reference it
+          var imgEl = document.createElement('img');
+          imgEl.setAttribute('crossorigin', 'anonymous');
+          imgEl.src = imgUrl;
+          imgEl.id = 'poster-img-' + (globalOffset + i);
+          // Handle load error gracefully
+          imgEl.onerror = function() { this.src = ''; };
+          document.querySelector('a-assets').appendChild(imgEl);
+          poster.setAttribute('src', '#poster-img-' + (globalOffset + i));
+        } else {
+          poster.setAttribute('color', '#222');
+        }
+        wrapper.appendChild(poster);
+
+        // Title text below poster
+        var titleText = document.createElement('a-text');
+        titleText.setAttribute('value', truncate(movie.title, 22));
+        titleText.setAttribute('position', '0 ' + (-(posterH / 2) - 0.2) + ' 0.01');
+        titleText.setAttribute('align', 'center');
+        titleText.setAttribute('color', '#fff');
+        titleText.setAttribute('width', '2.2');
+        titleText.setAttribute('font', 'mozillavr');
+        wrapper.appendChild(titleText);
+
+        // Year / rating badge
+        var badge = document.createElement('a-text');
+        var badgeVal = (movie.release_year || '') + (movie.imdb_rating ? '  *' + movie.imdb_rating : '');
+        badge.setAttribute('value', badgeVal);
+        badge.setAttribute('position', '0 ' + (-(posterH / 2) - 0.4) + ' 0.01');
+        badge.setAttribute('align', 'center');
+        badge.setAttribute('color', '#94a3b8');
+        badge.setAttribute('width', '1.8');
+        wrapper.appendChild(badge);
+
+        // Type badge (Movie/TV) - a small colored label
+        var typeBadge = document.createElement('a-plane');
+        typeBadge.setAttribute('width', '0.6');
+        typeBadge.setAttribute('height', '0.2');
+        typeBadge.setAttribute('position', (posterW / 2 - 0.35) + ' ' + (posterH / 2 - 0.15) + ' 0.02');
+        typeBadge.setAttribute('color', movie.type === 'movie' ? '#4ecdc4' : '#a855f7');
+        wrapper.appendChild(typeBadge);
+
+        var typeLabel = document.createElement('a-text');
+        typeLabel.setAttribute('value', movie.type === 'movie' ? 'MOVIE' : 'TV');
+        typeLabel.setAttribute('position', (posterW / 2 - 0.35) + ' ' + (posterH / 2 - 0.15) + ' 0.03');
+        typeLabel.setAttribute('align', 'center');
+        typeLabel.setAttribute('color', '#000');
+        typeLabel.setAttribute('width', '1.2');
+        wrapper.appendChild(typeLabel);
+
+        parent.appendChild(wrapper);
+        posterEntities.push(wrapper);
+      });
+    }
+
+    // --- Select Movie ---
+    function selectMovie(index) {
+      var movie;
+      if (currentFilter === 'all') {
+        var moviesList = allMovies.filter(function(m) { return m.type === 'movie'; });
+        var tvList = allMovies.filter(function(m) { return m.type === 'tv'; });
+        var combined = moviesList.concat(tvList);
+        movie = combined[index];
+      } else {
+        movie = filteredMovies[index];
+      }
+
+      if (!movie) {
+        console.warn('No movie found at index', index);
+        return;
+      }
+      selectedMovie = movie;
+      console.log('Selected:', movie.title);
+
+      // Update screen
+      document.getElementById('screen-default-text').setAttribute('visible', false);
+      document.getElementById('screen-movie-info').setAttribute('visible', true);
+
+      document.getElementById('screen-title').setAttribute('value', movie.title);
+      var metaStr = (movie.release_year || '') + '  |  ' + (movie.type === 'movie' ? 'Movie' : 'TV Show');
+      if (movie.imdb_rating) metaStr += '  |  * ' + movie.imdb_rating;
+      if (movie.genre) metaStr += '  |  ' + movie.genre;
+      document.getElementById('screen-meta').setAttribute('value', metaStr);
+      document.getElementById('screen-desc').setAttribute('value', movie.description || 'No description available.');
+
+      // Update screen surface with poster image as background
+      var screenSurf = document.getElementById('screen-surface');
+      if (movie.trailer_id) {
+        var bgImg = document.getElementById('screen-bg-img');
+        if (!bgImg) {
+          bgImg = document.createElement('img');
+          bgImg.id = 'screen-bg-img';
+          bgImg.setAttribute('crossorigin', 'anonymous');
+          document.querySelector('a-assets').appendChild(bgImg);
+        }
+        bgImg.src = ytThumb(movie.trailer_id);
+        screenSurf.setAttribute('src', '#screen-bg-img');
+        screenSurf.setAttribute('opacity', '0.3');
+      }
+
+      // Update HUD
+      document.getElementById('hud-title').textContent = movie.title;
+      document.getElementById('hud-year').textContent = movie.release_year || '';
+      document.getElementById('hud-type').textContent = movie.type === 'movie' ? 'Movie' : 'TV Show';
+      document.getElementById('hud-rating').textContent = movie.imdb_rating ? 'Rating: ' + movie.imdb_rating : '';
+      document.getElementById('hud-genre').textContent = movie.genre || '';
+      document.getElementById('hud-desc').textContent = movie.description || '';
+      document.getElementById('movie-hud').classList.add('visible');
+      updateHudQueueBtn();
+
+      // Update screen glow color
+      var glowColor = movie.type === 'movie' ? '#4ecdc4' : '#a855f7';
+      var screenGlow = document.getElementById('screen-glow');
+      if (screenGlow) {
+        screenGlow.setAttribute('color', glowColor);
+      }
+    }
+
+    // --- Play Trailer (queue-aware) ---
+    function playSelectedTrailer() {
+      if (!selectedMovie || !selectedMovie.trailer_id) return;
+      playTrailer(selectedMovie);
+    }
+
+    // Queue the currently-selected movie from the HUD
+    function queueSelected() {
+      if (!selectedMovie) return;
+      addToQueue(selectedMovie);
+    }
+
+    // Core: play a trailer for a given movie object
+    function playTrailer(movie) {
+      nowPlayingMovie = movie;
+      isPlaying = true;
+      selectedMovie = movie;
+
+      var overlay = document.getElementById('yt-overlay');
+      var container = document.getElementById('yt-container');
+      var titleEl = document.getElementById('yt-movie-title');
+
+      titleEl.textContent = movie.title + ' - Trailer';
+      container.innerHTML = '<div id="yt-player-div" style="width:100%;height:100%;"></div>';
+
+      // Use YouTube IFrame API if available for auto-advance
+      if (ytAPIReady && window.YT && window.YT.Player) {
+        ytPlayer = new YT.Player('yt-player-div', {
+          width: '100%',
+          height: '100%',
+          videoId: movie.trailer_id,
+          playerVars: { autoplay: 1, rel: 0, modestbranding: 1, playsinline: 1 },
+          events: { onStateChange: onPlayerStateChange }
+        });
+      } else {
+        // Fallback to raw iframe
+        container.innerHTML = '<iframe src="https://www.youtube.com/embed/' + movie.trailer_id +
+          '?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>';
+      }
+
+      overlay.classList.add('active');
+
+      // Show/hide "Next in Queue" button in overlay
+      var nextBtn = document.getElementById('yt-next');
+      nextBtn.style.display = playQueue.length > 0 ? 'inline-block' : 'none';
+
+      updateNowPlayingBar();
+      updateQueueUI();
+      updateHudQueueBtn();
+
+      // Also update the cinema screen
+      selectMovieOnScreen(movie);
+    }
+
+    // Update the VR cinema screen with movie info (without affecting HUD visibility)
+    function selectMovieOnScreen(movie) {
+      document.getElementById('screen-default-text').setAttribute('visible', false);
+      document.getElementById('screen-movie-info').setAttribute('visible', true);
+      document.getElementById('screen-title').setAttribute('value', movie.title);
+      var metaStr = (movie.release_year || '') + '  |  ' + (movie.type === 'movie' ? 'Movie' : 'TV Show');
+      if (movie.imdb_rating) metaStr += '  |  * ' + movie.imdb_rating;
+      if (movie.genre) metaStr += '  |  ' + movie.genre;
+      document.getElementById('screen-meta').setAttribute('value', metaStr);
+      document.getElementById('screen-desc').setAttribute('value', movie.description || 'No description available.');
+
+      var screenSurf = document.getElementById('screen-surface');
+      if (movie.trailer_id) {
+        var bgImg = document.getElementById('screen-bg-img');
+        if (!bgImg) {
+          bgImg = document.createElement('img');
+          bgImg.id = 'screen-bg-img';
+          bgImg.setAttribute('crossorigin', 'anonymous');
+          document.querySelector('a-assets').appendChild(bgImg);
+        }
+        bgImg.src = ytThumb(movie.trailer_id);
+        screenSurf.setAttribute('src', '#screen-bg-img');
+        screenSurf.setAttribute('opacity', '0.3');
+      }
+      var glowColor = movie.type === 'movie' ? '#4ecdc4' : '#a855f7';
+      var screenGlow = document.getElementById('screen-glow');
+      if (screenGlow) screenGlow.setAttribute('color', glowColor);
+    }
+
+    // YouTube IFrame API state change handler
+    function onPlayerStateChange(event) {
+      // YT.PlayerState.ENDED === 0
+      if (event.data === 0) {
+        playNext();
+      }
+    }
+
+    // Play next in queue
+    function playNext() {
+      if (playQueue.length > 0) {
+        var next = playQueue.shift();
+        playTrailer(next);
+        showToast('Now playing: ' + next.title);
+      } else {
+        closeYouTubePlayer();
+        showToast('Queue finished');
+      }
+    }
+
+    // Skip to next (called from Now Playing bar)
+    function skipToNext() {
+      if (playQueue.length > 0) {
+        playNext();
+      } else {
+        showToast('Queue is empty');
+      }
+    }
+
+    // Close YouTube player (replaces old closeYouTube)
+    function closeYouTubePlayer() {
+      var overlay = document.getElementById('yt-overlay');
+      var container = document.getElementById('yt-container');
+      if (ytPlayer && ytPlayer.destroy) {
+        try { ytPlayer.destroy(); } catch(e) {}
+        ytPlayer = null;
+      }
+      container.innerHTML = '';
+      overlay.classList.remove('active');
+      isPlaying = false;
+      nowPlayingMovie = null;
+      updateNowPlayingBar();
+      updateQueueUI();
+      updateHudQueueBtn();
+    }
+
+    // Legacy alias
+    function closeYouTube() { closeYouTubePlayer(); }
+
+    function closeHud() {
+      document.getElementById('movie-hud').classList.remove('visible');
+    }
+
+    // --- Hover Popup ---
+    function getMovieByGalleryIndex(index) {
+      if (currentFilter === 'all') {
+        var moviesList = allMovies.filter(function(m) { return m.type === 'movie'; });
+        var tvList = allMovies.filter(function(m) { return m.type === 'tv'; });
+        return moviesList.concat(tvList)[index];
+      }
+      return filteredMovies[index];
+    }
+
+    function showHoverPopup(movieIndex) {
+      var movie = getMovieByGalleryIndex(movieIndex);
+      if (!movie) return;
+      hoveredMovieIndex = movieIndex;
+
+      var popup = document.getElementById('hover-popup');
+      document.getElementById('hover-title').textContent = movie.title;
+      document.getElementById('hover-year').textContent =
+        (movie.release_year || '') + (movie.genre ? ' \u00B7 ' + movie.genre : '');
+
+      // Show the right set of buttons
+      var instantBtn = document.getElementById('hover-instant-btn');
+      var playNowBtn = document.getElementById('hover-playnow-btn');
+      var queueBtn   = document.getElementById('hover-queue-btn');
+      if (isPlaying) {
+        instantBtn.style.display = 'none';
+        playNowBtn.style.display = 'block';
+        queueBtn.style.display   = 'block';
+      } else {
+        instantBtn.style.display = 'block';
+        playNowBtn.style.display = 'none';
+        queueBtn.style.display   = 'none';
+      }
+
+      // Position near cursor, clamped to viewport
+      var pw = 200, x = mouseX + 15, y = mouseY - 30;
+      if (x + pw > window.innerWidth - 20) x = mouseX - pw - 15;
+      if (y < 10) y = 10;
+      if (y + 150 > window.innerHeight) y = window.innerHeight - 160;
+      popup.style.left = x + 'px';
+      popup.style.top  = y + 'px';
+      popup.classList.add('visible');
+    }
+
+    function hideHoverPopup() {
+      hoveredMovieIndex = null;
+      document.getElementById('hover-popup').classList.remove('visible');
+    }
+
+    // Wire up popup mouse events so it stays open when cursor moves onto it
+    (function() {
+      var popup = document.getElementById('hover-popup');
+      popup.addEventListener('mouseenter', function() {
+        clearTimeout(window._hoverHideTimeout);
+      });
+      popup.addEventListener('mouseleave', function() {
+        hideHoverPopup();
+      });
+    })();
+
+    // Hover popup action handlers
+    function instantPlayHovered() {
+      if (hoveredMovieIndex === null) return;
+      var movie = getMovieByGalleryIndex(hoveredMovieIndex);
+      if (!movie || !movie.trailer_id) return;
+      hideHoverPopup();
+      playTrailer(movie);
+    }
+
+    function playNowHovered() {
+      if (hoveredMovieIndex === null) return;
+      var movie = getMovieByGalleryIndex(hoveredMovieIndex);
+      if (!movie || !movie.trailer_id) return;
+      hideHoverPopup();
+      playTrailer(movie);
+    }
+
+    function queueHovered() {
+      if (hoveredMovieIndex === null) return;
+      var movie = getMovieByGalleryIndex(hoveredMovieIndex);
+      if (!movie) return;
+      hideHoverPopup();
+      addToQueue(movie);
+    }
+
+    // --- Queue Management ---
+    function addToQueue(movie) {
+      // Prevent duplicates
+      var isDupe = playQueue.some(function(m) { return m.id === movie.id; });
+      if (isDupe) {
+        showToast('"' + movie.title + '" is already queued');
+        return;
+      }
+      // Don't queue what's currently playing
+      if (nowPlayingMovie && nowPlayingMovie.id === movie.id) {
+        showToast('"' + movie.title + '" is already playing');
+        return;
+      }
+      playQueue.push(movie);
+      showToast('Queued "' + movie.title + '" (' + playQueue.length + ' in queue)');
+      updateQueueUI();
+      // Update "Next" button visibility in overlay
+      var nextBtn = document.getElementById('yt-next');
+      if (nextBtn) nextBtn.style.display = playQueue.length > 0 ? 'inline-block' : 'none';
+    }
+
+    function removeFromQueue(index) {
+      playQueue.splice(index, 1);
+      updateQueueUI();
+      var nextBtn = document.getElementById('yt-next');
+      if (nextBtn) nextBtn.style.display = playQueue.length > 0 ? 'inline-block' : 'none';
+    }
+
+    function clearQueue() {
+      playQueue = [];
+      updateQueueUI();
+      showToast('Queue cleared');
+      var nextBtn = document.getElementById('yt-next');
+      if (nextBtn) nextBtn.style.display = 'none';
+    }
+
+    // --- UI Updates ---
+    function updateNowPlayingBar() {
+      var bar     = document.getElementById('now-playing-bar');
+      var titleEl = document.getElementById('np-title');
+      var nextBtn = document.getElementById('np-next-btn');
+      var countEl = document.getElementById('np-queue-count');
+
+      if (isPlaying && nowPlayingMovie) {
+        titleEl.textContent = nowPlayingMovie.title;
+        countEl.textContent = playQueue.length;
+        bar.classList.add('active');
+        nextBtn.classList.toggle('disabled', playQueue.length === 0);
+      } else {
+        bar.classList.remove('active');
+      }
+    }
+
+    function updateQueueUI() {
+      var list      = document.getElementById('queue-list');
+      var empty     = document.getElementById('queue-empty');
+      var toggleBtn = document.getElementById('queue-toggle-btn');
+      var badge     = document.getElementById('queue-badge');
+
+      list.innerHTML = '';
+      badge.textContent = playQueue.length;
+
+      if (playQueue.length === 0 && !isPlaying) {
+        empty.style.display = 'block';
+        toggleBtn.classList.remove('has-items');
+      } else {
+        empty.style.display = playQueue.length === 0 ? 'block' : 'none';
+        toggleBtn.classList.add('has-items');
+
+        playQueue.forEach(function(movie, i) {
+          var item = document.createElement('div');
+          item.className = 'queue-item';
+          var thumb = movie.trailer_id ? ytThumb(movie.trailer_id) : '';
+          item.innerHTML =
+            (thumb ? '<img src="' + thumb + '" alt="">' : '') +
+            '<div class="qi-info">' +
+              '<div class="qi-title">' + escapeHtml(movie.title) + '</div>' +
+              '<div class="qi-meta">' + (movie.release_year || '') + ' \u00B7 ' + (movie.genre || movie.type) + '</div>' +
+            '</div>' +
+            '<button class="qi-remove" data-idx="' + i + '" title="Remove">\u2715</button>';
+
+          // Click item → play it immediately
+          item.addEventListener('click', function(e) {
+            if (e.target.classList.contains('qi-remove')) {
+              removeFromQueue(parseInt(e.target.dataset.idx, 10));
+              return;
+            }
+            playQueue.splice(i, 1);
+            playTrailer(movie);
+          });
+          list.appendChild(item);
+        });
+      }
+    }
+
+    // Show/hide the "Queue" button in the HUD based on play state
+    function updateHudQueueBtn() {
+      var btn = document.getElementById('queue-trailer-btn');
+      if (btn) {
+        btn.style.display = isPlaying ? 'inline-block' : 'none';
+      }
+    }
+
+    function toggleQueuePanel() {
+      document.getElementById('queue-panel').classList.toggle('open');
+    }
+
+    // Toast notification
+    function showToast(msg) {
+      var toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('visible');
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(function() {
+        toast.classList.remove('visible');
+      }, 2500);
+    }
+
+    function escapeHtml(text) {
+      var div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // --- Category Filter ---
+    document.querySelectorAll('#category-bar button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('#category-bar button').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        applyFilter();
+      });
+    });
+
+    function applyFilter() {
+      var filtered;
+      if (currentFilter === 'all') {
+        filtered = allMovies;
+      } else {
+        filtered = allMovies.filter(function(m) { return m.type === currentFilter; });
+      }
+
+      buildGallery(filtered);
+
+      var leftLabel = document.getElementById('left-wall-label');
+      var rightLabel = document.getElementById('right-wall-label');
+      if (currentFilter === 'movie') {
+        leftLabel.setAttribute('value', 'MOVIES');
+        rightLabel.setAttribute('value', 'MORE MOVIES');
+      } else if (currentFilter === 'tv') {
+        leftLabel.setAttribute('value', 'TV SHOWS');
+        rightLabel.setAttribute('value', 'MORE TV');
+      } else {
+        leftLabel.setAttribute('value', 'MOVIES');
+        rightLabel.setAttribute('value', 'TV SHOWS');
+      }
+    }
+
+    // --- Utility ---
+    function truncate(str, len) {
+      if (!str) return '';
+      return str.length > len ? str.substring(0, len - 1) + '...' : str;
+    }
+
+    // --- VR Video Player Functions (ENH-004) ---
+    // Uses WebXR DOM Overlay so YouTube plays INSIDE the headset without exiting VR.
+    var isVRMode = false;
+
+    function detectVRMode() {
+      var scene = document.querySelector('a-scene');
+      return scene && scene.is('vr-mode');
+    }
+
+    /* ── Open VR DOM overlay with YouTube player ── */
+    function playVRVideo(movie) {
+      var overlay   = document.getElementById('vr-dom-overlay');
+      var titleEl   = document.getElementById('vr-overlay-title');
+      var playerEl  = document.getElementById('vr-overlay-player');
+      var nextBtn   = document.getElementById('vr-overlay-next');
+
+      titleEl.textContent = movie.title + ' — Trailer';
+
+      var videoUrl = 'https://www.youtube.com/embed/' + movie.trailer_id +
+        '?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1' +
+        '&origin=' + encodeURIComponent(window.location.origin);
+
+      playerEl.innerHTML = '<iframe src="' + videoUrl + '" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+      overlay.classList.add('active');
+
+      nextBtn.style.display = (playQueue.length > 0) ? 'inline-block' : 'none';
+
+      isPlaying = true;
+      nowPlayingMovie = movie;
+      updateNowPlayingBar();
+      updateQueueUI();
+      updateHudQueueBtn();
+
+      // Also update the cinema screen info
+      selectMovieOnScreen(movie);
+
+      // Show "NOW PLAYING" on screen text
+      var screenTitle = document.getElementById('screen-title');
+      if (screenTitle) screenTitle.setAttribute('value', movie.title);
+      var screenMeta = document.getElementById('screen-meta');
+      if (screenMeta) screenMeta.setAttribute('value', (movie.year || '') + '  ' + (movie.rating || ''));
+      var screenDesc = document.getElementById('screen-desc');
+      if (screenDesc) screenDesc.setAttribute('value', 'Playing in VR overlay...');
+      document.getElementById('screen-default-text').setAttribute('visible', false);
+      document.getElementById('screen-movie-info').setAttribute('visible', true);
+
+      showToast('Playing in VR overlay: ' + movie.title);
+    }
+
+    /* ── Close VR DOM overlay ── */
+    window.closeVROverlay = function() {
+      var overlay = document.getElementById('vr-dom-overlay');
+      var playerEl = document.getElementById('vr-overlay-player');
+      overlay.classList.remove('active');
+      playerEl.innerHTML = ''; // stop playback
+
+      isPlaying = false;
+      nowPlayingMovie = null;
+      updateNowPlayingBar();
+
+      // Restore screen
+      document.getElementById('screen-default-text').setAttribute('visible', true);
+      document.getElementById('screen-movie-info').setAttribute('visible', false);
+    };
+
+    function toggleVRVideoPause() {
+      // Try VR overlay iframe first, then old screen-surface iframe
+      var iframe = document.querySelector('#vr-overlay-player iframe') ||
+                   document.querySelector('#screen-surface iframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        } catch(e) {
+          console.log('Could not pause video');
+        }
+      }
+    }
+
+    function stopVRVideo() {
+      // Close VR overlay if active
+      closeVROverlay();
+    }
+
+    // Modified playTrailer to support VR mode
+    var originalPlayTrailer = playTrailer;
+    playTrailer = function(movie) {
+      if (detectVRMode()) {
+        playVRVideo(movie);
+      } else {
+        // Use original 2D overlay for desktop
+        originalPlayTrailer(movie);
+      }
+    };
+
+    // --- Init ---
+    async function init() {
+      try {
+        allMovies = await fetchMovies();
+        buildGallery(allMovies);
+      } catch (err) {
+        console.error('Failed to load movies:', err);
+        allMovies = generateDemoMovies();
+        buildGallery(allMovies);
+      }
+
+      // Hide loading
+      setTimeout(function() {
+        document.getElementById('loading-overlay').classList.add('hidden');
+      }, 800);
+
+      // Hide scroll hint after 8s
+      setTimeout(function() {
+        var hint = document.getElementById('scroll-hint');
+        if (hint) hint.style.display = 'none';
+      }, 8000);
+      
+      // Listen for VR mode changes
+      var scene = document.querySelector('a-scene');
+      if (scene) {
+        scene.addEventListener('enter-vr', function() {
+          isVRMode = true;
+          console.log('[VR Theater] Entered VR mode');
+        });
+        scene.addEventListener('exit-vr', function() {
+          isVRMode = false;
+          console.log('[VR Theater] Exited VR mode');
+          // Stop VR video when exiting
+          if (isPlaying) stopVRVideo();
+        });
+      }
+    }
+
+    // Wait for scene to be ready
+    var sceneEl = document.querySelector('a-scene');
+    if (sceneEl.hasLoaded) {
+      init();
+    } else {
+      sceneEl.addEventListener('loaded', init);
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeYouTubePlayer();
+        closeHud();
+        hideHoverPopup();
+        // Close queue panel too
+        document.getElementById('queue-panel').classList.remove('open');
+      }
+      // N = next in queue
+      if ((e.key === 'n' || e.key === 'N') && isPlaying && !e.ctrlKey && !e.metaKey) {
+        skipToNext();
+      }
+    });
+  </script>
+
+  <!-- YouTube IFrame API for auto-advance -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    function onYouTubeIframeAPIReady() { ytAPIReady = true; }
+  </script>
+
+  <!-- Shared presence tracker + keyboard shortcuts -->
+  <script src="/vr/presence.js"></script>
+  <!-- VR Controller Support -->
+  <script src="/vr/controller-support.js"></script>
+  
+  <!-- VR Navigation Menu -->
+  <script src="/vr/nav-menu.js"></script>
+  <!-- VR Quick Wins -->
+  <script src="/vr/quick-wins.js"></script>
+
+  <!-- Comfort vignette + F1 help -->
+  <script src="/vr/vr-comfort.js"></script>
+  <!-- Quest Thumbstick Locomotion -->
+  <script>
+  (function () {
+    var rig, camera, moveSpeed = 0.06, turnCooldown = false;
+    function init() {
+      rig = document.getElementById('rig');
+      camera = document.querySelector('a-camera');
+      if (rig) requestAnimationFrame(step);
+    }
+    function step() {
+      var pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      var left = null, right = null;
+      for (var i = 0; i < pads.length; i++) {
+        var p = pads[i];
+        if (!p) continue;
+        if (p.hand === 'left') left = p;
+        if (p.hand === 'right') right = p;
+      }
+      if (left && left.axes.length >= 2) {
+        var x = left.axes[0] || 0, y = left.axes[1] || 0;
+        if (Math.abs(x) > 0.1 || Math.abs(y) > 0.1) {
+          var yaw = camera && camera.object3D ? camera.object3D.rotation.y : 0;
+          var dx = Math.sin(yaw) * -y + Math.cos(yaw) * x;
+          var dz = Math.cos(yaw) * -y - Math.sin(yaw) * x;
+          var pos = rig.getAttribute('position');
+          rig.setAttribute('position', { x: pos.x + dx * moveSpeed, y: pos.y, z: pos.z + dz * moveSpeed });
+        }
+      }
+      if (right && right.axes.length >= 2) {
+        var turn = right.axes[0] || 0;
+        if (!turnCooldown && Math.abs(turn) > 0.7) {
+          var rot = rig.getAttribute('rotation');
+          rig.setAttribute('rotation', { x: rot.x, y: rot.y + (turn > 0 ? -30 : 30), z: rot.z });
+          turnCooldown = true;
+          setTimeout(function () { turnCooldown = false; }, 300);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+  })();
+  </script>
+</body>
+</html>

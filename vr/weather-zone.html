@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Observatory VR - Toronto</title>
+  
+  <!-- A-Frame Core -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  
+  <!-- A-Frame Environment Component -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+  
+  <!-- A-Frame Extras for better controls -->
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.4.0/dist/aframe-extras.min.js"></script>
+  
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+    #weather-ui {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.85);
+      color: #00d4ff;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #00d4ff;
+      font-size: 14px;
+      max-width: 320px;
+      backdrop-filter: blur(10px);
+    }
+    #weather-ui h3 { margin: 0 0 10px 0; color: #fff; }
+    #weather-ui .temp { font-size: 28px; font-weight: bold; }
+    #weather-ui .condition { color: #ccc; margin: 5px 0; }
+    #loading { display: none; color: #ffd700; }
+    
+    /* Feels Like Box */
+    .feels-like-box {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      border-left: 4px solid;
+    }
+    .feels-like-box.cold { border-color: #3b82f6; background: rgba(59,130,246,0.15); }
+    .feels-like-box.cool { border-color: #14b8a6; background: rgba(20,184,166,0.15); }
+    .feels-like-box.warm { border-color: #f59e0b; background: rgba(245,158,11,0.15); }
+    .feels-like-box.hot { border-color: #ef4444; background: rgba(239,68,68,0.15); }
+    
+    .feels-like-label { font-size: 11px; color: #888; text-transform: uppercase; }
+    .feels-like-value { font-size: 20px; font-weight: bold; color: #fff; }
+    .feels-like-desc { font-size: 12px; color: #ccc; margin-top: 4px; }
+    
+    /* Alerts Panel */
+    #alerts-panel {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      max-width: 300px;
+    }
+    .alert {
+      background: rgba(239,68,68,0.9);
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border-left: 4px solid #ff6b6b;
+      animation: alert-pulse 2s infinite;
+    }
+    @keyframes alert-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+    }
+    .alert-title { font-weight: bold; font-size: 14px; }
+    .alert-desc { font-size: 12px; margin-top: 4px; opacity: 0.9; }
+    
+    /* Control Buttons */
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      background: rgba(0, 212, 255, 0.2);
+      color: #00d4ff;
+      padding: 12px 20px;
+      border: 2px solid #00d4ff;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+    .btn:hover { background: rgba(0, 212, 255, 0.4); }
+    .btn.passthrough {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: #a855f7;
+      color: #a855f7;
+    }
+    .btn.passthrough:hover { background: rgba(168, 85, 247, 0.4); }
+    .btn.passthrough.active {
+      background: rgba(168, 85, 247, 0.6);
+      box-shadow: 0 0 20px rgba(168,85,247,0.5);
+    }
+    
+    /* Season indicator */
+    #season-badge {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(0,0,0,0.7);
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Season Badge -->
+  <div id="season-badge">🍂 Autumn in Toronto</div>
+
+  <!-- Weather Info UI Overlay -->
+  <div id="weather-ui">
+    <h3>🌤️ Toronto Weather Observatory</h3>
+    <div id="loading">Loading weather data...</div>
+    <div id="weather-data" style="display: none;">
+      <div class="temp" id="temp">--°C</div>
+      <div class="condition" id="condition">--</div>
+      
+      <!-- What it REALLY feels like -->
+      <div class="feels-like-box" id="feels-box">
+        <div class="feels-like-label">🌡️ What it REALLY feels like</div>
+        <div class="feels-like-value" id="feels-like">--°C</div>
+        <div class="feels-like-desc" id="feels-desc">Calculating...</div>
+      </div>
+      
+      <div style="margin: 8px 0; font-size: 12px; color: #aaa;">
+        <span id="wind-chill-label">🥶 Wind chill:</span> <span id="wind-chill">--</span>°C
+        <span style="margin-left: 10px;" id="humidex-label">🔥 Humidex:</span> <span id="humidex">--</span>
+      </div>
+      
+      <div>💨 Wind: <span id="wind">--</span> km/h (gusts <span id="wind-gust">--</span>)</div>
+      <div>💧 Humidity: <span id="humidity">--</span>%</div>
+      <div>☀️ UV Index: <span id="uv-index">--</span></div>
+      <div>🌅 Sunrise: <span id="sunrise">--</span> | 🌇 Sunset: <span id="sunset">--</span></div>
+      
+      <div style="margin-top: 8px; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 13px;" id="jacket-advice"></div>
+      <div style="margin-top: 8px; font-size: 12px; color: #888;">
+        Last updated: <span id="updated">--</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Weather Alerts Panel -->
+  <div id="alerts-panel"></div>
+  
+  <!-- Controls -->
+  <div class="controls">
+    <a href="/vr/" class="btn">← Back to Hub</a>
+    <button class="btn passthrough" id="passthrough-btn" onclick="togglePassthrough()">
+      👁️ Passthrough AR
+    </button>
+  </div>
+
+  <a-scene 
+    id="weather-scene"
+    renderer="antialias: true; colorManagement: true; highRefreshRate: false; maxCanvasWidth: 1920; maxCanvasHeight: 1080"
+    vr-mode-ui="enabled: true"
+    background="color: #0a0a1a"
+    webxr="optionalFeatures: local-floor, dom-overlay, layers; referenceSpaceType: local-floor"
+    loading-screen="enabled: false">
+    
+    <!-- Assets -->
+    <a-assets>
+      <audio id="rain-sound" src="https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3" preload="auto" loop></audio>
+      <audio id="wind-sound" src="https://assets.mixkit.co/active_storage/sfx/2516/2516-preview.mp3" preload="auto" loop></audio>
+      <audio id="thunder-sound" src="https://assets.mixkit.co/active_storage/sfx/1271/1271-preview.mp3" preload="auto"></audio>
+    </a-assets>
+
+    <!-- ==================== ENVIRONMENT ==================== -->
+    
+    <!-- Sky/Atmosphere -->
+    <a-sky id="sky" color="#1a1a3e"></a-sky>
+
+    <!-- Atmospheric Fog -->
+    <a-entity id="fog-layer" visible="false">
+      <a-sphere radius="30" color="#888" opacity="0.3" material="transparent: true; side: back"></a-sphere>
+    </a-entity>
+
+    <!-- Spatial audio emitters -->
+    <a-entity position="0 2 -6"
+      sound="src: url(https://assets.mixkit.co/active_storage/sfx/2359/2359-preview.mp3); autoplay: true; loop: true; positional: true; refDistance: 3; rolloffFactor: 2; volume: 0.18">
+    </a-entity>
+    <a-entity id="wind-audio" position="-6 2 -4" visible="false"
+      sound="src: url(https://assets.mixkit.co/active_storage/sfx/2516/2516-preview.mp3); autoplay: true; loop: true; positional: true; refDistance: 4; rolloffFactor: 2.4; volume: 0.2">
+    </a-entity>
+    
+    <!-- Stars -->
+    <a-entity id="stars" visible="false"></a-entity>
+
+    <!-- Sun -->
+    <a-entity id="sun" visible="false" position="50 60 -100">
+      <a-sphere radius="8" color="#ffd700" shader="flat"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
+        <a-ring radius-inner="10" radius-outer="12" color="#ffaa00" opacity="0.3" rotation="90 0 0"></a-ring>
+      </a-sphere>
+      <a-light type="point" intensity="1.5" distance="200" color="#ffdd88"></a-light>
+    </a-entity>
+
+    <!-- Moon -->
+    <a-entity id="moon" visible="false" position="-50 60 -100">
+      <a-sphere radius="6" color="#e0e0e0" shader="flat">
+        <a-circle radius="1.5" position="1 0.5 5" color="#333" opacity="0.3"></a-circle>
+        <a-circle radius="1" position="-2 -1 5" color="#444" opacity="0.2"></a-circle>
+      </a-sphere>
+      <a-light type="point" intensity="0.5" distance="150" color="#ccddff"></a-light>
+    </a-entity>
+
+    <!-- Clouds -->
+    <a-entity id="clouds-container"></a-entity>
+
+    <!-- ==================== SEASONAL ELEMENTS ==================== -->
+    
+    <!-- Spring: Falling Petals -->
+    <a-entity id="spring-petals" visible="false">
+      <a-entity id="petal-particles"></a-entity>
+    </a-entity>
+
+    <!-- Summer: Fireflies -->
+    <a-entity id="summer-fireflies" visible="false"></a-entity>
+
+    <!-- Autumn: Falling Leaves -->
+    <a-entity id="autumn-leaves" visible="false">
+      <a-entity id="leaf-particles"></a-entity>
+    </a-entity>
+
+    <!-- Winter: Snow (enhanced) -->
+    <a-entity id="winter-snow" visible="false">
+      <a-entity id="snow-particles-enhanced"></a-entity>
+    </a-entity>
+
+    <!-- ==================== WEATHER PARTICLE SYSTEMS ==================== -->
+    
+    <a-entity id="rain-system" visible="false">
+      <a-entity id="rain-particles"></a-entity>
+    </a-entity>
+
+    <a-entity id="snow-system" visible="false">
+      <a-entity id="snow-particles"></a-entity>
+    </a-entity>
+
+    <!-- Lightning -->
+    <a-entity id="lightning" visible="false">
+      <a-light type="point" intensity="3" distance="100" color="#ffffff"
+               animation="property: intensity; from: 0; to: 3; dur: 100; dir: alternate; loop: 3"></a-light>
+    </a-entity>
+
+    <!-- ==================== OBSERVATORY STRUCTURE ==================== -->
+    
+    <!-- Floor -->
+    <a-circle id="observatory-floor" position="0 0 0" rotation="-90 0 0" radius="20" 
+              color="#2a2a4a" material="metalness: 0.8; roughness: 0.2"></a-circle>
+    
+    <!-- Glass Walls -->
+    <a-cylinder id="glass-walls" position="0 5 0" radius="18" height="10" open-ended="true"
+                material="color: #1a1a3e; opacity: 0.1; transparent: true; side: double" geometry="segmentsRadial: 16">
+    </a-cylinder>
+
+    <!-- Support Pillars -->
+    <a-cylinder position="-12 5 -12" radius="0.5" height="10" color="#3a3a5a"></a-cylinder>
+    <a-cylinder position="12 5 -12" radius="0.5" height="10" color="#3a3a5a"></a-cylinder>
+    <a-cylinder position="-12 5 12" radius="0.5" height="10" color="#3a3a5a"></a-cylinder>
+    <a-cylinder position="12 5 12" radius="0.5" height="10" color="#3a3a5a"></a-cylinder>
+
+    <!-- ==================== DISPLAY PANELS ==================== -->
+    
+    <!-- Main Weather Display -->
+    <a-entity position="0 4 -8" rotation="10 0 0">
+      <a-box width="9" height="5" depth="0.2" color="#0a0a1a" material="opacity: 0.9; transparent: true; metalness: 0.5"></a-box>
+      <a-box width="9.2" height="5.2" depth="0.15" color="#00d4ff" material="wireframe: true; emissive: #00d4ff; emissiveIntensity: 0.5"></a-box>
+      
+      <a-text value="TORONTO WEATHER" position="0 2 0.15" align="center" width="6" color="#00d4ff" font="mozillavr"></a-text>
+      
+      <!-- Big Temperature -->
+      <a-text id="vr-temp" value="--°C" position="-2.5 0.8 0.15" align="center" width="12" color="#ffffff"></a-text>
+      
+      <!-- Feels Like (What it really feels like) -->
+      <a-text id="vr-feels" value="Feels: --°C" position="2.5 1.2 0.15" align="center" width="5" color="#ffaa00"></a-text>
+      <a-text id="vr-windchill" value="Wind chill: --°C" position="2.5 0.6 0.15" align="center" width="4" color="#88ccff"></a-text>
+      <a-text id="vr-humidex" value="Humidex: --" position="2.5 0 0.15" align="center" width="4" color="#ff6b6b"></a-text>
+      
+      <!-- Condition -->
+      <a-text id="vr-condition" value="Loading..." position="0 -0.8 0.15" align="center" width="5" color="#cccccc"></a-text>
+      
+      <!-- Wind & Humidity -->
+      <a-text id="vr-wind" value="Wind: -- km/h" position="-2 -1.8 0.15" align="center" width="4" color="#88ccff"></a-text>
+      <a-text id="vr-humidity" value="Humidity: --%" position="2 -1.8 0.15" align="center" width="4" color="#88ccff"></a-text>
+    </a-entity>
+
+    <!-- "What It Really Feels Like" Info Panel -->
+    <a-entity id="feels-like-panel" position="0 1 -8" rotation="5 0 0">
+      <a-box width="8" height="1.5" depth="0.1" color="#1a1a3e" opacity="0.95" material="transparent: true"></a-box>
+      <a-text id="vr-feels-desc" value="Loading comfort info..." position="0 0 0.08" align="center" width="6" color="#ffffff" wrap-count="50"></a-text>
+    </a-entity>
+
+    <!-- Forecast Panel -->
+    <a-entity position="8 3 0" rotation="0 -30 0">
+      <a-box width="4.5" height="6" depth="0.2" color="#0a0a1a" material="opacity: 0.9; transparent: true"></a-box>
+      <a-text value="7-DAY FORECAST" position="0 2.5 0.15" align="center" width="5" color="#00d4ff"></a-text>
+      <a-text id="vr-forecast" value="Loading..." position="0 -0.5 0.15" align="center" width="3.5" color="#cccccc"></a-text>
+    </a-entity>
+
+    <!-- Atmosphere/Comfort Panel -->
+    <a-entity position="-8 3 0" rotation="0 30 0">
+      <a-box width="5" height="4" depth="0.2" color="#0a0a1a" material="opacity: 0.9; transparent: true"></a-box>
+      <a-text value="ATMOSPHERE" position="0 1.5 0.15" align="center" width="5" color="#00d4ff"></a-text>
+      <a-text id="vr-atmosphere" value="Analyzing..." position="0 -0.2 0.15" align="center" width="4" color="#cccccc"></a-text>
+      
+      <!-- Comfort meter -->
+      <a-box position="0 -1.5 0.15" width="4" height="0.3" depth="0.05" color="#333"></a-box>
+      <a-box id="comfort-bar" position="0 -1.5 0.18" width="2" height="0.25" depth="0.05" color="#22c55e"
+             animation="property: width; dur: 1000; easing: easeOutQuad"></a-box>
+    </a-entity>
+
+    <!-- Weather Alerts Panel (VR) -->
+    <a-entity id="vr-alerts" position="0 6.5 -6" visible="false">
+      <a-box width="7" height="1.2" depth="0.2" color="#ef4444" opacity="0.9"></a-box>
+      <a-text id="vr-alert-text" value="WEATHER ALERT" position="0 0 0.15" align="center" width="6" color="#ffffff"></a-text>
+      <a-entity position="3.2 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
+        <a-cone radius-bottom="0.2" height="0.4" color="#ffd700" position="0 0 0"></a-cone>
+      </a-entity>
+    </a-entity>
+
+    <!-- ==================== INTERACTIVE CONTROLS ==================== -->
+    
+    <!-- Back to Hub -->
+    <a-entity position="0 1 12" rotation="0 180 0" class="clickable" onclick="window.location.href='/vr/'">
+      <a-torus radius="1.5" radius-tubular="0.1" color="#00d4ff" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000"></a-torus>
+      <a-circle radius="1.3" color="#00d4ff" opacity="0.3" material="transparent: true; side: double"></a-circle>
+      <a-text value="BACK TO HUB" position="0 2.2 0" align="center" width="4" color="#00d4ff"></a-text>
+    </a-entity>
+
+    <!-- Mode Buttons -->
+    <a-entity position="-6 1.5 -5">
+      <a-text value="VIEW MODES" position="0 1.2 0" align="center" width="4" color="#ffffff"></a-text>
+      
+      <a-box id="btn-clear" position="0 0 0" width="1.8" height="0.5" depth="0.2" color="#333" class="clickable">
+        <a-text value="☀️ CLEAR" position="0 0 0.12" align="center" width="3" color="#ffffff"></a-text>
+      </a-box>
+      
+      <a-box id="btn-rain" position="0 -0.7 0" width="1.8" height="0.5" depth="0.2" color="#333" class="clickable">
+        <a-text value="🌧️ RAIN" position="0 0 0.12" align="center" width="3" color="#88ccff"></a-text>
+      </a-box>
+      
+      <a-box id="btn-snow" position="0 -1.4 0" width="1.8" height="0.5" depth="0.2" color="#333" class="clickable">
+        <a-text value="❄️ SNOW" position="0 0 0.12" align="center" width="3" color="#ffffff"></a-text>
+      </a-box>
+      
+      <a-box id="btn-thunder" position="0 -2.1 0" width="1.8" height="0.5" depth="0.2" color="#333" class="clickable">
+        <a-text value="⚡ STORM" position="0 0 0.12" align="center" width="3" color="#ffaa00"></a-text>
+      </a-box>
+    </a-entity>
+
+    <!-- ==================== LIGHTING ==================== -->
+    
+    <a-light type="ambient" intensity="0.4" color="#404060"></a-light>
+    <a-light type="directional" position="-5 10 5" intensity="0.6" color="#ffffff"></a-light>
+    <a-light type="point" position="0 8 0" intensity="0.3" color="#00d4ff" distance="20"></a-light>
+
+    <!-- ==================== CAMERA & CONTROLS ==================== -->
+    
+    <a-entity id="camera-rig" position="0 1.6 0">
+      <a-camera look-controls wasd-controls>
+        <a-cursor id="cursor" color="#00d4ff" fuse="true" fuse-timeout="1500" scale="0.5 0.5 0.5"
+                  animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 0.5 0.5 0.5; dur: 150"
+                  animation__fusing="property: scale; startEvents: fusing; from: 0.5 0.5 0.5; to: 0.1 0.1 0.1; dur: 1500">
+        </a-cursor>
+      </a-camera>
+
+      <a-entity id="left-hand" hand-tracking-controls="hand: left; modelColor: #00d4ff; modelOpacity: 0.6"
+                laser-controls="hand: left; model: false" raycaster="objects: .clickable; far: 20; lineColor: #00d4ff; lineOpacity: 0.4"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+      <a-entity id="right-hand" hand-tracking-controls="hand: right; modelColor: #a855f7; modelOpacity: 0.6"
+                laser-controls="hand: right; model: false" raycaster="objects: .clickable; far: 20; lineColor: #a855f7; lineOpacity: 0.4"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+    // Toronto coordinates
+    const LAT = 43.65;
+    const LON = -79.38;
+
+    // DOM Elements
+    const ui = {
+      loading: document.getElementById('loading'),
+      data: document.getElementById('weather-data'),
+      temp: document.getElementById('temp'),
+      condition: document.getElementById('condition'),
+      feelsLike: document.getElementById('feels-like'),
+      feelsDesc: document.getElementById('feels-desc'),
+      feelsBox: document.getElementById('feels-box'),
+      windChill: document.getElementById('wind-chill'),
+      windChillLabel: document.getElementById('wind-chill-label'),
+      humidex: document.getElementById('humidex'),
+      humidexLabel: document.getElementById('humidex-label'),
+      wind: document.getElementById('wind'),
+      windGust: document.getElementById('wind-gust'),
+      humidity: document.getElementById('humidity'),
+      uvIndex: document.getElementById('uv-index'),
+      sunrise: document.getElementById('sunrise'),
+      sunset: document.getElementById('sunset'),
+      jacketAdvice: document.getElementById('jacket-advice'),
+      updated: document.getElementById('updated'),
+      alertsPanel: document.getElementById('alerts-panel'),
+      seasonBadge: document.getElementById('season-badge')
+    };
+
+    const vr = {
+      temp: document.getElementById('vr-temp'),
+      feels: document.getElementById('vr-feels'),
+      windChill: document.getElementById('vr-windchill'),
+      humidex: document.getElementById('vr-humidex'),
+      condition: document.getElementById('vr-condition'),
+      wind: document.getElementById('vr-wind'),
+      humidity: document.getElementById('vr-humidity'),
+      forecast: document.getElementById('vr-forecast'),
+      atmosphere: document.getElementById('vr-atmosphere'),
+      feelsDesc: document.getElementById('vr-feels-desc'),
+      comfortBar: document.getElementById('comfort-bar'),
+      sky: document.getElementById('sky'),
+      sun: document.getElementById('sun'),
+      moon: document.getElementById('moon'),
+      stars: document.getElementById('stars'),
+      rainSystem: document.getElementById('rain-system'),
+      snowSystem: document.getElementById('snow-system'),
+      cloudsContainer: document.getElementById('clouds-container'),
+      fogLayer: document.getElementById('fog-layer'),
+      windAudio: document.getElementById('wind-audio'),
+      vrAlerts: document.getElementById('vr-alerts'),
+      vrAlertText: document.getElementById('vr-alert-text'),
+      springPetals: document.getElementById('spring-petals'),
+      autumnLeaves: document.getElementById('autumn-leaves'),
+      winterSnow: document.getElementById('winter-snow'),
+      summerFireflies: document.getElementById('summer-fireflies'),
+      glassWalls: document.getElementById('glass-walls')
+    };
+
+    let currentWeather = null;
+    let currentSeason = '';
+    let passthroughActive = false;
+
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        loadWeatherData();
+        setupButtonHandlers();
+        detectSeason();
+        setInterval(loadWeatherData, 600000);
+        
+        // Random lightning for storms (with safety check)
+        setInterval(() => {
+          try {
+            if (currentWeather && weatherCodeToInfo(currentWeather.current.weather_code).condition === 'thunder') {
+              triggerLightning();
+            }
+          } catch (e) { /* ignore */ }
+        }, 8000);
+      } catch (e) {
+        console.error('[Weather] Init error:', e);
+      }
+    });
+
+    // ========== SEASON DETECTION ==========
+    function detectSeason() {
+      const month = new Date().getMonth(); // 0-11
+      if (month >= 2 && month <= 4) currentSeason = 'spring';
+      else if (month >= 5 && month <= 7) currentSeason = 'summer';
+      else if (month >= 8 && month <= 10) currentSeason = 'autumn';
+      else currentSeason = 'winter';
+      
+      const seasonEmojis = { spring: '🌸', summer: '☀️', autumn: '🍂', winter: '❄️' };
+      const seasonNames = { spring: 'Spring', summer: 'Summer', autumn: 'Autumn', winter: 'Winter' };
+      ui.seasonBadge.textContent = `${seasonEmojis[currentSeason]} ${seasonNames[currentSeason]} in Toronto`;
+    }
+
+    // ========== HUMIDEX CALCULATION (Environment Canada) ==========
+    function calcHumidex(tempC, humidity) {
+      // Humidex only applies when temp >= 20°C and humidity >= 20%
+      if (tempC < 20 || humidity < 20) return null;
+      
+      // Simplified humidex formula
+      const dewpoint = tempC - ((100 - humidity) / 5);
+      const humidex = tempC + 0.5555 * (6.11 * Math.exp(5417.7530 * ((1/273.16) - (1/(273.16 + dewpoint)))) - 10);
+      return Math.round(humidex);
+    }
+
+    // ========== WIND CHILL (Environment Canada) ==========
+    function calcWindChill(tempC, windKmh) {
+      if (tempC > 10 || windKmh < 4.8) return null;
+      return 13.12 + 0.6215 * tempC - 11.37 * Math.pow(windKmh, 0.16) + 0.3965 * tempC * Math.pow(windKmh, 0.16);
+    }
+
+    // ========== "WHAT IT REALLY FEELS LIKE" ==========
+    function getRealFeel(tempC, windKmh, humidity) {
+      const windChill = calcWindChill(tempC, windKmh);
+      const humidex = calcHumidex(tempC, humidity);
+      
+      let realFeel = tempC;
+      let description = '';
+      let type = 'neutral';
+      
+      if (windChill !== null && windChill < tempC) {
+        realFeel = windChill;
+        type = 'cold';
+        if (windChill <= -20) description = 'Dangerous cold! Frostbite risk within minutes.';
+        else if (windChill <= -10) description = 'Bitter cold. Bundle up heavily.';
+        else if (windChill <= 0) description = 'Freezing cold. Winter coat essential.';
+        else if (windChill <= 10) description = 'Quite chilly. Dress warmly.';
+        else description = 'Cool with wind. Layer up.';
+      } else if (humidex !== null && humidex > tempC) {
+        realFeel = humidex;
+        type = 'hot';
+        if (humidex >= 45) description = 'Dangerous heat! Stay indoors if possible.';
+        else if (humidex >= 40) description = 'Extremely uncomfortable. Limit outdoor activity.';
+        else if (humidex >= 35) description = 'Very humid and uncomfortable. Stay hydrated.';
+        else if (humidex >= 30) description = 'Noticeably humid. Take breaks in shade.';
+        else description = 'Slightly muggy.';
+      } else {
+        // Neither wind chill nor humidex applies
+        if (tempC <= 0) { type = 'cold'; description = 'Cold but calm. Dress for the temperature.'; }
+        else if (tempC <= 10) { type = 'cool'; description = 'Cool and comfortable.'; }
+        else if (tempC <= 25) { type = 'warm'; description = 'Pleasant temperature!'; }
+        else { type = 'hot'; description = 'Hot but dry heat.'; }
+      }
+      
+      return { value: Math.round(realFeel), description, type, windChill, humidex };
+    }
+
+    // ========== COMFORT LEVEL ==========
+    function getComfortLevel(realFeel) {
+      if (realFeel <= -20) return { level: 'DANGEROUS COLD', color: '#7c3aed', width: 0.5 };
+      if (realFeel <= -10) return { level: 'EXTREME COLD', color: '#6366f1', width: 1 };
+      if (realFeel <= 0) return { level: 'FREEZING', color: '#3b82f6', width: 1.5 };
+      if (realFeel <= 10) return { level: 'COLD', color: '#0ea5e9', width: 2 };
+      if (realFeel <= 18) return { level: 'COOL', color: '#14b8a6', width: 2.5 };
+      if (realFeel <= 25) return { level: 'COMFORTABLE', color: '#22c55e', width: 3 };
+      if (realFeel <= 30) return { level: 'WARM', color: '#eab308', width: 3.5 };
+      if (realFeel <= 35) return { level: 'HOT', color: '#f97316', width: 3.8 };
+      return { level: 'EXTREME HEAT', color: '#ef4444', width: 4 };
+    }
+
+    // ========== LOAD WEATHER DATA ==========
+    async function loadWeatherData() {
+      ui.loading.style.display = 'block';
+      ui.data.style.display = 'none';
+
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}`
+          + `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_gusts_10m,cloud_cover,is_day,pressure_msl`
+          + `&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,uv_index_max,sunrise,sunset`
+          + `&timezone=America/Toronto&temperature_unit=celsius&wind_speed_unit=kmh&forecast_days=7`;
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('API ' + res.status);
+        const data = await res.json();
+
+        currentWeather = data;
+        updateUI(data);
+        updateVRScene(data);
+        checkWeatherAlerts(data);
+      } catch (err) {
+        console.warn('Weather fetch failed:', err);
+        ui.loading.style.display = 'none';
+        ui.data.style.display = 'block';
+        ui.condition.textContent = 'Could not load weather';
+      }
+    }
+
+    // ========== WEATHER ALERTS ==========
+    function checkWeatherAlerts(data) {
+      const c = data.current;
+      const alerts = [];
+      
+      const windChill = calcWindChill(c.temperature_2m, c.wind_speed_10m);
+      const humidex = calcHumidex(c.temperature_2m, c.relative_humidity_2m);
+      
+      // Cold alerts
+      if (windChill && windChill <= -30) {
+        alerts.push({ title: '🔴 EXTREME COLD WARNING', desc: `Wind chill of ${Math.round(windChill)}°C. Frostbite in minutes.`, severity: 'high' });
+      } else if (windChill && windChill <= -15) {
+        alerts.push({ title: '🟡 Cold Alert', desc: `Wind chill of ${Math.round(windChill)}°C. Dress very warmly.`, severity: 'medium' });
+      }
+      
+      // Heat alerts
+      if (humidex && humidex >= 40) {
+        alerts.push({ title: '🔴 HEAT WARNING', desc: `Humidex of ${humidex}. Dangerous heat levels.`, severity: 'high' });
+      } else if (humidex && humidex >= 35) {
+        alerts.push({ title: '🟡 Heat Alert', desc: `Humidex of ${humidex}. Stay hydrated.`, severity: 'medium' });
+      }
+      
+      // Wind alerts
+      if (c.wind_gusts_10m > 70) {
+        alerts.push({ title: '🔴 WIND WARNING', desc: `Gusts up to ${Math.round(c.wind_gusts_10m)} km/h. Secure loose objects.`, severity: 'high' });
+      } else if (c.wind_gusts_10m > 50) {
+        alerts.push({ title: '🟡 Wind Advisory', desc: `Gusts up to ${Math.round(c.wind_gusts_10m)} km/h.`, severity: 'medium' });
+      }
+      
+      // UV alert
+      if (data.daily && data.daily.uv_index_max && data.daily.uv_index_max[0] >= 8) {
+        alerts.push({ title: '☀️ HIGH UV', desc: `UV index ${data.daily.uv_index_max[0]}. Sunscreen essential.`, severity: 'medium' });
+      }
+      
+      // Display alerts
+      displayAlerts(alerts);
+    }
+
+    function displayAlerts(alerts) {
+      ui.alertsPanel.innerHTML = '';
+      
+      if (alerts.length === 0) {
+        vr.vrAlerts.setAttribute('visible', 'false');
+        return;
+      }
+      
+      // Show most severe alert in VR
+      const topAlert = alerts[0];
+      vr.vrAlertText.setAttribute('value', topAlert.title + ': ' + topAlert.desc);
+      vr.vrAlerts.setAttribute('visible', 'true');
+      
+      // Show all in 2D UI
+      alerts.forEach(alert => {
+        const div = document.createElement('div');
+        div.className = 'alert';
+        div.innerHTML = `<div class="alert-title">${alert.title}</div><div class="alert-desc">${alert.desc}</div>`;
+        ui.alertsPanel.appendChild(div);
+      });
+    }
+
+    // ========== UPDATE UI ==========
+    function updateUI(data) {
+      ui.loading.style.display = 'none';
+      ui.data.style.display = 'block';
+
+      const c = data.current;
+      const daily = data.daily;
+      const temp = Math.round(c.temperature_2m);
+      const windKmh = Math.round(c.wind_speed_10m);
+      const humidity = c.relative_humidity_2m;
+      
+      const realFeel = getRealFeel(c.temperature_2m, c.wind_speed_10m, c.relative_humidity_2m);
+      const info = weatherCodeToInfo(c.weather_code, c.is_day);
+      const comfort = getComfortLevel(realFeel.value);
+
+      ui.temp.textContent = temp + '°C';
+      ui.condition.textContent = info.emoji + ' ' + info.desc;
+      ui.feelsLike.textContent = realFeel.value + '°C';
+      ui.feelsDesc.textContent = realFeel.description;
+      ui.feelsBox.className = 'feels-like-box ' + realFeel.type;
+      
+      // Wind chill or humidex display
+      if (realFeel.windChill !== null && realFeel.windChill < temp) {
+        ui.windChill.textContent = Math.round(realFeel.windChill);
+        ui.windChillLabel.style.display = 'inline';
+        ui.humidexLabel.style.display = 'none';
+        document.getElementById('humidex').style.display = 'none';
+      } else if (realFeel.humidex !== null && realFeel.humidex > temp) {
+        ui.humidex.textContent = realFeel.humidex;
+        ui.humidexLabel.style.display = 'inline';
+        ui.windChillLabel.style.display = 'none';
+        document.getElementById('wind-chill').style.display = 'none';
+      } else {
+        ui.windChill.textContent = 'N/A';
+        ui.humidex.textContent = 'N/A';
+      }
+      
+      ui.wind.textContent = windKmh;
+      ui.windGust.textContent = Math.round(c.wind_gusts_10m);
+      ui.humidity.textContent = humidity;
+      ui.uvIndex.textContent = daily && daily.uv_index_max ? daily.uv_index_max[0].toFixed(1) : '--';
+      ui.updated.textContent = new Date().toLocaleTimeString();
+      
+      // Sunrise/sunset
+      if (daily && daily.sunrise && daily.sunset) {
+        ui.sunrise.textContent = new Date(daily.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        ui.sunset.textContent = new Date(daily.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      // Clothing advice
+      const advice = getClothingAdvice(realFeel.value, c.weather_code, windKmh);
+      ui.jacketAdvice.textContent = advice.text;
+      ui.jacketAdvice.style.background = advice.bg;
+      ui.jacketAdvice.style.color = advice.color;
+    }
+
+    // ========== UPDATE VR SCENE ==========
+    function updateVRScene(data) {
+      const c = data.current;
+      const daily = data.daily;
+      const temp = Math.round(c.temperature_2m);
+      const windKmh = Math.round(c.wind_speed_10m);
+      const info = weatherCodeToInfo(c.weather_code, c.is_day);
+      const realFeel = getRealFeel(c.temperature_2m, c.wind_speed_10m, c.relative_humidity_2m);
+      const comfort = getComfortLevel(realFeel.value);
+
+      vr.temp.setAttribute('value', info.emoji + ' ' + temp + '°C');
+      vr.feels.setAttribute('value', 'Feels like: ' + realFeel.value + '°C');
+      vr.windChill.setAttribute('value', realFeel.windChill !== null ? 'Wind chill: ' + Math.round(realFeel.windChill) + '°C' : '');
+      vr.humidex.setAttribute('value', realFeel.humidex !== null ? 'Humidex: ' + realFeel.humidex : '');
+      vr.condition.setAttribute('value', info.desc.toUpperCase());
+      vr.wind.setAttribute('value', `💨 ${windKmh} km/h (gusts ${Math.round(c.wind_gusts_10m)})`);
+      vr.humidity.setAttribute('value', `💧 ${c.relative_humidity_2m}% humidity`);
+      vr.feelsDesc.setAttribute('value', realFeel.description);
+      vr.atmosphere.setAttribute('value', `Comfort: ${comfort.level}\nPressure: ${Math.round(c.pressure_msl)} hPa`);
+      
+      // Comfort bar
+      vr.comfortBar.setAttribute('color', comfort.color);
+      vr.comfortBar.setAttribute('width', comfort.width);
+
+      // Forecast
+      let forecastText = '';
+      if (daily && daily.time) {
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        for (let i = 0; i < Math.min(daily.time.length, 7); i++) {
+          const d = new Date(daily.time[i]);
+          const dayName = dayNames[d.getDay()];
+          const hi = Math.round(daily.temperature_2m_max[i]);
+          const lo = Math.round(daily.temperature_2m_min[i]);
+          const fInfo = weatherCodeToInfo(daily.weather_code[i], true);
+          const pProb = daily.precipitation_probability_max[i] || 0;
+          forecastText += `${dayName}: ${hi}°/${lo}° ${fInfo.emoji}`;
+          if (pProb > 30) forecastText += ` ${pProb}%💧`;
+          forecastText += '\n';
+        }
+      }
+      vr.forecast.setAttribute('value', forecastText || 'No forecast data');
+
+      // Set visual weather mode
+      setWeatherMode(info.condition, c.cloud_cover, temp, c.is_day, c.relative_humidity_2m);
+      
+      // Set seasonal effects
+      setSeasonalEffects(c.is_day);
+    }
+
+    // ========== WEATHER MODE ==========
+    function setWeatherMode(condition, cloudCover, temp, isDay, humidity) {
+      clearParticles();
+      vr.rainSystem.setAttribute('visible', 'false');
+      vr.snowSystem.setAttribute('visible', 'false');
+      vr.sun.setAttribute('visible', 'false');
+      vr.moon.setAttribute('visible', 'false');
+      vr.stars.setAttribute('visible', 'false');
+      vr.fogLayer.setAttribute('visible', 'false');
+      vr.windAudio.setAttribute('visible', 'false');
+      vr.cloudsContainer.innerHTML = '';
+
+      let skyColor = '#1a1a3e';
+      
+      if (condition.includes('clear')) {
+        if (isDay) {
+          skyColor = temp > 25 ? '#87CEEB' : '#4a90d9';
+          vr.sun.setAttribute('visible', 'true');
+        } else {
+          skyColor = '#0a0a2e';
+          vr.moon.setAttribute('visible', 'true');
+          vr.stars.setAttribute('visible', 'true');
+          generateStars();
+        }
+      } else if (condition.includes('cloud')) {
+        skyColor = isDay ? '#6b7280' : '#374151';
+        createClouds(cloudCover / 15);
+      } else if (condition.includes('rain') || condition.includes('drizzl')) {
+        skyColor = '#2d3748';
+        createClouds(4);
+        startRain();
+      } else if (condition.includes('snow')) {
+        skyColor = '#4a5568';
+        startSnow();
+      } else if (condition.includes('thunder')) {
+        skyColor = '#1a1a2e';
+        createClouds(4);
+        startRain();
+      } else if (condition.includes('fog')) {
+        skyColor = '#4b5563';
+        vr.fogLayer.setAttribute('visible', 'true');
+      }
+      
+      // High wind audio
+      if (currentWeather && currentWeather.current.wind_gusts_10m > 30) {
+        vr.windAudio.setAttribute('visible', 'true');
+      }
+
+      vr.sky.setAttribute('color', skyColor);
+    }
+
+    // ========== SEASONAL EFFECTS ==========
+    function setSeasonalEffects(isDay) {
+      // Hide all seasonal effects first
+      vr.springPetals.setAttribute('visible', 'false');
+      vr.summerFireflies.setAttribute('visible', 'false');
+      vr.autumnLeaves.setAttribute('visible', 'false');
+      vr.winterSnow.setAttribute('visible', 'false');
+      
+      if (currentSeason === 'spring' && isDay) {
+        vr.springPetals.setAttribute('visible', 'true');
+        startPetals();
+      } else if (currentSeason === 'summer' && !isDay) {
+        vr.summerFireflies.setAttribute('visible', 'true');
+        startFireflies();
+      } else if (currentSeason === 'autumn') {
+        vr.autumnLeaves.setAttribute('visible', 'true');
+        startLeaves();
+      } else if (currentSeason === 'winter') {
+        vr.winterSnow.setAttribute('visible', 'true');
+        // Snow handled by weather mode
+      }
+    }
+
+    function startPetals() {
+      const container = document.getElementById('petal-particles');
+      container.innerHTML = '';
+      for (let i = 0; i < 15; i++) {
+        const petal = document.createElement('a-circle');
+        petal.setAttribute('radius', '0.1');
+        petal.setAttribute('color', '#ffb7c5');
+        petal.setAttribute('opacity', '0.7');
+        const x = (Math.random() - 0.5) * 40;
+        const z = (Math.random() - 0.5) * 40;
+        petal.setAttribute('position', `${x} 20 ${z}`);
+        petal.setAttribute('animation', `property: position; to: ${x + 5} 0 ${z + 2}; dur: ${6000 + Math.random() * 4000}; loop: true; easing: linear; delay: ${Math.random() * 5000}`);
+        container.appendChild(petal);
+      }
+    }
+
+    function startFireflies() {
+      vr.summerFireflies.innerHTML = '';
+      for (let i = 0; i < 10; i++) {
+        const fly = document.createElement('a-sphere');
+        fly.setAttribute('radius', '0.05');
+        fly.setAttribute('color', '#ccff00');
+        fly.setAttribute('opacity', '0.8');
+        const x = (Math.random() - 0.5) * 30;
+        const y = 1 + Math.random() * 4;
+        const z = (Math.random() - 0.5) * 30;
+        fly.setAttribute('position', `${x} ${y} ${z}`);
+        fly.setAttribute('animation', `property: opacity; from: 0.2; to: 1; dur: ${1000 + Math.random() * 1000}; loop: true; dir: alternate; easing: easeInOutSine; delay: ${Math.random() * 2000}`);
+        vr.summerFireflies.appendChild(fly);
+      }
+    }
+
+    function startLeaves() {
+      const container = document.getElementById('leaf-particles');
+      container.innerHTML = '';
+      const leafColors = ['#d97706', '#92400e', '#b45309', '#f59e0b'];
+      for (let i = 0; i < 20; i++) {
+        const leaf = document.createElement('a-plane');
+        leaf.setAttribute('width', '0.3');
+        leaf.setAttribute('height', '0.3');
+        leaf.setAttribute('color', leafColors[Math.floor(Math.random() * leafColors.length)]);
+        leaf.setAttribute('opacity', '0.8');
+        const x = (Math.random() - 0.5) * 50;
+        const z = (Math.random() - 0.5) * 50;
+        leaf.setAttribute('position', `${x} 25 ${z}`);
+        leaf.setAttribute('rotation', `${Math.random() * 360} ${Math.random() * 360} ${Math.random() * 360}`);
+        leaf.setAttribute('animation', `property: position; to: ${x - 8} 0 ${z + 5}; dur: ${8000 + Math.random() * 4000}; loop: true; easing: linear; delay: ${Math.random() * 3000}`);
+        leaf.setAttribute('animation__rot', `property: rotation; to: ${Math.random() * 720} ${Math.random() * 720} ${Math.random() * 720}; dur: ${4000 + Math.random() * 2000}; loop: true; easing: linear`);
+        container.appendChild(leaf);
+      }
+    }
+
+    function generateStars() {
+      vr.stars.innerHTML = '';
+      // Optimized: reduced star count for Quest 3
+      for (let i = 0; i < 20; i++) {
+        const star = document.createElement('a-sphere');
+        star.setAttribute('radius', Math.random() * 0.3 + 0.1);
+        star.setAttribute('color', '#ffffff');
+        star.setAttribute('shader', 'flat');
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * Math.PI / 2;
+        const r = 80;
+        const x = r * Math.sin(phi) * Math.cos(theta);
+        const y = r * Math.cos(phi);
+        const z = r * Math.sin(phi) * Math.sin(theta);
+        star.setAttribute('position', `${x} ${y} ${z}`);
+        star.setAttribute('animation', `property: opacity; from: 0.3; to: 1; dur: ${1000 + Math.random() * 2000}; loop: true; dir: alternate`);
+        vr.stars.appendChild(star);
+      }
+    }
+
+    function createClouds(count) {
+      for (let i = 0; i < count; i++) {
+        const cloud = document.createElement('a-entity');
+        const x = (Math.random() - 0.5) * 100;
+        const y = 20 + Math.random() * 20;
+        const z = -50 - Math.random() * 50;
+        cloud.setAttribute('position', `${x} ${y} ${z}`);
+        for (let j = 0; j < 5; j++) {
+          const puff = document.createElement('a-sphere');
+          puff.setAttribute('radius', 3 + Math.random() * 2);
+          puff.setAttribute('position', `${(Math.random() - 0.5) * 8} 0 ${(Math.random() - 0.5) * 4}`);
+          puff.setAttribute('color', '#ffffff');
+          puff.setAttribute('opacity', '0.6');
+          puff.setAttribute('material', 'transparent: true');
+          cloud.appendChild(puff);
+        }
+        cloud.setAttribute('animation', `property: position; to: ${x + 20} ${y} ${z}; dur: ${30000 + Math.random() * 20000}; loop: true; dir: alternate; easing: easeInOutSine`);
+        vr.cloudsContainer.appendChild(cloud);
+      }
+    }
+
+    function startRain() {
+      vr.rainSystem.setAttribute('visible', 'true');
+      const container = document.getElementById('rain-particles');
+      container.innerHTML = '';
+      // Optimized: reduced from 200 to 50 for Quest 3
+      for (let i = 0; i < 50; i++) {
+        const drop = document.createElement('a-cylinder');
+        const x = (Math.random() - 0.5) * 60;
+        const z = (Math.random() - 0.5) * 60;
+        drop.setAttribute('position', `${x} 30 ${z}`);
+        drop.setAttribute('radius', '0.02');
+        drop.setAttribute('height', '0.5');
+        drop.setAttribute('color', '#88ccff');
+        drop.setAttribute('opacity', '0.6');
+        drop.setAttribute('material', 'transparent: true');
+        drop.setAttribute('animation', `property: position; to: ${x} 0 ${z}; dur: ${800 + Math.random() * 400}; loop: true; easing: linear`);
+        container.appendChild(drop);
+      }
+    }
+
+    function startSnow() {
+      vr.snowSystem.setAttribute('visible', 'true');
+      const container = document.getElementById('snow-particles');
+      container.innerHTML = '';
+      // Optimized: reduced from 150 to 40 for Quest 3
+      for (let i = 0; i < 40; i++) {
+        const flake = document.createElement('a-sphere');
+        const x = (Math.random() - 0.5) * 60;
+        const z = (Math.random() - 0.5) * 60;
+        flake.setAttribute('position', `${x} 30 ${z}`);
+        flake.setAttribute('radius', '0.08');
+        flake.setAttribute('color', '#ffffff');
+        flake.setAttribute('opacity', '0.8');
+        flake.setAttribute('material', 'transparent: true');
+        const endX = x + (Math.random() - 0.5) * 10;
+        flake.setAttribute('animation', `property: position; to: ${endX} 0 ${z}; dur: ${3000 + Math.random() * 2000}; loop: true; easing: linear`);
+        container.appendChild(flake);
+      }
+    }
+
+    function triggerLightning() {
+      const lightning = document.getElementById('lightning');
+      lightning.setAttribute('visible', 'true');
+      setTimeout(() => lightning.setAttribute('visible', 'false'), 500);
+      
+      // Thunder sound
+      const thunder = document.getElementById('thunder-sound');
+      if (thunder) thunder.play().catch(() => {});
+    }
+
+    function clearParticles() {
+      document.getElementById('rain-particles').innerHTML = '';
+      document.getElementById('snow-particles').innerHTML = '';
+    }
+
+    // ========== CLOTHING ADVICE ==========
+    function getClothingAdvice(realFeel, weatherCode, windKmh) {
+      let text = '', bg = '', color = '#fff';
+
+      if (realFeel <= -20) {
+        text = '🥶 EXTREME COLD — Stay indoors if possible. Heavy winter coat, thermal layers, face cover required.';
+        bg = '#7c3aed';
+      } else if (realFeel <= -10) {
+        text = '❄️ Very cold — Heavy winter jacket, thermal layers, hat, gloves, and scarf essential.';
+        bg = '#6366f1';
+      } else if (realFeel <= 0) {
+        text = '🧥 Cold — Winter jacket needed. Wear layers, hat, and gloves.';
+        bg = '#3b82f6';
+      } else if (realFeel <= 5) {
+        text = '🧤 Chilly — Warm jacket or heavy sweater. Gloves recommended.';
+        bg = '#0ea5e9';
+      } else if (realFeel <= 10) {
+        text = '🧣 Cool — Light jacket or layered sweater. You might want a scarf.';
+        bg = '#14b8a6';
+      } else if (realFeel <= 18) {
+        text = '👕 Mild — Light layers. A hoodie or light jacket is enough.';
+        bg = '#22c55e';
+      } else if (realFeel <= 25) {
+        text = '☀️ Nice out! T-shirt weather. Sunscreen if sunny.';
+        bg = '#f59e0b';
+      } else if (realFeel <= 30) {
+        text = '🌡️ Warm — Light clothing, stay hydrated, sunscreen recommended.';
+        bg = '#f97316';
+      } else {
+        text = '🔥 Hot — Stay hydrated! Light clothing, sunscreen, hat. Limit outdoor activity.';
+        bg = '#ef4444';
+      }
+
+      const info = weatherCodeToInfo(weatherCode, true);
+      if (info.condition.includes('rain')) text += ' ☔ Bring an umbrella!';
+      if (windKmh > 40) text += ' 💨 Very windy — hold onto your hat!';
+
+      return { text, bg, color };
+    }
+
+    // ========== WEATHER CODES ==========
+    function weatherCodeToInfo(code, isDay) {
+      const map = {
+        0:  { desc: 'Clear sky',       condition: 'clear',   emoji: isDay ? '☀️' : '🌙' },
+        1:  { desc: 'Mainly clear',    condition: 'clear',   emoji: isDay ? '🌤️' : '🌙' },
+        2:  { desc: 'Partly cloudy',   condition: 'clouds',  emoji: '⛅' },
+        3:  { desc: 'Overcast',        condition: 'clouds',  emoji: '☁️' },
+        45: { desc: 'Foggy',           condition: 'fog',     emoji: '🌫️' },
+        48: { desc: 'Icy fog',         condition: 'fog',     emoji: '🌫️' },
+        51: { desc: 'Light drizzle',   condition: 'drizzle', emoji: '🌦️' },
+        53: { desc: 'Drizzle',         condition: 'drizzle', emoji: '🌦️' },
+        55: { desc: 'Dense drizzle',   condition: 'rain',    emoji: '🌧️' },
+        61: { desc: 'Light rain',      condition: 'rain',    emoji: '🌧️' },
+        63: { desc: 'Moderate rain',   condition: 'rain',    emoji: '🌧️' },
+        65: { desc: 'Heavy rain',      condition: 'rain',    emoji: '🌧️' },
+        66: { desc: 'Freezing rain',   condition: 'rain',    emoji: '🌧️' },
+        67: { desc: 'Heavy freezing rain', condition: 'rain', emoji: '🌧️' },
+        71: { desc: 'Light snow',      condition: 'snow',    emoji: '🌨️' },
+        73: { desc: 'Moderate snow',   condition: 'snow',    emoji: '🌨️' },
+        75: { desc: 'Heavy snow',      condition: 'snow',    emoji: '❄️' },
+        77: { desc: 'Snow grains',     condition: 'snow',    emoji: '🌨️' },
+        80: { desc: 'Light showers',   condition: 'rain',    emoji: '🌦️' },
+        81: { desc: 'Moderate showers', condition: 'rain',   emoji: '🌧️' },
+        82: { desc: 'Violent showers', condition: 'rain',    emoji: '🌧️' },
+        85: { desc: 'Snow showers',    condition: 'snow',    emoji: '🌨️' },
+        86: { desc: 'Heavy snow showers', condition: 'snow', emoji: '❄️' },
+        95: { desc: 'Thunderstorm',    condition: 'thunder', emoji: '⛈️' },
+        96: { desc: 'Thunderstorm w/ hail', condition: 'thunder', emoji: '⛈️' },
+        99: { desc: 'Severe thunderstorm', condition: 'thunder', emoji: '⛈️' }
+      };
+      return map[code] || { desc: 'Unknown', condition: 'clouds', emoji: '🌥️' };
+    }
+
+    // ========== BUTTON HANDLERS ==========
+    function setupButtonHandlers() {
+      document.getElementById('btn-clear').addEventListener('click', () => setWeatherMode('clear', 10, 20, 1, 50));
+      document.getElementById('btn-rain').addEventListener('click', () => setWeatherMode('rain', 80, 15, 1, 80));
+      document.getElementById('btn-snow').addEventListener('click', () => setWeatherMode('snow', 60, -5, 1, 60));
+      document.getElementById('btn-thunder').addEventListener('click', () => {
+        setWeatherMode('thunder', 90, 18, 0, 70);
+        triggerLightning();
+      });
+    }
+
+    // ========== PASSTHROUGH AR ==========
+    async function togglePassthrough() {
+      const scene = document.getElementById('weather-scene');
+      const btn = document.getElementById('passthrough-btn');
+      
+      if (!navigator.xr) {
+        alert('WebXR not supported on this device');
+        return;
+      }
+      
+      try {
+        const session = await navigator.xr.requestSession('immersive-ar', {
+          requiredFeatures: ['dom-overlay'],
+          domOverlay: { root: document.body }
+        });
+        
+        passthroughActive = true;
+        btn.classList.add('active');
+        btn.textContent = '👁️ Passthrough ON';
+        
+        // Make sky transparent in passthrough
+        vr.sky.setAttribute('color', '#000000');
+        vr.sky.setAttribute('opacity', '0.3');
+        vr.glassWalls.setAttribute('material', 'opacity: 0.05; transparent: true');
+        
+        session.addEventListener('end', () => {
+          passthroughActive = false;
+          btn.classList.remove('active');
+          btn.textContent = '👁️ Passthrough AR';
+          vr.sky.setAttribute('opacity', '1');
+          vr.glassWalls.setAttribute('material', 'opacity: 0.1; transparent: true');
+        });
+        
+      } catch (err) {
+        console.warn('Passthrough not available:', err);
+        alert('Passthrough AR requires a compatible VR headset (Quest 3, etc.)');
+      }
+    }
+  </script>
+  <script src="/vr/presence.js"></script>
+  <!-- VR Controller Support -->
+  <script src="/vr/controller-support.js"></script>
+  
+  <!-- VR Navigation Menu -->
+  <script src="/vr/nav-menu.js"></script>
+  <!-- VR Quick Wins -->
+  <script src="/vr/quick-wins.js"></script>
+
+  <!-- Comfort vignette + F1 help -->
+  <script src="/vr/vr-comfort.js"></script>
+  <!-- Quest Thumbstick Locomotion -->
+  <script>
+  (function () {
+    var rig, camera, moveSpeed = 0.06, turnCooldown = false;
+    function init() {
+      rig = document.getElementById('camera-rig') || document.getElementById('rig');
+      camera = document.querySelector('a-camera');
+      if (rig) requestAnimationFrame(step);
+    }
+    function step() {
+      var pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      var left = null, right = null;
+      for (var i = 0; i < pads.length; i++) {
+        var p = pads[i];
+        if (!p) continue;
+        if (p.hand === 'left') left = p;
+        if (p.hand === 'right') right = p;
+      }
+      if (left && left.axes.length >= 2) {
+        var x = left.axes[0] || 0, y = left.axes[1] || 0;
+        if (Math.abs(x) > 0.1 || Math.abs(y) > 0.1) {
+          var yaw = camera && camera.object3D ? camera.object3D.rotation.y : 0;
+          var dx = Math.sin(yaw) * -y + Math.cos(yaw) * x;
+          var dz = Math.cos(yaw) * -y - Math.sin(yaw) * x;
+          var pos = rig.getAttribute('position');
+          rig.setAttribute('position', { x: pos.x + dx * moveSpeed, y: pos.y, z: pos.z + dz * moveSpeed });
+        }
+      }
+      if (right && right.axes.length >= 2) {
+        var turn = right.axes[0] || 0;
+        if (!turnCooldown && Math.abs(turn) > 0.7) {
+          var rot = rig.getAttribute('rotation');
+          rig.setAttribute('rotation', { x: rot.x, y: rot.y + (turn > 0 ? -30 : 30), z: rot.z });
+          turnCooldown = true;
+          setTimeout(function () { turnCooldown = false; }, 300);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+  })();
+  </script>
+</body>
+</html>

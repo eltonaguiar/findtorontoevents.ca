@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toronto Events Explorer — VR Zone</title>
+  <meta name="description" content="Browse 1000+ Toronto events in immersive VR. Filter by category, view details, and discover what's happening in the city." />
+
+  <!-- A-Frame 1.6.0 -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+    /* Loading Screen */
+    #loading-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 50%, #302b63 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #fff; transition: opacity 0.6s ease;
+    }
+    #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+    #loading-screen h1 {
+      font-size: 2rem; margin: 0 0 0.3rem;
+      background: linear-gradient(90deg, #ff6b6b, #00d4ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #loading-screen p { color: #888; margin: 0.5rem 0; }
+    #loading-screen .spinner {
+      width: 50px; height: 50px; margin-top: 1.5rem;
+      border: 4px solid rgba(255,107,107,0.2); border-top-color: #ff6b6b;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Event Detail Overlay */
+    #event-detail {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 200; max-width: 520px; width: 92%; padding: 28px 24px;
+      background: rgba(15, 12, 41, 0.97); color: #fff;
+      border-radius: 16px; border: 1px solid rgba(255,107,107,0.3);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      display: none; backdrop-filter: blur(12px);
+    }
+    #event-detail.open { display: block; }
+    #event-detail .close-x {
+      position: absolute; top: 10px; right: 14px; background: none;
+      border: none; color: #aaa; font-size: 1.5rem; cursor: pointer; line-height: 1;
+    }
+    #event-detail .close-x:hover { color: #fff; }
+    #event-detail h2 { margin: 0 0 10px; color: #ff6b6b; font-size: 1.25rem; line-height: 1.3; }
+    #event-detail .meta { color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5; }
+    #event-detail .desc {
+      color: #cbd5e1; font-size: 0.95rem; line-height: 1.6;
+      max-height: 160px; overflow-y: auto; margin-bottom: 16px;
+    }
+    #event-detail .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    #event-detail .tag {
+      background: rgba(255,107,107,0.15); color: #ff6b6b; padding: 4px 10px;
+      border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+    }
+    #event-detail .btns { display: flex; gap: 10px; }
+    #event-detail .btn {
+      padding: 10px 22px; border-radius: 8px; border: none; cursor: pointer;
+      font-size: 0.95rem; font-weight: 600; text-decoration: none; display: inline-block;
+    }
+    #event-detail .btn-primary { background: #ff6b6b; color: #fff; }
+    #event-detail .btn-secondary { background: rgba(255,255,255,0.08); color: #ccc; }
+    #event-detail .btn:hover { filter: brightness(1.15); }
+
+    /* HUD Bar */
+    #hud {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(15,12,41,0.9); color: #fff; padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    #hud a { color: #00d4ff; text-decoration: none; }
+    #hud .hint { color: #666; }
+
+    /* Filter strips wrapper */
+    #filter-wrapper {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 100; display: flex; flex-direction: column; align-items: center;
+      gap: 4px; max-width: 95vw;
+    }
+
+    /* Category Pills (2D) */
+    #cat-strip {
+      display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+      padding: 6px;
+    }
+    #cat-strip button {
+      background: rgba(30,41,59,0.85); color: #94a3b8; border: 1px solid rgba(255,255,255,0.08);
+      padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.82rem;
+      font-weight: 500; transition: all 0.2s; backdrop-filter: blur(6px);
+    }
+    #cat-strip button:hover { background: rgba(50,60,80,0.9); color: #fff; }
+    #cat-strip button.active { background: var(--cat-color, #ff6b6b); color: #fff; border-color: transparent; }
+    #cat-strip button .count { opacity: 0.6; margin-left: 4px; font-size: 0.75rem; }
+
+    /* Page Controls (2D) */
+    #page-controls {
+      position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+      z-index: 100; display: flex; align-items: center; gap: 14px;
+    }
+    #page-controls button {
+      background: rgba(30,41,59,0.85); color: #00d4ff; border: 1px solid rgba(0,212,255,0.2);
+      padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+      font-weight: 600; backdrop-filter: blur(6px); transition: all 0.2s;
+    }
+    #page-controls button:hover { background: rgba(0,212,255,0.15); }
+    #page-controls button:disabled { opacity: 0.3; cursor: default; }
+    #page-controls .page-info { color: #888; font-size: 0.85rem; }
+
+    /* Back button */
+    #back-btn {
+      position: fixed; top: 12px; left: 12px; z-index: 150;
+      background: rgba(30,41,59,0.85); color: #00d4ff; border: 1px solid rgba(0,212,255,0.2);
+      padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+      font-weight: 600; backdrop-filter: blur(6px); text-decoration: none;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+    }
+    #back-btn:hover { background: rgba(0,212,255,0.15); }
+
+    /* VR button */
+    #vr-btn {
+      position: fixed; top: 12px; right: 12px; z-index: 150;
+      background: rgba(168,85,247,0.2); color: #a855f7; border: 2px solid #a855f7;
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 700;
+      font-size: 0.85rem; transition: all 0.3s;
+    }
+    #vr-btn:hover { background: rgba(168,85,247,0.4); box-shadow: 0 0 20px rgba(168,85,247,0.4); }
+  </style>
+</head>
+<body>
+
+  <!-- Loading -->
+  <div id="loading-screen">
+    <h1>Events Explorer</h1>
+    <p>Loading Toronto events in VR...</p>
+    <div class="spinner"></div>
+    <p id="loading-status" style="color:#555; font-size:0.8rem; margin-top:1rem;">Fetching events data...</p>
+  </div>
+
+  <a id="back-btn" href="/vr/">&#8592; Back to Hub</a>
+  <button id="vr-btn" onclick="document.querySelector('a-scene').enterVR()">Enter VR</button>
+  <div id="filter-wrapper">
+    <div id="cat-strip"></div>
+    <div id="time-strip" style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; padding: 4px;"></div>
+  </div>
+  <div id="page-controls">
+    <button id="btn-prev" onclick="prevPage()" disabled>&#9664; Prev</button>
+    <span class="page-info" id="page-info">Page 1</span>
+    <button id="btn-next" onclick="nextPage()">Next &#9654;</button>
+  </div>
+
+  <!-- Event detail overlay -->
+  <div id="event-detail">
+    <button class="close-x" onclick="closeDetail()">&times;</button>
+    <h2 id="det-title"></h2>
+    <div class="meta" id="det-meta"></div>
+    <div class="tags" id="det-tags"></div>
+    <div class="desc" id="det-desc"></div>
+    <div class="btns">
+      <a id="det-link" href="#" target="_blank" rel="noopener" class="btn btn-primary">View Event</a>
+      <button class="btn btn-secondary" onclick="closeDetail()">Close</button>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <span><strong>Events Explorer</strong> &mdash; <a href="https://findtorontoevents.ca">findtorontoevents.ca</a></span>
+    <span class="hint">Click cards for details &bull; Use category filters above &bull; Gaze or click in VR</span>
+  </div>
+
+  <!-- ================================================================
+       A-FRAME SCENE  (1.6.0 compatible — no environment component)
+       ================================================================ -->
+  <a-scene
+    loading-screen="enabled: false"
+    renderer="antialias: true; colorManagement: true; alpha: true"
+    vr-mode-ui="enabled: true"
+    webxr="optionalFeatures: ['dom-overlay', 'hand-tracking', 'local-floor', 'hit-test', 'layers']; referenceSpaceType: local-floor"
+    background="transparent: true"
+    cursor="rayOrigin: mouse"
+    raycaster="objects: .clickable"
+  >
+    
+    <!-- Passthrough Notification -->
+    <a-entity id="passthrough-ui" position="0 4 -8" visible="false">
+      <a-plane width="3.5" height="0.6" color="#000" opacity="0.7" material="transparent: true; shader: flat">
+        <a-text value="🥽 Passthrough Active - Events in Your Room" align="center" width="4" color="#ff6b6b" position="0 0 0.01"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- ---- Sky & Ground (replaces broken environment component) ---- -->
+    <a-sky color="#0a0a1a"></a-sky>
+    <a-plane rotation="-90 0 0" width="100" height="100" color="#111128" position="0 0 0"></a-plane>
+
+    <!-- Subtle grid lines on the floor -->
+    <a-plane rotation="-90 0 0" width="80" height="80" color="#161633" position="0 0.01 0"
+             material="shader: flat; wireframe: true; opacity: 0.15"></a-plane>
+
+    <!-- ---- Lighting ---- -->
+    <a-light type="ambient" color="#aabbcc" intensity="0.6"></a-light>
+    <a-light type="directional" position="2 4 -3" color="#ffffff" intensity="0.5"></a-light>
+    <a-light type="point" position="0 5 -7" color="#ff6b6b" intensity="0.4" distance="20"></a-light>
+    <a-light type="point" position="-5 4 -8" color="#00d4ff" intensity="0.3" distance="14"></a-light>
+    <a-light type="point" position="5 4 -8" color="#a855f7" intensity="0.3" distance="14"></a-light>
+
+    <!-- ---- Decorative stars ---- -->
+    <a-sphere position="-8 6 -15" radius="0.06" color="#00d4ff"
+              animation="property: position; to: -8 7 -15; dur: 3000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="7 5 -12" radius="0.05" color="#a855f7"
+              animation="property: position; to: 7 6.5 -12; dur: 4000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="-5 7 -10" radius="0.07" color="#ff6b6b"
+              animation="property: position; to: -5 8 -10; dur: 3500; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="10 4 -18" radius="0.04" color="#4ecdc4"
+              animation="property: position; to: 10 5.5 -18; dur: 5000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+
+    <!-- ---- Zone Title ---- -->
+    <a-text value="TORONTO EVENTS" position="0 4.5 -9" align="center" color="#ff6b6b" width="9"
+            animation="property: position; to: 0 4.6 -9; dur: 2500; loop: true; dir: alternate; easing: easeInOutSine"></a-text>
+    <a-text value="Explorer" position="0 3.9 -9" align="center" color="#ffffff" width="5" opacity="0.7"></a-text>
+
+    <!-- ---- Event count ---- -->
+    <a-text id="vr-event-count" value="" position="0 3.4 -9" align="center" color="#666666" width="3.5"></a-text>
+
+    <!-- ---- 3D Category bar ---- -->
+    <a-entity id="vr-cat-bar" position="0 2.95 -8.5"></a-entity>
+
+    <!-- ---- Event cards wall ---- -->
+    <a-entity id="card-wall"></a-entity>
+
+    <!-- ---- 3D Pagination ---- -->
+    <a-entity id="vr-pagination" position="0 0.5 -6">
+      <a-entity id="vr-prev" position="-2.8 0 0" class="clickable">
+        <a-box width="1.4" height="0.55" depth="0.1" color="#1e293b"></a-box>
+        <a-text value="< PREV" position="0 0 0.06" align="center" color="#00d4ff" width="2.8"></a-text>
+      </a-entity>
+      <a-text id="vr-page-text" value="Page 1 / 1" position="0 0 0" align="center" color="#888888" width="3"></a-text>
+      <a-entity id="vr-next" position="2.8 0 0" class="clickable">
+        <a-box width="1.4" height="0.55" depth="0.1" color="#1e293b"></a-box>
+        <a-text value="NEXT >" position="0 0 0.06" align="center" color="#00d4ff" width="2.8"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- ---- Back to Hub (3D) ---- -->
+    <a-entity position="-6 1.5 -3" class="clickable" id="vr-back-portal">
+      <a-box width="1.8" height="0.7" depth="0.12" color="#1e293b"></a-box>
+      <a-text value="< BACK TO HUB" position="0 0 0.08" align="center" color="#00d4ff" width="3"></a-text>
+    </a-entity>
+
+    <!-- ---- Floor accent ring ---- -->
+    <a-torus-knot position="0 0.3 -7" radius="4" radius-tubular="0.01" color="#ff6b6b" opacity="0.2"
+                  segments-tubular="60" segments-radial="4" p="2" q="3"
+                  rotation="-90 0 0"
+                  animation="property: rotation; to: -90 360 0; dur: 60000; loop: true; easing: linear"></a-torus-knot>
+
+    <!-- ---- Camera ---- -->
+    <a-entity id="rig" position="0 1.6 0">
+      <a-camera look-controls wasd-controls="acceleration: 20">
+        <a-cursor
+          fuse="true" fuse-timeout="1200" color="#ff6b6b"
+          geometry="primitive: ring; radiusInner: 0.005; radiusOuter: 0.012"
+          material="shader: flat; opacity: 0.7"
+          animation__click="property: scale; startEvents: click; from: 0.5 0.5 0.5; to: 1 1 1; dur: 200"
+          animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.5 0.5 0.5; dur: 1200"
+          animation__leave="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 150"
+          raycaster="objects: .clickable"
+        ></a-cursor>
+      </a-camera>
+      <a-entity id="left-hand"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 25; lineColor: #00d4ff; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+      <a-entity id="right-hand"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 25; lineColor: #ff6b6b; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+    </a-entity>
+
+  </a-scene>
+
+  <!-- ================================================================
+       APPLICATION LOGIC (1.6.0 compatible — uses color attribute, not material strings)
+       ================================================================ -->
+  <script>
+  (function () {
+    'use strict';
+
+    var allEvents = [];
+    var filteredEvents = [];
+    var currentCat = 'All';
+    var currentPage = 0;
+    var PER_PAGE = 12;
+    var CURVE_RADIUS = 7;
+    var COLS = 4;
+    var CARD_W = 2.4;
+    var CARD_H = 1.7;
+    var GAP_Y = 0.4;
+    var ARC = Math.PI * 0.55;
+
+    var CAT_COLORS = {
+      'All':          '#00d4ff',
+      'Arts':         '#a855f7',
+      'Business':     '#3b82f6',
+      'Community':    '#22c55e',
+      'Dating':       '#f43f5e',
+      'Family':       '#f59e0b',
+      'Food & Drink': '#ef4444',
+      'General':      '#6b7280',
+      'Music':        '#ec4899',
+      'Nightlife':    '#8b5cf6',
+      'Sports':       '#f97316'
+    };
+    var CAT_LIST = Object.keys(CAT_COLORS);
+
+    // Darker versions for card backgrounds
+    var CAT_DARK = {
+      'All':          '#0a2a33',
+      'Arts':         '#1a0f2a',
+      'Business':     '#0f1a2e',
+      'Community':    '#0a1f10',
+      'Dating':       '#2a0a14',
+      'Family':       '#1f180a',
+      'Food & Drink': '#1f0a0a',
+      'General':      '#15151a',
+      'Music':        '#1f0a1a',
+      'Nightlife':    '#140f2a',
+      'Sports':       '#1f120a'
+    };
+
+    // Dating keywords for smart matching (events tagged Nightlife but are dating events)
+    var DATING_KEYWORDS = ['dating', 'singles', 'mingle', 'speed dating', 'matchmaking', 'social mixer', 'date night', 'couples'];
+
+    // Time period filter
+    var currentTimePeriod = 'all';
+    var TIME_PERIODS = {
+      'all':       'All Time',
+      'today':     'Today',
+      'tomorrow':  'Tomorrow',
+      'weekend':   'This Weekend',
+      'week':      'This Week',
+      'month':     'This Month'
+    };
+
+    // =============== FETCH ===============
+    var SOURCES = [
+      '/events.json',
+      '/next/events.json',
+      '../events.json',
+      'https://findtorontoevents.ca/events.json',
+      'https://findtorontoevents.ca/next/events.json'
+    ];
+
+    function fetchEvents(sources, idx) {
+      if (idx >= sources.length) {
+        document.getElementById('loading-status').textContent = 'Could not load events. Refresh to retry.';
+        return;
+      }
+      document.getElementById('loading-status').textContent = 'Trying source ' + (idx + 1) + '/' + sources.length + '...';
+      fetch(sources[idx]).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      }).then(function (data) {
+        if (!Array.isArray(data) || data.length === 0) throw new Error('empty');
+        onEventsLoaded(data);
+      }).catch(function () {
+        fetchEvents(sources, idx + 1);
+      });
+    }
+
+    function onEventsLoaded(data) {
+      var now = new Date();
+      data = data.filter(function (e) { return e.status !== 'CANCELLED'; });
+      data.sort(function (a, b) { return new Date(a.date) - new Date(b.date); });
+      var upcoming = data.filter(function (e) { return new Date(e.date) >= now; });
+      var past = data.filter(function (e) { return new Date(e.date) < now; });
+      allEvents = upcoming.concat(past);
+      filteredEvents = allEvents.slice();
+      currentPage = 0;
+
+      console.log('[VR Events] Loaded ' + allEvents.length + ' events (' + upcoming.length + ' upcoming)');
+
+      build2DStrip();
+      build2DTimeStrip();
+      buildVRCatBar();
+      renderCards();
+      updatePagination();
+
+      var ls = document.getElementById('loading-screen');
+      ls.classList.add('fade-out');
+      setTimeout(function () { ls.style.display = 'none'; }, 700);
+    }
+
+    // =============== 2D CATEGORY STRIP ===============
+    function build2DStrip() {
+      var strip = document.getElementById('cat-strip');
+      strip.innerHTML = '';
+      CAT_LIST.forEach(function (cat) {
+        var btn = document.createElement('button');
+        var cnt = (cat === 'All') ? allEvents.length :
+          (cat === 'Dating') ? allEvents.filter(matchesDating).length :
+          allEvents.filter(function (e) { return e.categories && e.categories.indexOf(cat) !== -1; }).length;
+        btn.innerHTML = cat + '<span class="count">(' + cnt + ')</span>';
+        btn.style.setProperty('--cat-color', CAT_COLORS[cat]);
+        if (cat === currentCat) btn.classList.add('active');
+        btn.onclick = function () { filterByCat(cat); };
+        strip.appendChild(btn);
+      });
+    }
+
+    // =============== 3D CATEGORY BAR ===============
+    function buildVRCatBar() {
+      var bar = document.getElementById('vr-cat-bar');
+      while (bar.firstChild) bar.removeChild(bar.firstChild);
+
+      var totalW = CAT_LIST.length * 1.25;
+      var startX = -totalW / 2 + 0.625;
+
+      CAT_LIST.forEach(function (cat, i) {
+        var wrap = document.createElement('a-entity');
+        wrap.setAttribute('position', (startX + i * 1.25) + ' 0 0');
+        wrap.classList.add('clickable');
+
+        var active = (cat === currentCat);
+        var col = CAT_COLORS[cat] || '#666';
+
+        // Use color attribute directly on primitive (A-Frame 1.6 compatible)
+        var pill = document.createElement('a-box');
+        pill.setAttribute('width', '1.1');
+        pill.setAttribute('height', '0.38');
+        pill.setAttribute('depth', '0.06');
+        pill.setAttribute('color', active ? col : '#1e293b');
+        pill.setAttribute('opacity', active ? '1' : '0.8');
+        wrap.appendChild(pill);
+
+        var txt = document.createElement('a-text');
+        txt.setAttribute('value', cat);
+        txt.setAttribute('position', '0 0 0.04');
+        txt.setAttribute('align', 'center');
+        txt.setAttribute('color', active ? '#ffffff' : '#999999');
+        txt.setAttribute('width', '2.0');
+        wrap.appendChild(txt);
+
+        wrap.addEventListener('mouseenter', function () {
+          pill.setAttribute('color', col);
+          pill.setAttribute('opacity', '1');
+          wrap.setAttribute('scale', '1.08 1.08 1.08');
+        });
+        wrap.addEventListener('mouseleave', function () {
+          pill.setAttribute('color', active ? col : '#1e293b');
+          pill.setAttribute('opacity', active ? '1' : '0.8');
+          wrap.setAttribute('scale', '1 1 1');
+        });
+        wrap.addEventListener('click', function () { filterByCat(cat); });
+
+        bar.appendChild(wrap);
+      });
+    }
+
+    // =============== FILTER ===============
+    function matchesDating(e) {
+      // Match by category
+      if (e.categories && e.categories.indexOf('Dating') !== -1) return true;
+      // Match by tags
+      if (e.tags && e.tags.some(function(t) { return t.toLowerCase().indexOf('dating') !== -1; })) return true;
+      // Match by keywords in title/description
+      var text = ((e.title || '') + ' ' + (e.description || '')).toLowerCase();
+      return DATING_KEYWORDS.some(function(kw) { return text.indexOf(kw) !== -1; });
+    }
+
+    function matchesTimePeriod(e) {
+      if (currentTimePeriod === 'all') return true;
+      var now = new Date();
+      var eventDate = new Date(e.date);
+      if (isNaN(eventDate.getTime())) return false;
+
+      var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      var todayEnd = new Date(todayStart); todayEnd.setDate(todayEnd.getDate() + 1);
+
+      switch (currentTimePeriod) {
+        case 'today':
+          return eventDate >= todayStart && eventDate < todayEnd;
+        case 'tomorrow':
+          var tmrStart = new Date(todayStart); tmrStart.setDate(tmrStart.getDate() + 1);
+          var tmrEnd = new Date(tmrStart); tmrEnd.setDate(tmrEnd.getDate() + 1);
+          return eventDate >= tmrStart && eventDate < tmrEnd;
+        case 'weekend':
+          // Find next Saturday (or today if Sat/Sun)
+          var day = now.getDay();
+          var satOffset = (6 - day + 7) % 7; if (day === 0) satOffset = -1; if (day === 6) satOffset = 0;
+          var satStart = new Date(todayStart); satStart.setDate(satStart.getDate() + satOffset);
+          var sunEnd = new Date(satStart); sunEnd.setDate(sunEnd.getDate() + 2);
+          return eventDate >= satStart && eventDate < sunEnd;
+        case 'week':
+          var weekEnd = new Date(todayStart); weekEnd.setDate(weekEnd.getDate() + 7);
+          return eventDate >= todayStart && eventDate < weekEnd;
+        case 'month':
+          var monthEnd = new Date(todayStart); monthEnd.setMonth(monthEnd.getMonth() + 1);
+          return eventDate >= todayStart && eventDate < monthEnd;
+        default: return true;
+      }
+    }
+
+    function applyFilters() {
+      currentPage = 0;
+      filteredEvents = allEvents.filter(function (e) {
+        // Category filter
+        var catMatch = (currentCat === 'All') ? true :
+          (currentCat === 'Dating') ? matchesDating(e) :
+          (e.categories && e.categories.indexOf(currentCat) !== -1);
+        // Time filter
+        return catMatch && matchesTimePeriod(e);
+      });
+      build2DStrip();
+      build2DTimeStrip();
+      buildVRCatBar();
+      renderCards();
+      updatePagination();
+    }
+
+    window.filterByCat = function (cat) {
+      currentCat = cat;
+      applyFilters();
+    };
+
+    window.filterByTime = function (period) {
+      currentTimePeriod = period;
+      applyFilters();
+    };
+
+    // =============== 2D TIME STRIP ===============
+    function build2DTimeStrip() {
+      var strip = document.getElementById('time-strip');
+      strip.innerHTML = '';
+      Object.keys(TIME_PERIODS).forEach(function (key) {
+        var btn = document.createElement('button');
+        btn.textContent = TIME_PERIODS[key];
+        btn.style.cssText = 'background: rgba(30,41,59,0.85); color: #94a3b8; border: 1px solid rgba(255,255,255,0.08); padding: 5px 12px; border-radius: 16px; cursor: pointer; font-size: 0.78rem; font-weight: 500; backdrop-filter: blur(6px); transition: all 0.2s;';
+        if (key === currentTimePeriod) {
+          btn.style.background = '#f59e0b';
+          btn.style.color = '#fff';
+          btn.style.borderColor = 'transparent';
+        }
+        btn.onclick = function () { filterByTime(key); };
+        strip.appendChild(btn);
+      });
+    }
+
+    // =============== RENDER CARDS ===============
+    function renderCards() {
+      var wall = document.getElementById('card-wall');
+      while (wall.firstChild) wall.removeChild(wall.firstChild);
+
+      var start = currentPage * PER_PAGE;
+      var end = Math.min(start + PER_PAGE, filteredEvents.length);
+      var slice = filteredEvents.slice(start, end);
+
+      var countEl = document.getElementById('vr-event-count');
+      var suffix = (currentCat !== 'All') ? ' in ' + currentCat : '';
+      countEl.setAttribute('value', filteredEvents.length + ' events' + suffix);
+
+      var halfArc = ARC / 2;
+
+      slice.forEach(function (evt, i) {
+        var col = i % COLS;
+        var row = Math.floor(i / COLS);
+        var colFrac = (COLS > 1) ? col / (COLS - 1) : 0.5;
+        var angle = -halfArc + colFrac * ARC;
+        var x = Math.sin(angle) * CURVE_RADIUS;
+        var z = -Math.cos(angle) * CURVE_RADIUS;
+        var y = 2.6 - row * (CARD_H + GAP_Y);
+        var rotY = angle * 180 / Math.PI;
+
+        wall.appendChild(buildCard(evt, start + i, x, y, z, rotY));
+      });
+    }
+
+    function buildCard(evt, gIdx, x, y, z, rotY) {
+      var w = CARD_W, h = CARD_H;
+      var catPrimary = (evt.categories && evt.categories.length) ? evt.categories[0] : 'General';
+      var catCol = CAT_COLORS[catPrimary] || CAT_COLORS.General;
+      var bgCol = CAT_DARK[catPrimary] || '#12121f';
+
+      var wrap = document.createElement('a-entity');
+      wrap.setAttribute('position', x + ' ' + y + ' ' + z);
+      wrap.setAttribute('rotation', '0 ' + rotY + ' 0');
+      wrap.classList.add('clickable');
+
+      // Interaction
+      wrap.addEventListener('mouseenter', function () { wrap.setAttribute('scale', '1.06 1.06 1.06'); });
+      wrap.addEventListener('mouseleave', function () { wrap.setAttribute('scale', '1 1 1'); });
+      wrap.addEventListener('click', function () { showDetail(gIdx); });
+
+      // Card background
+      var bg = document.createElement('a-box');
+      bg.setAttribute('width', '' + w);
+      bg.setAttribute('height', '' + h);
+      bg.setAttribute('depth', '0.05');
+      bg.setAttribute('color', bgCol);
+      wrap.appendChild(bg);
+
+      // Left accent strip
+      var strip = document.createElement('a-box');
+      strip.setAttribute('width', '0.07');
+      strip.setAttribute('height', '' + (h * 0.85));
+      strip.setAttribute('depth', '0.06');
+      strip.setAttribute('position', (-w / 2 + 0.05) + ' 0 0.01');
+      strip.setAttribute('color', catCol);
+      wrap.appendChild(strip);
+
+      // Title
+      var title = evt.title || 'Untitled';
+      if (title.length > 46) title = title.substring(0, 43) + '...';
+      wrap.appendChild(mkText(title, (-w / 2 + 0.22) + ' ' + (h / 2 - 0.3) + ' 0.04', 'left', '#ffffff', w * 1.65));
+
+      // Date
+      wrap.appendChild(mkText(fmtDate(evt.date), (-w / 2 + 0.22) + ' ' + (h / 2 - 0.65) + ' 0.04', 'left', '#94a3b8', w * 1.4));
+
+      // Location
+      wrap.appendChild(mkText(evt.location || 'Toronto, ON', (-w / 2 + 0.22) + ' ' + (h / 2 - 0.9) + ' 0.04', 'left', '#64748b', w * 1.3));
+
+      // Price
+      var priceStr = evt.isFree ? 'FREE' : (evt.price || 'Details');
+      var priceCol = evt.isFree ? '#4ade80' : '#fbbf24';
+      wrap.appendChild(mkText(priceStr, (-w / 2 + 0.22) + ' ' + (-h / 2 + 0.25) + ' 0.04', 'left', priceCol, w * 1.35));
+
+      // Category label
+      wrap.appendChild(mkText(catPrimary, (w / 2 - 0.12) + ' ' + (-h / 2 + 0.25) + ' 0.04', 'right', catCol, w * 1.2));
+
+      // Source
+      if (evt.source) {
+        wrap.appendChild(mkText('via ' + evt.source, (w / 2 - 0.12) + ' ' + (h / 2 - 0.65) + ' 0.04', 'right', '#475569', w * 1.1));
+      }
+
+      // Past indicator
+      if (new Date(evt.date) < new Date()) {
+        wrap.appendChild(mkText('PAST', (w / 2 - 0.12) + ' ' + (h / 2 - 0.3) + ' 0.04', 'right', '#ef4444', w * 1.0));
+      }
+
+      return wrap;
+    }
+
+    // Helper: create a-text with position, align, color, width
+    function mkText(value, pos, align, color, width) {
+      var t = document.createElement('a-text');
+      t.setAttribute('value', value);
+      t.setAttribute('position', pos);
+      t.setAttribute('align', align);
+      t.setAttribute('color', color);
+      t.setAttribute('width', '' + width);
+      return t;
+    }
+
+    function getCatColor(cats) {
+      if (!cats || !cats.length) return CAT_COLORS.General;
+      return CAT_COLORS[cats[0]] || CAT_COLORS.General;
+    }
+
+    // =============== DATE FORMAT ===============
+    function fmtDate(ds) {
+      if (!ds) return 'Date TBD';
+      try {
+        var d = new Date(ds);
+        if (isNaN(d.getTime())) return 'Date TBD';
+        var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        var mons = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var h = d.getHours(), m = d.getMinutes();
+        var ap = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return days[d.getDay()] + ', ' + mons[d.getMonth()] + ' ' + d.getDate() + ' - ' + h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
+      } catch (_) { return 'Date TBD'; }
+    }
+
+    // =============== PAGINATION ===============
+    function totalPages() { return Math.max(1, Math.ceil(filteredEvents.length / PER_PAGE)); }
+
+    function updatePagination() {
+      var tp = totalPages();
+      document.getElementById('page-info').textContent = 'Page ' + (currentPage + 1) + ' of ' + tp;
+      document.getElementById('btn-prev').disabled = (currentPage <= 0);
+      document.getElementById('btn-next').disabled = (currentPage >= tp - 1);
+      var vrPt = document.getElementById('vr-page-text');
+      if (vrPt) vrPt.setAttribute('value', 'Page ' + (currentPage + 1) + ' / ' + tp);
+    }
+
+    window.nextPage = function () {
+      if (currentPage < totalPages() - 1) { currentPage++; renderCards(); updatePagination(); }
+    };
+    window.prevPage = function () {
+      if (currentPage > 0) { currentPage--; renderCards(); updatePagination(); }
+    };
+
+    // =============== DETAIL OVERLAY ===============
+    window.showDetail = function (gIdx) {
+      var evt = filteredEvents[gIdx];
+      if (!evt) return;
+      document.getElementById('det-title').textContent = evt.title || 'Untitled';
+      var meta = fmtDate(evt.date);
+      if (evt.location) meta += '  \u2022  ' + evt.location;
+      if (evt.price) meta += '  \u2022  ' + evt.price;
+      if (evt.isFree) meta += '  \u2022  FREE';
+      if (evt.source) meta += '  \u2022  via ' + evt.source;
+      document.getElementById('det-meta').textContent = meta;
+      var tagsEl = document.getElementById('det-tags');
+      tagsEl.innerHTML = '';
+      (evt.categories || []).forEach(function (c) {
+        var sp = document.createElement('span');
+        sp.className = 'tag'; sp.textContent = c;
+        sp.style.color = CAT_COLORS[c] || '#ff6b6b';
+        tagsEl.appendChild(sp);
+      });
+      document.getElementById('det-desc').textContent = evt.description || 'No description available. Click "View Event" for full details.';
+      document.getElementById('det-link').href = evt.url || '#';
+      document.getElementById('event-detail').classList.add('open');
+    };
+
+    window.closeDetail = function () {
+      document.getElementById('event-detail').classList.remove('open');
+    };
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDetail();
+      if (e.key === 'ArrowRight') nextPage();
+      if (e.key === 'ArrowLeft') prevPage();
+    });
+
+    // =============== VR NAV ===============
+    document.addEventListener('DOMContentLoaded', function () {
+      var vrPrev = document.getElementById('vr-prev');
+      var vrNext = document.getElementById('vr-next');
+      if (vrPrev) {
+        vrPrev.addEventListener('mouseenter', function () { vrPrev.setAttribute('scale', '1.1 1.1 1.1'); });
+        vrPrev.addEventListener('mouseleave', function () { vrPrev.setAttribute('scale', '1 1 1'); });
+        vrPrev.addEventListener('click', function () { prevPage(); });
+      }
+      if (vrNext) {
+        vrNext.addEventListener('mouseenter', function () { vrNext.setAttribute('scale', '1.1 1.1 1.1'); });
+        vrNext.addEventListener('mouseleave', function () { vrNext.setAttribute('scale', '1 1 1'); });
+        vrNext.addEventListener('click', function () { nextPage(); });
+      }
+      var vrBack = document.getElementById('vr-back-portal');
+      if (vrBack) {
+        vrBack.addEventListener('mouseenter', function () { vrBack.setAttribute('scale', '1.08 1.08 1.08'); });
+        vrBack.addEventListener('mouseleave', function () { vrBack.setAttribute('scale', '1 1 1'); });
+        vrBack.addEventListener('click', function () { window.location.href = '/vr/'; });
+      }
+      fetchEvents(SOURCES, 0);
+    });
+
+    // Fallback: hide loading after 12s
+    setTimeout(function () {
+      var ls = document.getElementById('loading-screen');
+      if (ls && !ls.classList.contains('fade-out')) {
+        ls.classList.add('fade-out');
+        setTimeout(function () { ls.style.display = 'none'; }, 700);
+      }
+    }, 12000);
+
+  })();
+  </script>
+  <!-- Shared presence tracker + keyboard shortcuts -->
+  <script src="/vr/presence.js"></script>
+  <!-- VR Controller Support -->
+  <script src="/vr/controller-support.js"></script>
+  
+  <!-- VR Navigation Menu -->
+  <script src="/vr/nav-menu.js"></script>
+  <!-- VR Quick Wins -->
+  <script src="/vr/quick-wins.js"></script>
+
+  <!-- Comfort vignette + F1 help -->
+  <script src="/vr/vr-comfort.js"></script>
+  <!-- Quest Thumbstick Locomotion -->
+  <script>
+  (function () {
+    var rig, camera, moveSpeed = 0.06, turnCooldown = false;
+    function init() {
+      rig = document.getElementById('rig');
+      camera = document.querySelector('a-camera');
+      if (rig) requestAnimationFrame(step);
+    }
+    function step() {
+      var pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      var left = null, right = null;
+      for (var i = 0; i < pads.length; i++) {
+        var p = pads[i];
+        if (!p) continue;
+        if (p.hand === 'left') left = p;
+        if (p.hand === 'right') right = p;
+      }
+      if (left && left.axes.length >= 2) {
+        var x = left.axes[0] || 0, y = left.axes[1] || 0;
+        if (Math.abs(x) > 0.1 || Math.abs(y) > 0.1) {
+          var yaw = camera && camera.object3D ? camera.object3D.rotation.y : 0;
+          var dx = Math.sin(yaw) * -y + Math.cos(yaw) * x;
+          var dz = Math.cos(yaw) * -y - Math.sin(yaw) * x;
+          var pos = rig.getAttribute('position');
+          rig.setAttribute('position', { x: pos.x + dx * moveSpeed, y: pos.y, z: pos.z + dz * moveSpeed });
+        }
+      }
+      if (right && right.axes.length >= 2) {
+        var turn = right.axes[0] || 0;
+        if (!turnCooldown && Math.abs(turn) > 0.7) {
+          var rot = rig.getAttribute('rotation');
+          rig.setAttribute('rotation', { x: rot.x, y: rot.y + (turn > 0 ? -30 : 30), z: rot.z });
+          turnCooldown = true;
+          setTimeout(function () { turnCooldown = false; }, 300);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+  })();
+  </script>
+</body>
+</html>

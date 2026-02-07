@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VR Chat Server Test Client</title>
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f23;
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #00d4ff;
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: 300px 1fr 300px;
+      gap: 20px;
+    }
+    
+    @media (max-width: 1200px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .panel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .panel h2 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #00d4ff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+    }
+    
+    input, select, button, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      font-size: 14px;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #00d4ff;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+    }
+    
+    button:disabled {
+      background: #444;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    button.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      margin-top: 10px;
+    }
+    
+    button.danger {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+    }
+    
+    .status {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .status.connected { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
+    .status.disconnected { background: #ff4444; }
+    .status.connecting { background: #ffaa00; animation: pulse 1s infinite; }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .connection-status {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+    }
+    
+    .chat-messages {
+      height: 400px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .message {
+      margin-bottom: 12px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      border-left: 3px solid #00d4ff;
+    }
+    
+    .message.own {
+      border-left-color: #00ff88;
+      background: rgba(0, 255, 136, 0.05);
+    }
+    
+    .message.system {
+      border-left-color: #ffaa00;
+      background: rgba(255, 170, 0, 0.05);
+      font-style: italic;
+    }
+    
+    .message-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+    
+    .message-author {
+      color: #00d4ff;
+      font-weight: bold;
+    }
+    
+    .message-time {
+      color: #666;
+    }
+    
+    .message-content {
+      word-break: break-word;
+    }
+    
+    .user-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .user-item {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      margin-bottom: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .user-info {
+      flex: 1;
+    }
+    
+    .user-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .user-status {
+      font-size: 11px;
+      color: #888;
+    }
+    
+    .typing-indicator {
+      font-size: 12px;
+      color: #888;
+      font-style: italic;
+      margin-bottom: 10px;
+      height: 20px;
+    }
+    
+    .log-panel {
+      margin-top: 20px;
+    }
+    
+    .log-output {
+      height: 200px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+    
+    .log-entry {
+      margin-bottom: 5px;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .log-entry.error { color: #ff4444; }
+    .log-entry.success { color: #00ff88; }
+    .log-entry.info { color: #00d4ff; }
+    .log-entry.warn { color: #ffaa00; }
+    
+    .voice-controls {
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(0, 212, 255, 0.1);
+      border-radius: 6px;
+    }
+    
+    .voice-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .voice-btn.muted {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+    }
+    
+    .voice-peers {
+      margin-top: 15px;
+    }
+    
+    .peer-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px;
+      margin-bottom: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+    }
+    
+    .peer-status {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #444;
+    }
+    
+    .peer-status.connected { background: #00ff88; color: #000; }
+    .peer-status.muted { background: #ff4444; }
+    .peer-status.speaking { background: #00d4ff; color: #000; }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .stat-box {
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #00d4ff;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+    
+    .room-selector {
+      margin-bottom: 15px;
+    }
+    
+    .test-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .test-actions button {
+      font-size: 12px;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎮 VR Chat Server Test Client</h1>
+    
+    <div class="grid">
+      <!-- Left Panel: Connection & Settings -->
+      <div class="left-panel">
+        <div class="panel">
+          <h2>⚙️ Connection</h2>
+          
+          <div class="connection-status">
+            <span id="statusIndicator" class="status disconnected"></span>
+            <span id="statusText">Disconnected</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Server URL</label>
+            <input type="text" id="serverUrl" value="http://localhost:3001" placeholder="ws://localhost:3001">
+          </div>
+          
+          <div class="form-group">
+            <label>Signal Server URL</label>
+            <input type="text" id="signalUrl" value="http://localhost:3002" placeholder="ws://localhost:3002">
+          </div>
+          
+          <div class="form-group">
+            <label>User ID</label>
+            <input type="text" id="userId" value="user_" placeholder="Enter user ID">
+          </div>
+          
+          <div class="form-group">
+            <label>Display Name</label>
+            <input type="text" id="displayName" value="Test User" placeholder="Enter display name">
+          </div>
+          
+          <div class="form-group">
+            <label>Avatar URL (optional)</label>
+            <input type="text" id="avatarUrl" placeholder="https://example.com/avatar.png">
+          </div>
+          
+          <button id="connectBtn" onclick="connect()">Connect</button>
+          <button id="disconnectBtn" class="secondary danger" onclick="disconnect()" disabled>Disconnect</button>
+        </div>
+        
+        <div class="panel" style="margin-top: 20px;">
+          <h2>📊 Server Stats</h2>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-value" id="statUsers">-</div>
+              <div class="stat-label">Users</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="statOnline">-</div>
+              <div class="stat-label">Online</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="statMessages">-</div>
+              <div class="stat-label">Messages</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="statRooms">-</div>
+              <div class="stat-label">Rooms</div>
+            </div>
+          </div>
+          <button class="secondary" onclick="fetchStats()">Refresh Stats</button>
+        </div>
+      </div>
+      
+      <!-- Center Panel: Chat -->
+      <div class="center-panel">
+        <div class="panel">
+          <h2>💬 Chat Room</h2>
+          
+          <div class="room-selector">
+            <label>Select Room</label>
+            <select id="roomSelect" onchange="joinRoom()">
+              <option value="">-- Select a room --</option>
+              <option value="events">Events Zone</option>
+              <option value="movies">Movies Zone</option>
+              <option value="creators">Creators Zone</option>
+              <option value="stocks">Stocks Zone</option>
+              <option value="wellness">Wellness Zone</option>
+              <option value="weather">Weather Zone</option>
+              <option value="hub">Main Hub</option>
+            </select>
+          </div>
+          
+          <div class="typing-indicator" id="typingIndicator"></div>
+          
+          <div class="chat-messages" id="chatMessages">
+            <div class="message system">
+              <div class="message-header">
+                <span class="message-author">System</span>
+                <span class="message-time">Now</span>
+              </div>
+              <div class="message-content">Connect to server and join a room to start chatting</div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <textarea id="messageInput" rows="3" placeholder="Type your message... (Enter to send, Shift+Enter for new line)" onkeydown="handleMessageKeydown(event)"></textarea>
+          </div>
+          
+          <button id="sendBtn" onclick="sendMessage()" disabled>Send Message</button>
+          
+          <div class="test-actions">
+            <button class="secondary" onclick="simulateTyping()">Simulate Typing</button>
+            <button class="secondary" onclick="sendTestMessages()">Send Test Msgs</button>
+            <button class="secondary" onclick="testReconnection()">Test Reconnect</button>
+            <button class="secondary" onclick="clearMessages()">Clear Chat</button>
+          </div>
+        </div>
+        
+        <div class="panel log-panel">
+          <h2>📋 Event Log</h2>
+          <div class="log-output" id="logOutput"></div>
+          <button class="secondary" onclick="clearLogs()">Clear Logs</button>
+        </div>
+      </div>
+      
+      <!-- Right Panel: Users & Voice -->
+      <div class="right-panel">
+        <div class="panel">
+          <h2>👥 Online Users</h2>
+          <div class="user-list" id="userList">
+            <p style="color: #666; text-align: center; padding: 20px;">Join a room to see users</p>
+          </div>
+        </div>
+        
+        <div class="panel" style="margin-top: 20px;">
+          <h2>🎤 Voice Chat</h2>
+          
+          <div class="voice-controls">
+            <button id="voiceBtn" class="voice-btn" onclick="toggleVoice()" disabled>
+              <span id="voiceIcon">🎤</span>
+              <span id="voiceText">Join Voice</span>
+            </button>
+          </div>
+          
+          <div class="voice-peers" id="voicePeers">
+            <p style="color: #666; text-align: center; padding: 10px; font-size: 12px;">
+              Voice chat uses WebRTC. Join a room first, then click to enable voice.
+            </p>
+          </div>
+        </div>
+        
+        <div class="panel" style="margin-top: 20px;">
+          <h2>🔧 API Tests</h2>
+          <div class="test-actions">
+            <button class="secondary" onclick="testGetRooms()">GET /rooms</button>
+            <button class="secondary" onclick="testGetHistory()">GET /history</button>
+            <button class="secondary" onclick="testGetOnline()">GET /online</button>
+            <button class="secondary" onclick="testPostMessage()">POST /message</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global state
+    let socket = null;
+    let signalSocket = null;
+    let currentRoom = null;
+    let currentUser = null;
+    let messageHistory = [];
+    let isVoiceConnected = false;
+    let isMuted = true;
+    
+    // Generate random user ID on load
+    document.getElementById('userId').value = 'user_' + Math.random().toString(36).substring(2, 10);
+    
+    // Logging
+    function log(message, type = 'info') {
+      const logOutput = document.getElementById('logOutput');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logOutput.appendChild(entry);
+      logOutput.scrollTop = logOutput.scrollHeight;
+    }
+    
+    function clearLogs() {
+      document.getElementById('logOutput').innerHTML = '';
+    }
+    
+    // Connection status
+    function updateStatus(status, text) {
+      const indicator = document.getElementById('statusIndicator');
+      const statusText = document.getElementById('statusText');
+      
+      indicator.className = `status ${status}`;
+      statusText.textContent = text;
+    }
+    
+    // Connect to servers
+    async function connect() {
+      const serverUrl = document.getElementById('serverUrl').value;
+      const signalUrl = document.getElementById('signalUrl').value;
+      
+      updateStatus('connecting', 'Connecting...');
+      log('Connecting to chat server...', 'info');
+      
+      try {
+        // Connect to chat server
+        socket = io(serverUrl, {
+          transports: ['websocket', 'polling']
+        });
+        
+        socket.on('connect', () => {
+          log('Connected to chat server: ' + socket.id, 'success');
+          updateStatus('connected', 'Connected');
+          
+          document.getElementById('connectBtn').disabled = true;
+          document.getElementById('disconnectBtn').disabled = false;
+          document.getElementById('sendBtn').disabled = false;
+          document.getElementById('voiceBtn').disabled = false;
+          
+          // Fetch initial stats
+          fetchStats();
+        });
+        
+        socket.on('disconnect', (reason) => {
+          log('Disconnected: ' + reason, 'warn');
+          updateStatus('disconnected', 'Disconnected');
+          
+          document.getElementById('connectBtn').disabled = false;
+          document.getElementById('disconnectBtn').disabled = true;
+          document.getElementById('sendBtn').disabled = true;
+          document.getElementById('voiceBtn').disabled = true;
+        });
+        
+        socket.on('connect_error', (err) => {
+          log('Connection error: ' + err.message, 'error');
+          updateStatus('disconnected', 'Connection Failed');
+        });
+        
+        // Chat events
+        socket.on('connected', (data) => {
+          log('Server acknowledged connection: ' + data.clientId, 'success');
+        });
+        
+        socket.on('room_joined', (data) => {
+          log(`Joined room: ${data.roomId}`, 'success');
+          currentRoom = data.roomId;
+          
+          // Display history
+          if (data.history && data.history.length > 0) {
+            data.history.forEach(msg => displayMessage(msg, false));
+            log(`Loaded ${data.history.length} messages from history`, 'info');
+          }
+          
+          // Update user list
+          updateUserList(data.users || []);
+        });
+        
+        socket.on('user_joined', (data) => {
+          log(`User joined: ${data.user.name}`, 'info');
+          addSystemMessage(`${data.user.name} joined the room`);
+          
+          // Refresh user list
+          if (currentRoom) {
+            fetchOnlineUsers();
+          }
+        });
+        
+        socket.on('user_left', (data) => {
+          log(`User left: ${data.userId}`, 'info');
+          addSystemMessage(`A user left the room`);
+          
+          // Refresh user list
+          if (currentRoom) {
+            fetchOnlineUsers();
+          }
+        });
+        
+        socket.on('message', (data) => {
+          displayMessage(data, false);
+        });
+        
+        socket.on('message_ack', (data) => {
+          log(`Message delivered: ${data.messageId}`, 'success');
+        });
+        
+        socket.on('typing', (data) => {
+          showTypingIndicator(data.userId, data.isTyping);
+        });
+        
+        socket.on('presence', (data) => {
+          log(`Presence update: ${data.userId} is ${data.status}`, 'info');
+        });
+        
+        socket.on('voice_state', (data) => {
+          log(`Voice state: ${data.userId} muted=${data.muted}`, 'info');
+        });
+        
+        socket.on('reconnected', (data) => {
+          log(`Reconnected! ${data.missedMessages?.length || 0} missed messages`, 'success');
+          if (data.missedMessages) {
+            data.missedMessages.forEach(msg => displayMessage(msg, false));
+          }
+        });
+        
+        socket.on('error', (data) => {
+          log(`Error: ${data.code} - ${data.message}`, 'error');
+        });
+        
+        // Connect to signal server for voice
+        connectSignalServer(signalUrl);
+        
+      } catch (err) {
+        log('Failed to connect: ' + err.message, 'error');
+        updateStatus('disconnected', 'Connection Failed');
+      }
+    }
+    
+    // Connect to signal server
+    function connectSignalServer(url) {
+      log('Connecting to signal server...', 'info');
+      
+      signalSocket = io(url, {
+        transports: ['websocket', 'polling']
+      });
+      
+      signalSocket.on('connect', () => {
+        log('Connected to signal server: ' + signalSocket.id, 'success');
+      });
+      
+      signalSocket.on('connected', (data) => {
+        log('Signal server acknowledged: ' + data.clientId, 'success');
+      });
+      
+      signalSocket.on('zone_joined', (data) => {
+        log(`Joined voice zone: ${data.zoneId}`, 'success');
+        isVoiceConnected = true;
+        updateVoiceButton();
+        
+        // Display peers
+        if (data.peers && data.peers.length > 0) {
+          updateVoicePeers(data.peers);
+        }
+      });
+      
+      signalSocket.on('new_peer', (data) => {
+        log(`New voice peer: ${data.peer.displayName}`, 'info');
+        addVoicePeer(data.peer);
+      });
+      
+      signalSocket.on('peer_left', (data) => {
+        log(`Voice peer left: ${data.peerId}`, 'info');
+        removeVoicePeer(data.peerId);
+      });
+      
+      signalSocket.on('offer', (data) => {
+        log(`Received offer from: ${data.from}`, 'info');
+        // In a real implementation, handle WebRTC offer here
+      });
+      
+      signalSocket.on('answer', (data) => {
+        log(`Received answer from: ${data.from}`, 'info');
+        // In a real implementation, handle WebRTC answer here
+      });
+      
+      signalSocket.on('ice_candidate', (data) => {
+        log(`Received ICE candidate from: ${data.from}`, 'info');
+        // In a real implementation, handle ICE candidate here
+      });
+      
+      signalSocket.on('peer_voice_state', (data) => {
+        updatePeerVoiceState(data.peerId, data);
+      });
+      
+      signalSocket.on('cull_update', (data) => {
+        log(`Audio cull update: ${data.audiblePeers.length} audible peers`, 'info');
+      });
+      
+      signalSocket.on('error', (data) => {
+        log(`Signal error: ${data.code} - ${data.message}`, 'error');
+      });
+    }
+    
+    // Disconnect
+    function disconnect() {
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+      if (signalSocket) {
+        signalSocket.disconnect();
+        signalSocket = null;
+      }
+      
+      currentRoom = null;
+      isVoiceConnected = false;
+      
+      updateStatus('disconnected', 'Disconnected');
+      log('Disconnected from servers', 'info');
+      
+      document.getElementById('connectBtn').disabled = false;
+      document.getElementById('disconnectBtn').disabled = true;
+      document.getElementById('sendBtn').disabled = true;
+      document.getElementById('voiceBtn').disabled = true;
+      
+      document.getElementById('userList').innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Join a room to see users</p>';
+      document.getElementById('voicePeers').innerHTML = '<p style="color: #666; text-align: center; padding: 10px; font-size: 12px;">Voice chat uses WebRTC. Join a room first, then click to enable voice.</p>';
+    }
+    
+    // Join room
+    function joinRoom() {
+      if (!socket || !socket.connected) {
+        log('Not connected to server', 'error');
+        return;
+      }
+      
+      const roomId = document.getElementById('roomSelect').value;
+      if (!roomId) return;
+      
+      const userId = document.getElementById('userId').value;
+      const displayName = document.getElementById('displayName').value;
+      const avatarUrl = document.getElementById('avatarUrl').value;
+      
+      currentUser = {
+        id: userId,
+        name: displayName,
+        avatar: avatarUrl,
+        zone: roomId
+      };
+      
+      socket.emit('join_room', {
+        roomId,
+        userInfo: currentUser
+      });
+      
+      log(`Joining room: ${roomId}`, 'info');
+    }
+    
+    // Send message
+    function sendMessage() {
+      if (!socket || !socket.connected) {
+        log('Not connected to server', 'error');
+        return;
+      }
+      
+      if (!currentRoom) {
+        log('Not in a room', 'error');
+        return;
+      }
+      
+      const input = document.getElementById('messageInput');
+      const content = input.value.trim();
+      
+      if (!content) return;
+      
+      socket.emit('chat', {
+        roomId: currentRoom,
+        content,
+        type: 'text'
+      });
+      
+      // Display own message immediately
+      displayMessage({
+        userId: currentUser.id,
+        displayName: currentUser.name,
+        content: content,
+        timestamp: new Date().toISOString()
+      }, true);
+      
+      input.value = '';
+      
+      // Stop typing indicator
+      socket.emit('typing', { isTyping: false });
+    }
+    
+    // Handle message input keydown
+    function handleMessageKeydown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      } else {
+        // Send typing indicator
+        if (socket && currentRoom) {
+          socket.emit('typing', { isTyping: true });
+          
+          // Clear typing after 3 seconds
+          clearTimeout(window.typingTimeout);
+          window.typingTimeout = setTimeout(() => {
+            if (socket) {
+              socket.emit('typing', { isTyping: false });
+            }
+          }, 3000);
+        }
+      }
+    }
+    
+    // Display message
+    function displayMessage(msg, isOwn) {
+      const container = document.getElementById('chatMessages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isOwn ? 'own' : ''}`;
+      
+      const time = new Date(msg.timestamp).toLocaleTimeString();
+      const author = msg.displayName || 'Unknown';
+      
+      messageDiv.innerHTML = `
+        <div class="message-header">
+          <span class="message-author">${author}</span>
+          <span class="message-time">${time}</span>
+        </div>
+        <div class="message-content">${escapeHtml(msg.content)}</div>
+      `;
+      
+      container.appendChild(messageDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    // Add system message
+    function addSystemMessage(content) {
+      const container = document.getElementById('chatMessages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message system';
+      
+      messageDiv.innerHTML = `
+        <div class="message-header">
+          <span class="message-author">System</span>
+          <span class="message-time">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="message-content">${content}</div>
+      `;
+      
+      container.appendChild(messageDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    // Show typing indicator
+    function showTypingIndicator(userId, isTyping) {
+      const indicator = document.getElementById('typingIndicator');
+      if (isTyping) {
+        indicator.textContent = `${userId} is typing...`;
+      } else {
+        indicator.textContent = '';
+      }
+    }
+    
+    // Update user list
+    function updateUserList(users) {
+      const container = document.getElementById('userList');
+      
+      if (users.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No users in room</p>';
+        return;
+      }
+      
+      container.innerHTML = users.map(user => `
+        <div class="user-item">
+          <div class="user-avatar">${(user.name || 'U').charAt(0).toUpperCase()}</div>
+          <div class="user-info">
+            <div class="user-name">${escapeHtml(user.name || 'Unknown')}</div>
+            <div class="user-status">${user.micMuted ? '🔇 Muted' : '🎤 Active'}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Voice controls
+    function toggleVoice() {
+      if (!signalSocket || !signalSocket.connected) {
+        log('Signal server not connected', 'error');
+        return;
+      }
+      
+      if (!currentRoom) {
+        log('Join a room first', 'error');
+        return;
+      }
+      
+      if (!isVoiceConnected) {
+        // Join voice
+        signalSocket.emit('join_voice_zone', {
+          zoneId: currentRoom,
+          userId: currentUser.id,
+          displayName: currentUser.name
+        });
+      } else {
+        // Leave voice
+        signalSocket.emit('leave_voice_zone');
+        isVoiceConnected = false;
+        updateVoiceButton();
+        document.getElementById('voicePeers').innerHTML = '<p style="color: #666; text-align: center; padding: 10px; font-size: 12px;">Voice chat uses WebRTC. Join a room first, then click to enable voice.</p>';
+      }
+    }
+    
+    function updateVoiceButton() {
+      const btn = document.getElementById('voiceBtn');
+      const icon = document.getElementById('voiceIcon');
+      const text = document.getElementById('voiceText');
+      
+      if (isVoiceConnected) {
+        btn.classList.add('muted');
+        icon.textContent = isMuted ? '🔇' : '🎤';
+        text.textContent = isMuted ? 'Muted (Click to Leave)' : 'Voice Active (Click to Leave)';
+      } else {
+        btn.classList.remove('muted');
+        icon.textContent = '🎤';
+        text.textContent = 'Join Voice';
+      }
+    }
+    
+    function updateVoicePeers(peers) {
+      const container = document.getElementById('voicePeers');
+      container.innerHTML = peers.map(peer => `
+        <div class="peer-item" id="peer-${peer.peerId}">
+          <span>${escapeHtml(peer.displayName)}</span>
+          <span class="peer-status ${peer.muted ? 'muted' : 'connected'}">${peer.muted ? 'Muted' : 'Connected'}</span>
+        </div>
+      `).join('');
+    }
+    
+    function addVoicePeer(peer) {
+      const container = document.getElementById('voicePeers');
+      
+      // Remove placeholder if exists
+      if (container.querySelector('p')) {
+        container.innerHTML = '';
+      }
+      
+      const peerDiv = document.createElement('div');
+      peerDiv.className = 'peer-item';
+      peerDiv.id = `peer-${peer.peerId}`;
+      peerDiv.innerHTML = `
+        <span>${escapeHtml(peer.displayName)}</span>
+        <span class="peer-status ${peer.muted ? 'muted' : 'connected'}">${peer.muted ? 'Muted' : 'Connected'}</span>
+      `;
+      container.appendChild(peerDiv);
+    }
+    
+    function removeVoicePeer(peerId) {
+      const peerEl = document.getElementById(`peer-${peerId}`);
+      if (peerEl) {
+        peerEl.remove();
+      }
+    }
+    
+    function updatePeerVoiceState(peerId, state) {
+      const peerEl = document.getElementById(`peer-${peerId}`);
+      if (peerEl) {
+        const statusEl = peerEl.querySelector('.peer-status');
+        if (state.speaking) {
+          statusEl.className = 'peer-status speaking';
+          statusEl.textContent = 'Speaking';
+        } else if (state.muted) {
+          statusEl.className = 'peer-status muted';
+          statusEl.textContent = 'Muted';
+        } else {
+          statusEl.className = 'peer-status connected';
+          statusEl.textContent = 'Connected';
+        }
+      }
+    }
+    
+    // API Tests
+    async function fetchStats() {
+      const serverUrl = document.getElementById('serverUrl').value;
+      try {
+        const response = await fetch(`${serverUrl}/api/stats`);
+        const data = await response.json();
+        
+        if (data.success) {
+          document.getElementById('statUsers').textContent = data.stats.users;
+          document.getElementById('statOnline').textContent = data.stats.onlineUsers;
+          document.getElementById('statMessages').textContent = data.stats.messages;
+          document.getElementById('statRooms').textContent = data.stats.rooms;
+          log('Stats fetched successfully', 'success');
+        }
+      } catch (err) {
+        log('Failed to fetch stats: ' + err.message, 'error');
+      }
+    }
+    
+    async function fetchOnlineUsers() {
+      if (!currentRoom) return;
+      
+      const serverUrl = document.getElementById('serverUrl').value;
+      try {
+        const response = await fetch(`${serverUrl}/api/presence/online?room=${currentRoom}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          updateUserList(data.users);
+        }
+      } catch (err) {
+        log('Failed to fetch online users: ' + err.message, 'error');
+      }
+    }
+    
+    async function testGetRooms() {
+      const serverUrl = document.getElementById('serverUrl').value;
+      try {
+        log('Testing GET /api/chat/rooms...', 'info');
+        const response = await fetch(`${serverUrl}/api/chat/rooms`);
+        const data = await response.json();
+        log('Rooms: ' + JSON.stringify(data.rooms.map(r => r.name)), 'success');
+      } catch (err) {
+        log('GET /rooms failed: ' + err.message, 'error');
+      }
+    }
+    
+    async function testGetHistory() {
+      const serverUrl = document.getElementById('serverUrl').value;
+      const roomId = document.getElementById('roomSelect').value || 'hub';
+      
+      try {
+        log(`Testing GET /api/chat/history/${roomId}...`, 'info');
+        const response = await fetch(`${serverUrl}/api/chat/history/${roomId}`);
+        const data = await response.json();
+        log(`History: ${data.messages.length} messages`, 'success');
+      } catch (err) {
+        log('GET /history failed: ' + err.message, 'error');
+      }
+    }
+    
+    async function testGetOnline() {
+      const serverUrl = document.getElementById('serverUrl').value;
+      try {
+        log('Testing GET /api/presence/online...', 'info');
+        const response = await fetch(`${serverUrl}/api/presence/online`);
+        const data = await response.json();
+        log(`Online users: ${data.count}`, 'success');
+      } catch (err) {
+        log('GET /online failed: ' + err.message, 'error');
+      }
+    }
+    
+    async function testPostMessage() {
+      const serverUrl = document.getElementById('serverUrl').value;
+      const roomId = document.getElementById('roomSelect').value || 'hub';
+      const userId = document.getElementById('userId').value;
+      
+      try {
+        log('Testing POST /api/chat/message...', 'info');
+        const response = await fetch(`${serverUrl}/api/chat/message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomId,
+            userId,
+            content: 'Test message from API',
+            type: 'text'
+          })
+        });
+        const data = await response.json();
+        log('Message sent via API: ' + data.message.id, 'success');
+      } catch (err) {
+        log('POST /message failed: ' + err.message, 'error');
+      }
+    }
+    
+    // Test actions
+    function simulateTyping() {
+      if (!socket || !currentRoom) {
+        log('Not connected or not in room', 'error');
+        return;
+      }
+      
+      socket.emit('typing', { isTyping: true });
+      log('Sent typing indicator', 'info');
+      
+      setTimeout(() => {
+        socket.emit('typing', { isTyping: false });
+      }, 2000);
+    }
+    
+    function sendTestMessages() {
+      if (!socket || !currentRoom) {
+        log('Not connected or not in room', 'error');
+        return;
+      }
+      
+      const messages = [
+        'Hello everyone! 👋',
+        'This is a test message',
+        'How is everyone doing today?',
+        'The VR chat server is working great!',
+        'Testing message 5 of 5'
+      ];
+      
+      messages.forEach((msg, i) => {
+        setTimeout(() => {
+          socket.emit('chat', {
+            roomId: currentRoom,
+            content: msg,
+            type: 'text'
+          });
+          displayMessage({
+            userId: currentUser.id,
+            displayName: currentUser.name,
+            content: msg,
+            timestamp: new Date().toISOString()
+          }, true);
+        }, i * 500);
+      });
+      
+      log('Sent 5 test messages', 'success');
+    }
+    
+    function testReconnection() {
+      if (!socket || !currentRoom) {
+        log('Not connected or not in room', 'error');
+        return;
+      }
+      
+      log('Testing reconnection...', 'info');
+      
+      // Get last message ID (simplified - in real app track this)
+      const lastMessageId = messageHistory.length > 0 ? messageHistory[messageHistory.length - 1].id : null;
+      
+      socket.emit('reconnect', {
+        lastMessageId,
+        roomId: currentRoom,
+        userInfo: currentUser
+      });
+    }
+    
+    function clearMessages() {
+      document.getElementById('chatMessages').innerHTML = '';
+      log('Chat cleared', 'info');
+    }
+    
+    // Utility
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Auto-refresh stats every 30 seconds
+    setInterval(() => {
+      if (socket && socket.connected) {
+        fetchStats();
+      }
+    }, 30000);
+  </script>
+</body>
+</html>

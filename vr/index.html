@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toronto Events VR Hub - Meta Quest Experience</title>
+
+  <!-- A-Frame WebXR Framework -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+  <!-- Environment Component -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+
+  <!-- VR Controller System (ENH-001) -->
+  <script src="/vr/components/vr-controller-system.js"></script>
+
+  <!-- Custom components (registered before scene parses) -->
+  <script>
+    // Simple billboard: face the camera each frame
+    AFRAME.registerComponent('look-at-camera', {
+      tick: function () {
+        var cam = this.el.sceneEl.camera;
+        if (cam) this.el.object3D.lookAt(cam.getWorldPosition(new THREE.Vector3()));
+      }
+    });
+
+    // Teleport surface: move rig to clicked point + show indicator
+    AFRAME.registerComponent('teleport-surface', {
+      schema: { rig: { type: 'selector' }, indicator: { type: 'selector' } },
+      init: function () {
+        var rig = this.data.rig;
+        var indicator = this.data.indicator;
+        this.el.addEventListener('click', function (evt) {
+          if (!rig || !evt.detail || !evt.detail.intersection) return;
+          var point = evt.detail.intersection.point;
+          var rigPos = rig.getAttribute('position') || { x: 0, y: 1.6, z: 0 };
+          rig.setAttribute('position', `${point.x} ${rigPos.y} ${point.z}`);
+          if (indicator) {
+            indicator.setAttribute('position', `${point.x} ${point.y + 0.02} ${point.z}`);
+            indicator.setAttribute('visible', true);
+          }
+        });
+      }
+    });
+
+    // Zone portal: makes entire entity clickable and navigates on click
+    AFRAME.registerComponent('zone-link', {
+      schema: { url: { type: 'string', default: '' } },
+      init: function () {
+        var self = this;
+        this.el.addEventListener('click', function () {
+          if (!self.data.url) return;
+          // Flash feedback: rapid pulse + show loading overlay
+          self.el.setAttribute('animation__flash', 'property: opacity; from: 1; to: 0.3; dur: 150; dir: alternate; loop: 3');
+          showZoneLoading(self.data.url);
+          setTimeout(function () { goToZone(self.data.url); }, 400);
+        });
+        // Hover: scale up
+        this.el.addEventListener('mouseenter', function () {
+          self.el.setAttribute('animation__grow', 'property: scale; to: 1.12 1.12 1.12; dur: 200; easing: easeOutQuad');
+        });
+        this.el.addEventListener('mouseleave', function () {
+          self.el.setAttribute('animation__grow', 'property: scale; to: 1 1 1; dur: 200; easing: easeOutQuad');
+        });
+      }
+    });
+
+    function showZoneLoading(url) {
+      // 2D overlay
+      var overlay = document.getElementById('zone-loading');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'zone-loading';
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);opacity:0;transition:opacity 0.3s;pointer-events:none;';
+        overlay.innerHTML = '<div style="text-align:center;color:#fff;font-family:Inter,sans-serif;"><div style="font-size:1.4rem;font-weight:700;margin-bottom:8px;">Entering Zone...</div><div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.2);border-top-color:#00d4ff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto;"></div></div>';
+        document.body.appendChild(overlay);
+      }
+      requestAnimationFrame(function () { overlay.style.opacity = '1'; });
+    }
+  </script>
+
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Inter', -apple-system, sans-serif; }
+
+    /* Loading overlay */
+    #loading {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a0a1a 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; color: white; transition: opacity 0.5s;
+    }
+    #loading h1 {
+      font-size: 2.5rem; margin-bottom: 1rem;
+      background: linear-gradient(90deg, #00d4ff, #a855f7);
+      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    #loading p { color: #888; font-size: 1.1rem; }
+    .spinner {
+      width: 60px; height: 60px; border: 4px solid rgba(0,212,255,0.3);
+      border-top-color: #00d4ff; border-radius: 50%;
+      animation: spin 1s linear infinite; margin-bottom: 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Instructions */
+    #instructions {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.8); color: white; padding: 12px 24px;
+      border-radius: 2rem; z-index: 100; text-align: center;
+      backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+      font-size: 14px; pointer-events: none;
+      animation: fadeInUp 0.5s ease;
+    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } }
+
+    .hidden { display: none !important; }
+
+    /* Help overlay */
+    #help-overlay {
+      position: fixed; inset: 0; background: rgba(8,10,20,0.88);
+      color: #e8f6ff; z-index: 10001;
+      display: flex; align-items: center; justify-content: center; padding: 2rem;
+    }
+    #help-card {
+      max-width: 720px; width: min(90vw, 720px);
+      background: rgba(10,18,32,0.95); border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 20px; padding: 2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    #help-card h2 { margin: 0 0 0.75rem; font-size: 1.8rem; color: #7dd3fc; }
+    #help-card .columns {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem; margin-top: 1.25rem;
+    }
+    #help-card ul { margin: 0.5rem 0 0; padding-left: 1.1rem; color: #cbd5f5; line-height: 1.5; }
+    #help-card .tip { margin-top: 1rem; color: #93c5fd; font-size: 0.95rem; }
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.5);
+      border-radius: 6px; padding: 0.1rem 0.4rem; margin-right: 0.35rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <h1>Toronto Events VR Hub</h1>
+    <p>Preparing your immersive experience...</p>
+  </div>
+
+  <!-- Instructions (shown after load) -->
+  <div id="instructions" class="hidden">
+    <p>Click any zone to enter | WASD to move | Mouse to look | Press 1-6 to jump | F1 for help</p>
+  </div>
+
+  <!-- Help Overlay (F1) -->
+  <div id="help-overlay" class="hidden">
+    <div id="help-card">
+      <h2>Quick Start + Controls</h2>
+      <p>Welcome to the Toronto Events VR Hub. Use mouse, keyboard, or Quest controllers.</p>
+      <div class="columns">
+        <div>
+          <strong>Desktop</strong>
+          <ul>
+            <li><span class="kbd">Mouse</span>Look around + click zones</li>
+            <li><span class="kbd">WASD</span>Move</li>
+            <li><span class="kbd">1-6</span>Jump to zones</li>
+            <li><span class="kbd">0</span>Return to center</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Quest / VR</strong>
+          <ul>
+            <li>Point at zones and click/pinch</li>
+            <li>Gaze at a zone for 1.5s to enter</li>
+            <li>Use thumbstick to move</li>
+          </ul>
+        </div>
+      </div>
+      <p class="tip">Press <span class="kbd">F1</span> or <span class="kbd">Esc</span> to close this guide.</p>
+    </div>
+  </div>
+
+  <!-- ========== A-FRAME SCENE ========== -->
+  <a-scene
+    renderer="antialias: true; colorManagement: true; sortTransparentObjects: true"
+    vr-mode-ui="enabled: true"
+    loading-screen="enabled: false"
+    cursor="rayOrigin: mouse; fuse: false"
+    raycaster="objects: .clickable"
+  >
+
+    <!-- Assets -->
+    <a-assets></a-assets>
+
+    <!-- Starfield Environment -->
+    <a-entity environment="
+      preset: starry;
+      groundColor: #1a1a2e;
+      groundTexture: none;
+      dressing: none;
+      skyType: atmosphere;
+      skyColor: #0a0a1a;
+      horizonColor: #1a1a3e;
+      fog: 0.4"></a-entity>
+
+    <!-- Teleport Floor -->
+    <a-circle id="teleport-floor" class="clickable" position="0 0 0" rotation="-90 0 0" radius="30"
+              color="#0b1020" opacity="0.15" material="transparent: true"
+              teleport-surface="rig: #rig; indicator: #teleport-indicator"></a-circle>
+
+    <!-- Teleport Indicator -->
+    <a-ring id="teleport-indicator" position="0 0.02 0" rotation="-90 0 0" radius-inner="0.25" radius-outer="0.35"
+            color="#00d4ff" opacity="0.8" visible="false" material="transparent: true"></a-ring>
+
+    <!-- Central Hub Platform -->
+    <a-cylinder position="0 0.05 0" radius="4" height="0.1" color="#1a1a2e" opacity="0.8"></a-cylinder>
+    <a-ring position="0 0.12 0" rotation="-90 0 0" radius-inner="3.5" radius-outer="4" color="#00d4ff" opacity="0.4"
+            animation="property: rotation; to: -90 360 0; dur: 60000; loop: true; easing: linear"></a-ring>
+
+    <!-- Central Hub Title (faces camera) -->
+    <a-entity position="0 4.5 0" look-at-camera>
+      <a-text value="Toronto Events" align="center" width="8" color="#00d4ff" font="mozillavr"></a-text>
+      <a-text value="VR Hub" align="center" width="5" color="#a855f7" position="0 -0.6 0" font="mozillavr"></a-text>
+      <a-text value="Click any zone to enter" align="center" width="3" color="#888" position="0 -1.1 0"></a-text>
+    </a-entity>
+
+    <!-- ===== ZONE 1: Toronto Events ===== -->
+    <a-entity position="-6 0 -8">
+      <!-- Clickable box -->
+      <a-box class="clickable" position="0 1.5 0" width="2.5" height="2.5" depth="0.5"
+             color="#ff6b6b" opacity="0.9"
+             zone-link="url: /vr/events/"
+             animation="property: rotation; to: 0 360 0; dur: 30000; loop: true; easing: linear">
+        <a-text value="Events" align="center" position="0 0.1 0.3" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Toronto Events\nExplorer" align="center" position="0 -0.6 0.3" width="2.5" color="#fecaca"></a-text>
+        <a-text value="Events" align="center" position="0 0.1 -0.3" rotation="0 180 0" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Toronto Events\nExplorer" align="center" position="0 -0.6 -0.3" rotation="0 180 0" width="2.5" color="#fecaca"></a-text>
+      </a-box>
+      <!-- ENTER button -->
+      <a-entity position="0 -0.2 0.8" look-at-camera>
+        <a-plane class="clickable" width="1.8" height="0.5" color="#ff6b6b" opacity="0.9"
+                 zone-link="url: /vr/events/"
+                 animation="property: position; from: 0 0 0; to: 0 0.08 0; dur: 1500; dir: alternate; loop: true; easing: easeInOutSine">
+          <a-text value="ENTER" align="center" width="4" color="#fff" position="0 0 0.01" font="mozillavr"></a-text>
+        </a-plane>
+      </a-entity>
+      <!-- Ground ring -->
+      <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="1.5" radius-outer="1.6" color="#ff6b6b" opacity="0.5"
+              animation="property: rotation; to: -90 360 0; dur: 10000; loop: true; easing: linear"></a-ring>
+      <!-- Glow disc -->
+      <a-cylinder position="0 0.01 0" radius="1.5" height="0.02" color="#ff6b6b" opacity="0.15"
+                  class="clickable" zone-link="url: /vr/events/"></a-cylinder>
+    </a-entity>
+
+    <!-- ===== ZONE 2: Movies & Trailers ===== -->
+    <a-entity position="0 0 -8">
+      <a-box class="clickable" position="0 1.5 0" width="2.5" height="2.5" depth="0.5"
+             color="#4ecdc4" opacity="0.9"
+             zone-link="url: /vr/movies.html"
+             animation="property: rotation; to: 0 360 0; dur: 28000; loop: true; easing: linear">
+        <a-text value="Movies" align="center" position="0 0.1 0.3" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Trailers &amp;\nShowtimes" align="center" position="0 -0.6 0.3" width="2.5" color="#99f6e4"></a-text>
+        <a-text value="Movies" align="center" position="0 0.1 -0.3" rotation="0 180 0" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Trailers &amp;\nShowtimes" align="center" position="0 -0.6 -0.3" rotation="0 180 0" width="2.5" color="#99f6e4"></a-text>
+      </a-box>
+      <a-entity position="0 -0.2 0.8" look-at-camera>
+        <a-plane class="clickable" width="1.8" height="0.5" color="#4ecdc4" opacity="0.9"
+                 zone-link="url: /vr/movies.html"
+                 animation="property: position; from: 0 0 0; to: 0 0.08 0; dur: 1500; dir: alternate; loop: true; easing: easeInOutSine">
+          <a-text value="ENTER" align="center" width="4" color="#000" position="0 0 0.01" font="mozillavr"></a-text>
+        </a-plane>
+      </a-entity>
+      <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="1.5" radius-outer="1.6" color="#4ecdc4" opacity="0.5"
+              animation="property: rotation; to: -90 360 0; dur: 10000; loop: true; easing: linear"></a-ring>
+      <a-cylinder position="0 0.01 0" radius="1.5" height="0.02" color="#4ecdc4" opacity="0.15"
+                  class="clickable" zone-link="url: /vr/movies.html"></a-cylinder>
+    </a-entity>
+
+    <!-- ===== ZONE 3: FavCreators ===== -->
+    <a-entity position="6 0 -8">
+      <a-box class="clickable" position="0 1.5 0" width="2.5" height="2.5" depth="0.5"
+             color="#a855f7" opacity="0.9"
+             zone-link="url: /vr/creators.html"
+             animation="property: rotation; to: 0 360 0; dur: 32000; loop: true; easing: linear">
+        <a-text value="Creators" align="center" position="0 0.1 0.3" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Live Streamers\n&amp; Content" align="center" position="0 -0.6 0.3" width="2.5" color="#d8b4fe"></a-text>
+        <a-text value="Creators" align="center" position="0 0.1 -0.3" rotation="0 180 0" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Live Streamers\n&amp; Content" align="center" position="0 -0.6 -0.3" rotation="0 180 0" width="2.5" color="#d8b4fe"></a-text>
+      </a-box>
+      <a-entity position="0 -0.2 0.8" look-at-camera>
+        <a-plane class="clickable" width="1.8" height="0.5" color="#a855f7" opacity="0.9"
+                 zone-link="url: /vr/creators.html"
+                 animation="property: position; from: 0 0 0; to: 0 0.08 0; dur: 1500; dir: alternate; loop: true; easing: easeInOutSine">
+          <a-text value="ENTER" align="center" width="4" color="#fff" position="0 0 0.01" font="mozillavr"></a-text>
+        </a-plane>
+      </a-entity>
+      <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="1.5" radius-outer="1.6" color="#a855f7" opacity="0.5"
+              animation="property: rotation; to: -90 360 0; dur: 10000; loop: true; easing: linear"></a-ring>
+      <a-cylinder position="0 0.01 0" radius="1.5" height="0.02" color="#a855f7" opacity="0.15"
+                  class="clickable" zone-link="url: /vr/creators.html"></a-cylinder>
+    </a-entity>
+
+    <!-- ===== ZONE 4: Stock Ideas ===== -->
+    <a-entity position="-6 0 8">
+      <a-box class="clickable" position="0 1.5 0" width="2.5" height="2.5" depth="0.5"
+             color="#22c55e" opacity="0.9"
+             zone-link="url: /vr/stocks-zone.html"
+             animation="property: rotation; to: 0 360 0; dur: 34000; loop: true; easing: linear">
+        <a-text value="Stocks" align="center" position="0 0.1 0.3" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Trading Ideas\n&amp; Analysis" align="center" position="0 -0.6 0.3" width="2.5" color="#86efac"></a-text>
+        <a-text value="Stocks" align="center" position="0 0.1 -0.3" rotation="0 180 0" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Trading Ideas\n&amp; Analysis" align="center" position="0 -0.6 -0.3" rotation="0 180 0" width="2.5" color="#86efac"></a-text>
+      </a-box>
+      <a-entity position="0 -0.2 0.8" look-at-camera>
+        <a-plane class="clickable" width="1.8" height="0.5" color="#22c55e" opacity="0.9"
+                 zone-link="url: /vr/stocks-zone.html"
+                 animation="property: position; from: 0 0 0; to: 0 0.08 0; dur: 1500; dir: alternate; loop: true; easing: easeInOutSine">
+          <a-text value="ENTER" align="center" width="4" color="#000" position="0 0 0.01" font="mozillavr"></a-text>
+        </a-plane>
+      </a-entity>
+      <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="1.5" radius-outer="1.6" color="#22c55e" opacity="0.5"
+              animation="property: rotation; to: -90 360 0; dur: 10000; loop: true; easing: linear"></a-ring>
+      <a-cylinder position="0 0.01 0" radius="1.5" height="0.02" color="#22c55e" opacity="0.15"
+                  class="clickable" zone-link="url: /vr/stocks-zone.html"></a-cylinder>
+    </a-entity>
+
+    <!-- ===== ZONE 5: Wellness & Garden ===== -->
+    <a-entity position="0 0 8">
+      <a-box class="clickable" position="0 1.5 0" width="2.5" height="2.5" depth="0.5"
+             color="#10b981" opacity="0.9"
+             zone-link="url: /vr/wellness/"
+             animation="property: rotation; to: 0 360 0; dur: 26000; loop: true; easing: linear">
+        <a-text value="Wellness" align="center" position="0 0.1 0.3" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Mental Health\n&amp; Garden" align="center" position="0 -0.6 0.3" width="2.5" color="#6ee7b7"></a-text>
+        <a-text value="Wellness" align="center" position="0 0.1 -0.3" rotation="0 180 0" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Mental Health\n&amp; Garden" align="center" position="0 -0.6 -0.3" rotation="0 180 0" width="2.5" color="#6ee7b7"></a-text>
+      </a-box>
+      <!-- Breathing sphere glow -->
+      <a-sphere position="0 1.5 0" radius="1.8" color="#10b981" opacity="0.06"
+                animation="property: scale; from: 1 1 1; to: 1.3 1.3 1.3; dur: 3000; dir: alternate; loop: true; easing: easeInOutSine"></a-sphere>
+      <a-entity position="0 -0.2 0.8" look-at-camera>
+        <a-plane class="clickable" width="1.8" height="0.5" color="#10b981" opacity="0.9"
+                 zone-link="url: /vr/wellness/"
+                 animation="property: position; from: 0 0 0; to: 0 0.08 0; dur: 1500; dir: alternate; loop: true; easing: easeInOutSine">
+          <a-text value="ENTER GARDEN" align="center" width="4" color="#000" position="0 0 0.01" font="mozillavr"></a-text>
+        </a-plane>
+      </a-entity>
+      <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="1.5" radius-outer="1.6" color="#10b981" opacity="0.6"
+              animation="property: rotation; to: -90 360 0; dur: 8000; loop: true; easing: linear"></a-ring>
+      <a-cylinder position="0 0.01 0" radius="1.5" height="0.02" color="#10b981" opacity="0.2"
+                  class="clickable" zone-link="url: /vr/wellness/"></a-cylinder>
+    </a-entity>
+
+    <!-- ===== ZONE 6: Weather ===== -->
+    <a-entity position="6 0 8">
+      <a-box class="clickable" position="0 1.5 0" width="2.5" height="2.5" depth="0.5"
+             color="#06b6d4" opacity="0.9"
+             zone-link="url: /vr/weather-zone.html"
+             animation="property: rotation; to: 0 360 0; dur: 36000; loop: true; easing: linear">
+        <a-text value="Weather" align="center" position="0 0.1 0.3" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Toronto\nForecast" align="center" position="0 -0.6 0.3" width="2.5" color="#67e8f9"></a-text>
+        <a-text value="Weather" align="center" position="0 0.1 -0.3" rotation="0 180 0" width="4" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Toronto\nForecast" align="center" position="0 -0.6 -0.3" rotation="0 180 0" width="2.5" color="#67e8f9"></a-text>
+      </a-box>
+      <a-entity position="0 -0.2 0.8" look-at-camera>
+        <a-plane class="clickable" width="1.8" height="0.5" color="#06b6d4" opacity="0.9"
+                 zone-link="url: /vr/weather-zone.html"
+                 animation="property: position; from: 0 0 0; to: 0 0.08 0; dur: 1500; dir: alternate; loop: true; easing: easeInOutSine">
+          <a-text value="ENTER" align="center" width="4" color="#000" position="0 0 0.01" font="mozillavr"></a-text>
+        </a-plane>
+      </a-entity>
+      <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="1.5" radius-outer="1.6" color="#06b6d4" opacity="0.5"
+              animation="property: rotation; to: -90 360 0; dur: 10000; loop: true; easing: linear"></a-ring>
+      <a-cylinder position="0 0.01 0" radius="1.5" height="0.02" color="#06b6d4" opacity="0.15"
+                  class="clickable" zone-link="url: /vr/weather-zone.html"></a-cylinder>
+    </a-entity>
+
+    <!-- TUTORIAL ZONE (ENH-007) -->
+    <a-entity position="0 0 12">
+      <a-box class="clickable" position="0 1.5 0" width="2.5" height="2.5" depth="0.5"
+             color="#f59e0b" opacity="0.9"
+             zone-link="url: /vr/tutorial/"
+             animation="property: rotation; to: 0 360 0; dur: 20000; loop: true; easing: linear">
+        <a-text value="Tutorial" align="center" position="0 0.1 0.3" width="4" color="#000" font="mozillavr"></a-text>
+        <a-text value="?" align="center" position="0 -0.4 0.3" width="6" color="rgba(0,0,0,0.5)"></a-text>
+      </a-box>
+      <a-text value="TUTORIAL" align="center" position="0 3.2 0" width="6" color="#f59e0b" look-at-camera></a-text>
+      <a-text value="Learn the Controls" align="center" position="0 2.8 0" width="3" color="#94a3b8" look-at-camera></a-text>
+      <a-entity position="0 -0.2 0.8" look-at-camera>
+        <a-plane class="clickable" width="1.8" height="0.5" color="#f59e0b" opacity="0.9"
+                 zone-link="url: /vr/tutorial/"
+                 animation="property: position; from: 0 0 0; to: 0 0.08 0; dur: 1500; dir: alternate; loop: true; easing: easeInOutSine">
+          <a-text value="START TUTORIAL" align="center" width="4" color="#000" position="0 0 0.01" font="mozillavr"></a-text>
+        </a-plane>
+      </a-entity>
+      <a-ring rotation="-90 0 0" position="0 0.02 0" radius-inner="1.2" radius-outer="1.5" color="#f59e0b" opacity="0.15"
+              animation="property: rotation; to: -90 360 0; dur: 12000; loop: true; easing: linear"></a-ring>
+      <a-cylinder position="0 0.01 0" radius="1.5" height="0.02" color="#f59e0b" opacity="0.15"
+                  class="clickable" zone-link="url: /vr/tutorial/"></a-cylinder>
+    </a-entity>
+
+    <!-- Decorative Particles -->
+    <a-sphere position="-10 3 -10" radius="0.1" color="#00d4ff" opacity="0.5"
+              animation="property: position; to: -10 5 -10; dur: 4000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="10 4 -5" radius="0.08" color="#a855f7" opacity="0.5"
+              animation="property: position; to: 10 6 -5; dur: 5000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="-5 2 10" radius="0.12" color="#ff6b6b" opacity="0.4"
+              animation="property: position; to: -5 4 10; dur: 4500; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="8 3 8" radius="0.1" color="#4ecdc4" opacity="0.5"
+              animation="property: position; to: 8 5 8; dur: 3500; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+
+    <!-- Lighting -->
+    <a-light type="ambient" color="#404080" intensity="0.4"></a-light>
+    <a-light type="point" position="0 6 0" color="#00d4ff" intensity="0.8" distance="25"></a-light>
+    <a-light type="point" position="-6 3 -8" color="#ff6b6b" intensity="0.5" distance="10"></a-light>
+    <a-light type="point" position="0 3 -8" color="#4ecdc4" intensity="0.5" distance="10"></a-light>
+    <a-light type="point" position="6 3 -8" color="#a855f7" intensity="0.5" distance="10"></a-light>
+    <a-light type="point" position="-6 3 8" color="#22c55e" intensity="0.5" distance="10"></a-light>
+    <a-light type="point" position="0 3 8" color="#10b981" intensity="0.6" distance="10"></a-light>
+    <a-light type="point" position="6 3 8" color="#06b6d4" intensity="0.5" distance="10"></a-light>
+
+    <!-- Camera Rig -->
+    <a-entity id="rig" position="0 1.6 0">
+      <a-camera look-controls wasd-controls="acceleration: 40" fov="80">
+        <!-- Gaze cursor for VR headset -->
+        <a-ring cursor="fuse: true; fuseTimeout: 1500"
+                raycaster="objects: .clickable; far: 30"
+                radius-inner="0.005" radius-outer="0.012"
+                color="#00d4ff" shader="flat"
+                position="0 0 -1"
+                animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 200"
+                animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.5 0.5 0.5; dur: 1500; easing: linear"
+                animation__mouseleave="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 200">
+        </a-ring>
+      </a-camera>
+      <a-entity id="left-hand"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 25; lineColor: #00d4ff; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+      <a-entity id="right-hand"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 25; lineColor: #a855f7; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    // ===== LOADING =====
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var el = document.getElementById('loading');
+        el.style.opacity = '0';
+        setTimeout(function () {
+          el.classList.add('hidden');
+          document.getElementById('instructions').classList.remove('hidden');
+          // Auto-hide instructions after 12s
+          setTimeout(function () {
+            document.getElementById('instructions').classList.add('hidden');
+          }, 12000);
+        }, 500);
+      }, 1500);
+    });
+
+    // ===== NAVIGATE TO ZONE =====
+    function goToZone(url) {
+      // Brief flash effect
+      document.body.style.transition = 'opacity 0.3s';
+      document.body.style.opacity = '0.5';
+      setTimeout(function () {
+        window.location.href = url;
+      }, 300);
+    }
+
+    // ===== KEYBOARD CONTROLS =====
+    document.addEventListener('keydown', function (e) {
+      var cam = document.querySelector('a-camera');
+
+      if (e.key === 'F1') {
+        e.preventDefault();
+        document.getElementById('help-overlay').classList.toggle('hidden');
+        return;
+      }
+      if (e.key === 'Escape') {
+        document.getElementById('help-overlay').classList.add('hidden');
+        return;
+      }
+
+      switch (e.key) {
+        case '1': cam.setAttribute('position', '-6 1.6 -5'); break; // Events
+        case '2': cam.setAttribute('position', '0 1.6 -5'); break;  // Movies
+        case '3': cam.setAttribute('position', '6 1.6 -5'); break;  // Creators
+        case '4': cam.setAttribute('position', '-6 1.6 5'); break;  // Stocks
+        case '5': cam.setAttribute('position', '0 1.6 5'); break;   // Wellness
+        case '6': cam.setAttribute('position', '6 1.6 5'); break;   // Weather
+        case '0': cam.setAttribute('position', '0 1.6 0'); break;   // Center
+      }
+    });
+
+    // ===== QUEST CONTROLLER LOCOMOTION =====
+    (function () {
+      var rig = document.getElementById('rig');
+      var camera = document.querySelector('a-camera');
+      var moveSpeed = 0.06;
+      var turnCooldown = false;
+
+      function getYaw() {
+        if (!camera || !camera.object3D) return 0;
+        return camera.object3D.rotation.y;
+      }
+
+      function step() {
+        var pads = navigator.getGamepads ? navigator.getGamepads() : [];
+        if (!rig || !pads) {
+          requestAnimationFrame(step);
+          return;
+        }
+
+        var left = null;
+        var right = null;
+        for (var i = 0; i < pads.length; i++) {
+          var pad = pads[i];
+          if (!pad) continue;
+          if (pad.hand === 'left') left = pad;
+          if (pad.hand === 'right') right = pad;
+        }
+
+        if (left && left.axes.length >= 2) {
+          var x = left.axes[0] || 0;
+          var y = left.axes[1] || 0;
+          if (Math.abs(x) > 0.1 || Math.abs(y) > 0.1) {
+            var yaw = getYaw();
+            var dx = Math.sin(yaw) * -y + Math.cos(yaw) * x;
+            var dz = Math.cos(yaw) * -y - Math.sin(yaw) * x;
+            var pos = rig.getAttribute('position');
+            rig.setAttribute('position', {
+              x: pos.x + dx * moveSpeed,
+              y: pos.y,
+              z: pos.z + dz * moveSpeed
+            });
+          }
+        }
+
+        if (right && right.axes.length >= 2) {
+          var turn = right.axes[0] || 0;
+          if (!turnCooldown && Math.abs(turn) > 0.7) {
+            var rot = rig.getAttribute('rotation');
+            rig.setAttribute('rotation', {
+              x: rot.x,
+              y: rot.y + (turn > 0 ? -30 : 30),
+              z: rot.z
+            });
+            turnCooldown = true;
+            setTimeout(function () { turnCooldown = false; }, 300);
+          }
+        }
+
+        requestAnimationFrame(step);
+      }
+
+      requestAnimationFrame(step);
+    })();
+  </script>
+
+  <!-- ===== QUICK-WIN: Hub Portal Live Data Badges ===== -->
+  <script>
+  (function () {
+    'use strict';
+
+    /* ---------- Zone Visit Tracking ---------- */
+    // Read visited zones from localStorage
+    var VISITED_KEY = 'vr_visited_zones';
+    function getVisitedZones() {
+      try { return JSON.parse(localStorage.getItem(VISITED_KEY)) || {}; } catch (e) { return {}; }
+    }
+    // Mark hub as visited
+    var visited = getVisitedZones();
+    visited.hub = Date.now();
+    localStorage.setItem(VISITED_KEY, JSON.stringify(visited));
+
+    // Render visited checkmarks on portals
+    function renderVisitedBadges() {
+      var v = getVisitedZones();
+      var zonePositions = {
+        events:   { x: -6, y: 3.6, z: -8 },
+        movies:   { x: 0,  y: 3.6, z: -8 },
+        creators: { x: 6,  y: 3.6, z: -8 },
+        stocks:   { x: -6, y: 3.6, z: 8 },
+        wellness: { x: 0,  y: 3.6, z: 8 },
+        weather:  { x: 6,  y: 3.6, z: 8 },
+        tutorial: { x: 0,  y: 4.0, z: 12 }
+      };
+      var scene = document.querySelector('a-scene');
+      if (!scene) return;
+
+      Object.keys(zonePositions).forEach(function (zoneId) {
+        if (v[zoneId]) {
+          var pos = zonePositions[zoneId];
+          var badge = document.createElement('a-entity');
+          badge.setAttribute('position', pos.x + ' ' + pos.y + ' ' + pos.z);
+          badge.setAttribute('look-at-camera', '');
+          badge.setAttribute('class', 'visited-badge');
+          badge.innerHTML =
+            '<a-circle radius="0.18" color="#22c55e" opacity="0.85" material="shader: flat"></a-circle>' +
+            '<a-text value="\\u2713" align="center" width="3" color="#fff" position="0 0 0.01"></a-text>';
+          scene.appendChild(badge);
+        }
+      });
+    }
+
+    /* ---------- Live Data Badges ---------- */
+    var DATA_BADGE_POSITIONS = {
+      events:   { x: -6, y: -0.8, z: -7.2 },
+      movies:   { x: 0,  y: -0.8, z: -7.2 },
+      creators: { x: 6,  y: -0.8, z: -7.2 },
+      stocks:   { x: -6, y: -0.8, z: 8.8 },
+      wellness: { x: 0,  y: -0.8, z: 8.8 },
+      weather:  { x: 6,  y: -0.8, z: 8.8 }
+    };
+
+    function createDataBadge(zoneId, text, color) {
+      var scene = document.querySelector('a-scene');
+      if (!scene) return;
+      var pos = DATA_BADGE_POSITIONS[zoneId];
+      if (!pos) return;
+
+      var badge = document.createElement('a-entity');
+      badge.id = 'data-badge-' + zoneId;
+      badge.setAttribute('position', pos.x + ' ' + pos.y + ' ' + pos.z);
+      badge.setAttribute('look-at-camera', '');
+      badge.innerHTML =
+        '<a-plane width="2.2" height="0.35" color="#0a0a1a" opacity="0.85" material="shader: flat"' +
+        '  animation="property: position; from: 0 0 0; to: 0 0.05 0; dur: 2000; dir: alternate; loop: true; easing: easeInOutSine">' +
+        '  <a-text value="' + text + '" align="center" width="3.5" color="' + color + '" position="0 0 0.01"></a-text>' +
+        '</a-plane>';
+      scene.appendChild(badge);
+    }
+
+    function updateDataBadge(zoneId, text) {
+      var el = document.getElementById('data-badge-' + zoneId);
+      if (el) {
+        var t = el.querySelector('a-text');
+        if (t) t.setAttribute('value', text);
+      }
+    }
+
+    /* --- Fetch event count --- */
+    function fetchEventCount() {
+      createDataBadge('events', 'Loading...', '#ff6b6b');
+      fetch('/events.json').then(function (r) { return r.json(); }).then(function (data) {
+        var events = Array.isArray(data) ? data : (data.events || []);
+        var count = events.length;
+        var label = count > 100 ? (Math.floor(count / 100) * 100) + '+ Events' : count + ' Events';
+        updateDataBadge('events', label);
+      }).catch(function () {
+        updateDataBadge('events', 'Browse Events');
+      });
+    }
+
+    /* --- Fetch weather --- */
+    function fetchWeather() {
+      createDataBadge('weather', 'Loading...', '#06b6d4');
+      var url = 'https://api.open-meteo.com/v1/forecast?latitude=43.65&longitude=-79.38&current_weather=true&timezone=America/Toronto';
+      fetch(url).then(function (r) { return r.json(); }).then(function (data) {
+        if (data.current_weather) {
+          var temp = Math.round(data.current_weather.temperature);
+          var label = temp + '\u00B0C Toronto';
+          updateDataBadge('weather', label);
+        }
+      }).catch(function () {
+        updateDataBadge('weather', 'Toronto Forecast');
+      });
+    }
+
+    /* --- Static badges for other zones --- */
+    function createStaticBadges() {
+      createDataBadge('movies', '50+ Trailers', '#4ecdc4');
+      createDataBadge('creators', 'Live Lounge', '#a855f7');
+      createDataBadge('stocks', '8 Tickers', '#22c55e');
+      createDataBadge('wellness', 'Breathe & Relax', '#10b981');
+    }
+
+    /* --- Init after scene loads --- */
+    function initBadges() {
+      var scene = document.querySelector('a-scene');
+      if (!scene) return;
+
+      function onReady() {
+        renderVisitedBadges();
+        createStaticBadges();
+        fetchEventCount();
+        fetchWeather();
+      }
+
+      if (scene.hasLoaded) { onReady(); }
+      else { scene.addEventListener('loaded', onReady); }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBadges);
+    } else {
+      initBadges();
+    }
+  })();
+  </script>
+
+  <!-- VR Controller Support -->
+  <script src="/vr/controller-support.js"></script>
+
+  <!-- VR Navigation Menu -->
+  <script src="/vr/nav-menu.js"></script>
+  <!-- VR Quick Wins -->
+  <script src="/vr/quick-wins.js"></script>
+  <!-- Comfort vignette + F1 help -->
+  <script src="/vr/vr-comfort.js"></script>
+</body>
+</html>

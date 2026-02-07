@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VR Tutorial — Learn the Controls</title>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; font-family: -apple-system, system-ui, sans-serif; }
+
+    #tutorial-hud {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 100; background: rgba(0,0,0,0.8); border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 14px; padding: 14px 24px; text-align: center;
+      color: #fff; max-width: 500px; pointer-events: none;
+      backdrop-filter: blur(8px); transition: all 0.4s;
+    }
+    #tutorial-hud h2 { margin: 0 0 4px; font-size: 16px; color: #00d4ff; }
+    #tutorial-hud p  { margin: 0; font-size: 13px; color: #94a3b8; }
+
+    #progress-bar {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 100; background: rgba(0,0,0,0.7); border-radius: 10px;
+      padding: 10px 20px; display: flex; gap: 8px; align-items: center;
+    }
+    .step-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.1);
+      transition: all 0.3s;
+    }
+    .step-dot.active { background: #00d4ff; border-color: #00d4ff; box-shadow: 0 0 8px #00d4ff; }
+    .step-dot.done { background: #22c55e; border-color: #22c55e; }
+
+    #back-link {
+      position: fixed; top: 12px; left: 12px; z-index: 200;
+      color: #00d4ff; text-decoration: none; font-size: 14px;
+      background: rgba(0,0,0,0.5); padding: 6px 14px; border-radius: 8px;
+    }
+
+    #input-status {
+      position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+      z-index: 100; background: rgba(0,0,0,0.7); border-radius: 8px;
+      padding: 8px 16px; color: #64748b; font-size: 12px; text-align: center;
+    }
+    #input-status .detected { color: #22c55e; }
+    #input-status .missing { color: #ef4444; }
+  </style>
+</head>
+<body>
+
+  <a id="back-link" href="/vr/">&#8592; Hub</a>
+
+  <div id="tutorial-hud">
+    <h2 id="step-title">Step 1: Look Around</h2>
+    <p id="step-desc">Move your head to look around the room. Try looking at each colored panel.</p>
+  </div>
+
+  <div id="input-status">
+    Detecting inputs... <span id="kb-status" class="detected">Keyboard</span> |
+    <span id="ctrl-status" class="missing">Controllers</span> |
+    <span id="hand-status" class="missing">Hands</span>
+  </div>
+
+  <div id="progress-bar">
+    <div class="step-dot active" id="dot-0"></div>
+    <div class="step-dot" id="dot-1"></div>
+    <div class="step-dot" id="dot-2"></div>
+    <div class="step-dot" id="dot-3"></div>
+    <div class="step-dot" id="dot-4"></div>
+    <div class="step-dot" id="dot-5"></div>
+    <div class="step-dot" id="dot-6"></div>
+  </div>
+
+  <a-scene
+    vr-mode-ui="enabled: true"
+    renderer="antialias: true; colorManagement: true; alpha: true"
+    loading-screen="enabled: false"
+    cursor="rayOrigin: mouse; fuse: false"
+    raycaster="objects: .clickable"
+    webxr="optionalFeatures: hand-tracking, local-floor, hit-test; referenceSpaceType: local-floor"
+    background="transparent: true">
+
+    <a-assets timeout="10000"></a-assets>
+
+    <!-- ===== TUTORIAL ROOM ===== -->
+
+    <!-- Floor — grid pattern -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#0a0a12">
+      <a-plane width="20" height="20" color="#1e293b" opacity="0.15" material="wireframe: true; wireframeLinewidth: 1" position="0 0 0.01"></a-plane>
+    </a-plane>
+
+    <!-- Ceiling -->
+    <a-plane position="0 4 0" rotation="90 0 0" width="20" height="20" color="#050510"></a-plane>
+
+    <!-- Walls -->
+    <a-plane position="0 2 -10" width="20" height="4" color="#0a0a18"></a-plane>
+    <a-plane position="0 2  10" width="20" height="4" color="#0a0a18"></a-plane>
+    <a-plane position="-10 2 0" rotation="0 90 0" width="20" height="4" color="#0a0a18"></a-plane>
+    <a-plane position=" 10 2 0" rotation="0 -90 0" width="20" height="4" color="#0a0a18"></a-plane>
+
+    <!-- Room title -->
+    <a-text value="CONTROLLER TUTORIAL" position="0 3.5 -9.9" align="center" color="#00d4ff" width="10"></a-text>
+    <a-text value="Complete each step to learn VR controls" position="0 3.1 -9.9" align="center" color="#475569" width="6"></a-text>
+
+    <!-- ===== CAMERA RIG ===== -->
+    <a-entity id="rig" position="0 1.6 6">
+      <a-camera look-controls wasd-controls="acceleration: 10" position="0 0 0">
+        <a-entity cursor="rayOrigin: mouse; fuse: false"
+                  raycaster="objects: .clickable; far: 20"
+                  position="0 0 -0.5">
+        </a-entity>
+      </a-camera>
+    </a-entity>
+
+    <!-- ===== STEP 1: LOOK AROUND — colored panels on walls ===== -->
+    <a-entity id="step1-targets">
+      <a-box id="look-target-1" position="-4 2 -9.5" width="1.5" height="1.5" depth="0.1" color="#ef4444" class="clickable look-target"
+             animation__hover="property: scale; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter"
+             animation__leave="property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave">
+        <a-text value="LOOK" position="0 0 0.06" align="center" color="#fff" width="3"></a-text>
+      </a-box>
+      <a-box id="look-target-2" position="4 2 -9.5" width="1.5" height="1.5" depth="0.1" color="#22c55e" class="clickable look-target"
+             animation__hover="property: scale; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter"
+             animation__leave="property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave">
+        <a-text value="HERE" position="0 0 0.06" align="center" color="#fff" width="3"></a-text>
+      </a-box>
+      <a-box id="look-target-3" position="-9.5 2 0" rotation="0 90 0" width="1.5" height="1.5" depth="0.1" color="#a855f7" class="clickable look-target"
+             animation__hover="property: scale; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter"
+             animation__leave="property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave">
+        <a-text value="LEFT" position="0 0 0.06" align="center" color="#fff" width="3"></a-text>
+      </a-box>
+    </a-entity>
+
+    <!-- ===== STEP 2: POINT & CLICK — target buttons ===== -->
+    <a-entity id="step2-targets" visible="false">
+      <a-entity id="click-target-1" position="-2 1.5 -5" class="clickable click-target">
+        <a-sphere radius="0.3" color="#4ecdc4" opacity="0.9"
+                  animation="property: rotation; to: 0 360 0; dur: 4000; loop: true; easing: linear"></a-sphere>
+        <a-text value="CLICK ME" position="0 0.5 0" align="center" color="#4ecdc4" width="3"></a-text>
+      </a-entity>
+      <a-entity id="click-target-2" position="2 1.5 -5" class="clickable click-target">
+        <a-sphere radius="0.3" color="#f59e0b" opacity="0.9"
+                  animation="property: rotation; to: 0 -360 0; dur: 4000; loop: true; easing: linear"></a-sphere>
+        <a-text value="CLICK ME" position="0 0.5 0" align="center" color="#f59e0b" width="3"></a-text>
+      </a-entity>
+      <a-entity id="click-target-3" position="0 2.5 -5" class="clickable click-target">
+        <a-sphere radius="0.3" color="#ec4899" opacity="0.9"
+                  animation="property: rotation; to: 360 0 0; dur: 4000; loop: true; easing: linear"></a-sphere>
+        <a-text value="CLICK ME" position="0 0.5 0" align="center" color="#ec4899" width="3"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== STEP 3: MOVE AROUND — walk to waypoints ===== -->
+    <a-entity id="step3-targets" visible="false">
+      <a-entity id="walk-target-1" position="-3 0.01 0">
+        <a-ring rotation="-90 0 0" radius-inner="0.3" radius-outer="0.5" color="#00d4ff" opacity="0.8"
+                animation="property: scale; from: 0.9 0.9 0.9; to: 1.1 1.1 1.1; dur: 800; loop: true; dir: alternate"></a-ring>
+        <a-cylinder radius="0.02" height="2" color="#00d4ff" opacity="0.2" position="0 1 0"></a-cylinder>
+        <a-text value="WALK HERE" position="0 1.5 0" align="center" color="#00d4ff" width="3"
+                look-at="[camera]"></a-text>
+      </a-entity>
+      <a-entity id="walk-target-2" position="3 0.01 -3">
+        <a-ring rotation="-90 0 0" radius-inner="0.3" radius-outer="0.5" color="#22c55e" opacity="0.8"
+                animation="property: scale; from: 0.9 0.9 0.9; to: 1.1 1.1 1.1; dur: 800; loop: true; dir: alternate"></a-ring>
+        <a-cylinder radius="0.02" height="2" color="#22c55e" opacity="0.2" position="0 1 0"></a-cylinder>
+        <a-text value="WALK HERE" position="0 1.5 0" align="center" color="#22c55e" width="3"
+                look-at="[camera]"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== STEP 4: TELEPORT — teleport rings ===== -->
+    <a-entity id="step4-targets" visible="false">
+      <a-entity id="teleport-target-1" position="-4 0.01 -5">
+        <a-ring rotation="-90 0 0" radius-inner="0.4" radius-outer="0.6" color="#a855f7" opacity="0.8"
+                animation="property: scale; from: 0.85 0.85 0.85; to: 1.15 1.15 1.15; dur: 700; loop: true; dir: alternate"></a-ring>
+        <a-text value="TELEPORT" position="0 0.8 0" align="center" color="#a855f7" width="3"
+                look-at="[camera]"></a-text>
+      </a-entity>
+      <a-entity id="teleport-target-2" position="4 0.01 -7">
+        <a-ring rotation="-90 0 0" radius-inner="0.4" radius-outer="0.6" color="#f59e0b" opacity="0.8"
+                animation="property: scale; from: 0.85 0.85 0.85; to: 1.15 1.15 1.15; dur: 700; loop: true; dir: alternate"></a-ring>
+        <a-text value="TELEPORT" position="0 0.8 0" align="center" color="#f59e0b" width="3"
+                look-at="[camera]"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== STEP 5: SNAP TURN ===== -->
+    <a-entity id="step5-targets" visible="false">
+      <a-entity position="0 2 -8">
+        <a-plane width="5" height="2" color="#0a0a1a" opacity="0.9" material="shader: flat"></a-plane>
+        <a-text value="SNAP TURN TEST" position="0 0.6 0.01" align="center" color="#00d4ff" width="6"></a-text>
+        <a-text value="Push right stick LEFT or RIGHT" position="0 0.15 0.01" align="center" color="#94a3b8" width="4"></a-text>
+        <a-text value="Or press Q / E keys" position="0 -0.2 0.01" align="center" color="#475569" width="3.5"></a-text>
+        <a-text id="snap-count-text" value="Turns: 0" position="0 -0.6 0.01" align="center" color="#22c55e" width="4"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== STEP 6: OPEN MENU ===== -->
+    <a-entity id="step6-targets" visible="false">
+      <a-entity position="0 2 -6">
+        <a-plane width="4.5" height="2" color="#0a0a1a" opacity="0.9" material="shader: flat"></a-plane>
+        <a-text value="OPEN THE MENU" position="0 0.6 0.01" align="center" color="#00d4ff" width="6"></a-text>
+        <a-text value="Press M key or Menu button on controller" position="0 0.15 0.01" align="center" color="#94a3b8" width="4"></a-text>
+        <a-text value="Then close it with Escape" position="0 -0.2 0.01" align="center" color="#475569" width="3.5"></a-text>
+        <a-text id="menu-status-text" value="Menu not opened yet" position="0 -0.6 0.01" align="center" color="#f59e0b" width="4"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- ===== STEP 7: NAVIGATE — go to Hub ===== -->
+    <a-entity id="step7-targets" visible="false">
+      <a-entity position="0 1.5 -5" class="clickable"
+                onclick="window.location.href='/vr/'"
+                animation="property: rotation; to: 0 360 0; dur: 8000; loop: true; easing: linear">
+        <a-box width="1.5" height="1.5" depth="1.5" color="#00d4ff" opacity="0.3"
+               material="wireframe: true; wireframeLinewidth: 2"></a-box>
+        <a-sphere radius="0.3" color="#00d4ff" opacity="0.8"></a-sphere>
+        <a-text value="ENTER HUB" position="0 1.2 0" align="center" color="#00d4ff" width="4"
+                look-at="[camera]"></a-text>
+        <a-text value="Click to finish tutorial" position="0 -1.0 0" align="center" color="#94a3b8" width="3"
+                look-at="[camera]"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- Ambient lighting -->
+    <a-light type="ambient" color="#334155" intensity="0.4"></a-light>
+    <a-light type="point" position="0 3.5 0" color="#00d4ff" intensity="0.3" distance="15"></a-light>
+    <a-light type="point" position="-5 3 -5" color="#a855f7" intensity="0.2" distance="10"></a-light>
+    <a-light type="point" position=" 5 3 -5" color="#4ecdc4" intensity="0.2" distance="10"></a-light>
+
+  </a-scene>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var STEPS = [
+      { id: 0, title: 'Step 1: Look Around',   desc: 'Move your head to look at each colored panel on the walls.',       targets: 'step1-targets', needed: 3 },
+      { id: 1, title: 'Step 2: Point & Click',  desc: 'Point at each spinning sphere and click (trigger or mouse).',     targets: 'step2-targets', needed: 3 },
+      { id: 2, title: 'Step 3: Move Around',    desc: 'Walk to each ring using WASD or left thumbstick.',                targets: 'step3-targets', needed: 2 },
+      { id: 3, title: 'Step 4: Teleport',       desc: 'Push right stick forward to aim, release to teleport to each ring.', targets: 'step4-targets', needed: 2 },
+      { id: 4, title: 'Step 5: Snap Turn',      desc: 'Push right stick left/right (or Q/E) to snap-turn 3 times.',      targets: 'step5-targets', needed: 3 },
+      { id: 5, title: 'Step 6: Open Menu',      desc: 'Press M key (or Menu button) to open the nav menu, then Escape.', targets: 'step6-targets', needed: 1 },
+      { id: 6, title: 'Step 7: Go to the Hub!', desc: 'Click the portal cube to complete the tutorial and enter the Hub.', targets: 'step7-targets', needed: 1 }
+    ];
+
+    var currentStep = 0;
+    var stepProgress = {};  // { stepId: count }
+    var lookTargetsSeen = {};
+    var snapCount = 0;
+    var menuOpened = false;
+    var menuClosed = false;
+
+    function updateUI() {
+      var step = STEPS[currentStep];
+      document.getElementById('step-title').textContent = step.title;
+      document.getElementById('step-desc').textContent = step.desc;
+
+      // Update dots
+      for (var i = 0; i < STEPS.length; i++) {
+        var dot = document.getElementById('dot-' + i);
+        dot.className = 'step-dot';
+        if (i < currentStep) dot.className += ' done';
+        else if (i === currentStep) dot.className += ' active';
+      }
+
+      // Show/hide target groups
+      for (var j = 0; j < STEPS.length; j++) {
+        var el = document.getElementById(STEPS[j].targets);
+        if (el) el.setAttribute('visible', j === currentStep ? 'true' : 'false');
+      }
+    }
+
+    function advanceStep() {
+      if (currentStep >= STEPS.length - 1) return;
+      currentStep++;
+      stepProgress = {};
+      updateUI();
+    }
+
+    function recordProgress(id) {
+      if (!stepProgress[id]) stepProgress[id] = 0;
+      stepProgress[id]++;
+      var total = Object.keys(stepProgress).length;
+      if (total >= STEPS[currentStep].needed) {
+        setTimeout(advanceStep, 600);
+      }
+    }
+
+    // ── Step 1: Look at panels ──
+    function setupStep1() {
+      var targets = document.querySelectorAll('.look-target');
+      targets.forEach(function (t) {
+        t.addEventListener('mouseenter', function () {
+          if (currentStep !== 0) return;
+          if (lookTargetsSeen[t.id]) return;
+          lookTargetsSeen[t.id] = true;
+          t.setAttribute('color', '#22c55e');
+          t.querySelector('a-text').setAttribute('color', '#22c55e');
+          t.querySelector('a-text').setAttribute('value', 'DONE!');
+          recordProgress(t.id);
+        });
+      });
+    }
+
+    // ── Step 2: Click targets ──
+    function setupStep2() {
+      var targets = document.querySelectorAll('.click-target');
+      targets.forEach(function (t) {
+        t.addEventListener('click', function () {
+          if (currentStep !== 1) return;
+          if (t._done) return;
+          t._done = true;
+          var sphere = t.querySelector('a-sphere');
+          sphere.setAttribute('color', '#22c55e');
+          sphere.removeAttribute('animation');
+          t.querySelector('a-text').setAttribute('value', 'DONE!');
+          t.querySelector('a-text').setAttribute('color', '#22c55e');
+          recordProgress(t.id);
+        });
+      });
+    }
+
+    // ── Step 3: Walk to waypoints ──
+    function setupStep3() {
+      var interval = setInterval(function () {
+        if (currentStep !== 2) { clearInterval(interval); return; }
+        var rig = document.getElementById('rig');
+        if (!rig) return;
+        var pos = rig.object3D.position;
+        ['walk-target-1', 'walk-target-2'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (!el || el._done) return;
+          var tp = el.object3D.position;
+          var dx = pos.x - tp.x, dz = pos.z - tp.z;
+          if (Math.sqrt(dx * dx + dz * dz) < 1.2) {
+            el._done = true;
+            var ring = el.querySelector('a-ring');
+            if (ring) ring.setAttribute('color', '#22c55e');
+            var txt = el.querySelector('a-text');
+            if (txt) { txt.setAttribute('value', 'REACHED!'); txt.setAttribute('color', '#22c55e'); }
+            recordProgress(id);
+          }
+        });
+      }, 200);
+    }
+
+    // ── Step 4: Teleport to waypoints ──
+    function setupStep4() {
+      var interval = setInterval(function () {
+        if (currentStep !== 3) { clearInterval(interval); return; }
+        var rig = document.getElementById('rig');
+        if (!rig) return;
+        var pos = rig.object3D.position;
+        ['teleport-target-1', 'teleport-target-2'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (!el || el._done) return;
+          var tp = el.object3D.position;
+          var dx = pos.x - tp.x, dz = pos.z - tp.z;
+          if (Math.sqrt(dx * dx + dz * dz) < 1.5) {
+            el._done = true;
+            var ring = el.querySelector('a-ring');
+            if (ring) ring.setAttribute('color', '#22c55e');
+            var txt = el.querySelector('a-text');
+            if (txt) { txt.setAttribute('value', 'REACHED!'); txt.setAttribute('color', '#22c55e'); }
+            recordProgress(id);
+          }
+        });
+      }, 200);
+    }
+
+    // ── Step 5: Snap turn ──
+    function setupStep5() {
+      var lastRot = null;
+      var interval = setInterval(function () {
+        if (currentStep !== 4) { clearInterval(interval); return; }
+        var rig = document.getElementById('rig');
+        if (!rig) return;
+        var rot = rig.getAttribute('rotation');
+        if (!rot) return;
+        var y = Math.round(rot.y);
+        if (lastRot !== null && Math.abs(y - lastRot) >= 30) {
+          snapCount++;
+          var el = document.getElementById('snap-count-text');
+          if (el) el.setAttribute('value', 'Turns: ' + snapCount);
+          if (snapCount >= 3) recordProgress('snap-' + snapCount);
+        }
+        lastRot = y;
+      }, 300);
+
+      // Also listen for Q/E keyboard snap turns
+      document.addEventListener('keydown', function (e) {
+        if (currentStep !== 4) return;
+        if (e.key === 'q' || e.key === 'Q' || e.key === 'e' || e.key === 'E') {
+          var rig = document.getElementById('rig');
+          if (!rig) return;
+          var rot = rig.getAttribute('rotation') || { x: 0, y: 0, z: 0 };
+          var dir = (e.key === 'q' || e.key === 'Q') ? 45 : -45;
+          rig.setAttribute('rotation', { x: rot.x, y: rot.y + dir, z: rot.z });
+          snapCount++;
+          var el = document.getElementById('snap-count-text');
+          if (el) el.setAttribute('value', 'Turns: ' + snapCount);
+          if (snapCount >= 3) recordProgress('snap-' + snapCount);
+        }
+      });
+    }
+
+    // ── Step 6: Menu toggle ──
+    function setupStep6() {
+      var observer = new MutationObserver(function () {
+        if (currentStep !== 5) return;
+        var menu = document.getElementById('vr-nav-menu-2d');
+        if (menu && menu.classList.contains('active') && !menuOpened) {
+          menuOpened = true;
+          var el = document.getElementById('menu-status-text');
+          if (el) { el.setAttribute('value', 'Menu opened! Now press Escape.'); el.setAttribute('color', '#f59e0b'); }
+        }
+        if (menu && !menu.classList.contains('active') && menuOpened && !menuClosed) {
+          menuClosed = true;
+          var el2 = document.getElementById('menu-status-text');
+          if (el2) { el2.setAttribute('value', 'DONE!'); el2.setAttribute('color', '#22c55e'); }
+          recordProgress('menu');
+        }
+      });
+      // Watch for menu element creation and class changes
+      var check = setInterval(function () {
+        var menu = document.getElementById('vr-nav-menu-2d');
+        if (menu) {
+          clearInterval(check);
+          observer.observe(menu, { attributes: true, attributeFilter: ['class'] });
+        }
+      }, 500);
+    }
+
+    // ── Input detection display ──
+    function updateInputStatus() {
+      var kbEl = document.getElementById('kb-status');
+      var ctrlEl = document.getElementById('ctrl-status');
+      var handEl = document.getElementById('hand-status');
+
+      kbEl.className = 'detected';
+      kbEl.textContent = 'Keyboard ✓';
+
+      // Check controllers
+      var hasCtrl = false;
+      if (navigator.getGamepads) {
+        var gps = navigator.getGamepads();
+        for (var i = 0; i < gps.length; i++) {
+          if (gps[i] && gps[i].connected) { hasCtrl = true; break; }
+        }
+      }
+      ctrlEl.className = hasCtrl ? 'detected' : 'missing';
+      ctrlEl.textContent = 'Controllers ' + (hasCtrl ? '✓' : '✗');
+
+      // Hand tracking
+      var hasHands = window.VRControllerSupport && window.VRControllerSupport.isHandTracking && window.VRControllerSupport.isHandTracking();
+      handEl.className = hasHands ? 'detected' : 'missing';
+      handEl.textContent = 'Hands ' + (hasHands ? '✓' : '✗');
+    }
+
+    // ── Init ──
+    function init() {
+      updateUI();
+      setupStep1();
+      setupStep2();
+      setupStep3();
+      setupStep4();
+      setupStep5();
+      setupStep6();
+
+      setInterval(updateInputStatus, 2000);
+      updateInputStatus();
+    }
+
+    var scene = document.querySelector('a-scene');
+    if (scene.hasLoaded) init();
+    else scene.addEventListener('loaded', init);
+  })();
+  </script>
+
+  <!-- Shared scripts -->
+  <script src="/vr/presence.js"></script>
+  <script src="/vr/controller-support.js"></script>
+  <script src="/vr/nav-menu.js"></script>
+</body>
+</html>

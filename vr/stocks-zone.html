@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Ideas Trading Floor VR</title>
+  
+  <!-- A-Frame Core -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+    
+    /* Stock info overlay */
+    #stock-ui {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.8);
+      color: #00d4ff;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #00d4ff;
+      font-size: 14px;
+      max-width: 300px;
+    }
+    
+    #stock-ui h3 { margin: 0 0 10px 0; color: #fff; }
+    .stock-card { 
+      background: rgba(255,255,255,0.05); 
+      margin: 10px 0; 
+      padding: 10px; 
+      border-radius: 5px; 
+    }
+    
+    .stock-up { color: #22c55e; }
+    .stock-down { color: #ef4444; }
+    .stock-neutral { color: #eab308; }
+    
+    .back-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(0, 212, 255, 0.2);
+      color: #00d4ff;
+      padding: 12px 24px;
+      border: 2px solid #00d4ff;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .back-btn:hover { background: rgba(0, 212, 255, 0.4); }
+  </style>
+</head>
+<body>
+  <!-- Stock Info UI Overlay -->
+  <div id="stock-ui">
+    <h3>💼 Stock Ideas Trading Floor</h3>
+    <div id="stock-data"></div>
+  </div>
+  
+  <a href="index.html" class="back-btn">← Back to VR Hub</a>
+
+  <a-scene 
+    renderer="antialias: true; colorManagement: true; highRefreshRate: true; alpha: true"
+    vr-mode-ui="enabled: true"
+    webxr="optionalFeatures: ['dom-overlay', 'hand-tracking', 'local-floor', 'hit-test', 'layers']; referenceSpaceType: local-floor"
+    background="transparent: true">
+    
+    <!-- Passthrough Notification -->
+    <a-entity id="passthrough-ui" position="0 4 -10" visible="false" billboard>
+      <a-plane width="3.5" height="0.6" color="#000" opacity="0.7" material="transparent: true; shader: flat">
+        <a-text value="🥽 Passthrough Active - Trading Desk in Your Room" align="center" width="4" color="#22c55e" position="0 0 0.01"></a-text>
+      </a-plane>
+    </a-entity>
+    
+    <!-- Assets -->
+    <a-assets>
+      <!-- Audio -->
+      <audio id="trading-sounds" src="https://assets.mixkit.co/active_storage/sfx/2364/2364-preview.mp3" preload="auto" loop></audio>
+      <audio id="notification-sound" src="https://assets.mixkit.co/active_storage/sfx/2626/2626-preview.mp3" preload="auto"></audio>
+    </a-assets>
+
+    <!-- Sky & Floor -->
+    <a-sky color="#070714"></a-sky>
+    <a-plane rotation="-90 0 0" width="60" height="60" color="#0d0d1a" position="0 0 0"></a-plane>
+    <a-plane rotation="-90 0 0" width="50" height="50" color="#111128" position="0 0.01 0"
+             material="shader: flat; wireframe: true; opacity: 0.12"></a-plane>
+    
+    <!-- Ambient glow pillars -->
+    <a-cylinder position="-8 1.5 -6" radius="0.08" height="3" color="#22c55e" opacity="0.4"
+               material="shader: flat"></a-cylinder>
+    <a-cylinder position="8 1.5 -6" radius="0.08" height="3" color="#ef4444" opacity="0.4"
+               material="shader: flat"></a-cylinder>
+    
+    <!-- Main trading desk -->
+    <a-entity id="main-desk" position="0 0.5 -8">
+      <a-box position="0 0 -1" width="12" height="1" depth="6" color="#101010"></a-box>
+      <a-text value="TRADING DESK" position="0 0.6 -1" align="center" color="#00d4ff" width="8"></a-text>
+    </a-entity>
+    
+    <!-- Stock display panels -->
+    <a-entity id="stock-panels">
+      <!-- Panel 1: Top Gainers -->
+      <a-plane position="-5 3 -5" width="4" height="2.5" color="#1a1a2e" class="clickable"
+              animation__hover="property: position; to: -5 3 -4.8; dur: 200; startEvents: mouseenter; pauseEvents: mouseleave"
+              animation__leave="property: position; to: -5 3 -5; dur: 200; startEvents: mouseleave">
+        <a-text value="TOP GAINERS" position="0 1.2 0.01" align="center" color="#22c55e" width="3.5"></a-text>
+        <a-text id="gainer1" value="AAPL +2.3%" position="-1 0.5 0.01" color="#22c55e" width="1.5"></a-text>
+        <a-text id="gainer2" value="MSFT +1.8%" position="-1 0 0.01" color="#22c55e" width="1.5"></a-text>
+        <a-text id="gainer3" value="NVDA +5.2%" position="-1 -0.5 0.01" color="#22c55e" width="1.5"></a-text>
+      </a-plane>
+      
+      <!-- Panel 2: Top Losers -->
+      <a-plane position="5 3 -5" width="4" height="2.5" color="#1a1a2e" class="clickable"
+              animation__hover="property: position; to: 5 3 -4.8; dur: 200; startEvents: mouseenter; pauseEvents: mouseleave"
+              animation__leave="property: position; to: 5 3 -5; dur: 200; startEvents: mouseleave">
+        <a-text value="TOP LOSERS" position="0 1.2 0.01" align="center" color="#ef4444" width="3.5"></a-text>
+        <a-text id="loser1" value="TSLA -3.1%" position="-1 0.5 0.01" color="#ef4444" width="1.5"></a-text>
+        <a-text id="loser2" value="AMZN -2.4%" position="-1 0 0.01" color="#ef4444" width="1.5"></a-text>
+        <a-text id="loser3" value="GOOGL -1.7%" position="-1 -0.5 0.01" color="#ef4444" width="1.5"></a-text>
+      </a-plane>
+      
+      <!-- News Ticker -->
+      <a-plane position="0 4 -2" width="14" height="1" color="#000000" opacity="0.8">
+        <a-text id="news-ticker" value="Breaking: Market opens with volatility - Tech stocks showing mixed results" position="7 0 0.01" color="#00d4ff" width="12"
+                animation="property: position; from: 7 0 0.01; to: -7 0 0.01; dur: 12000; loop: true; easing: linear"></a-text>
+        <a-text id="news-ticker2" value="Dow Jones rises 200 points as investors await Fed decision" position="7 0 0.02" color="#00d4ff" width="12"
+                animation="property: position; from: 7 0 0.02; to: -7 0 0.02; dur: 12000; loop: true; easing: linear; delay: 4000"></a-text>
+        <a-text id="news-ticker3" value="S&P 500 hits new high as tech stocks surge" position="7 0 0.03" color="#00d4ff" width="12"
+                animation="property: position; from: 7 0 0.03; to: -7 0 0.03; dur: 12000; loop: true; easing: linear; delay: 8000"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- Back to Hub (3D) -->
+    <a-entity position="-6 1.5 -3" class="clickable" id="vr-back-portal">
+      <a-box width="1.8" height="0.7" depth="0.12" color="#1e293b"></a-box>
+      <a-text value="< BACK TO HUB" position="0 0 0.08" align="center" color="#00d4ff" width="3"></a-text>
+    </a-entity>
+
+    <!-- Camera Rig -->
+    <a-entity id="rig" position="0 1.6 0">
+      <a-camera look-controls wasd-controls="acceleration: 20">
+        <a-cursor fuse="true" fuse-timeout="1200" color="#00d4ff"
+                  geometry="primitive: ring; radiusInner: 0.005; radiusOuter: 0.012"
+                  material="shader: flat; opacity: 0.7"
+                  raycaster="objects: .clickable"
+                  animation__click="property: scale; startEvents: click; from: 0.5 0.5 0.5; to: 1 1 1; dur: 200"
+                  animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.5 0.5 0.5; dur: 1200"
+                  animation__leave="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 150"></a-cursor>
+      </a-camera>
+      <a-entity id="left-hand"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 30; lineColor: #22c55e; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+      <a-entity id="right-hand"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 30; lineColor: #ef4444; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+    </a-entity>
+
+    <!-- Lighting -->
+    <a-light type="ambient" color="#445588" intensity="0.5"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="0.6" position="-1 2 1"></a-light>
+    <a-light type="point" position="-5 4 -5" color="#22c55e" intensity="0.3" distance="12"></a-light>
+    <a-light type="point" position="5 4 -5" color="#ef4444" intensity="0.3" distance="12"></a-light>
+    <a-light type="point" position="0 3 -8" color="#00d4ff" intensity="0.4" distance="15"></a-light>
+    
+  </a-scene>
+
+  <script>
+    // Stock data simulation
+    const stockData = {
+      'AAPL': { name: 'Apple Inc.', price: 182.35, change: '+2.35%', trend: 'up' },
+      'MSFT': { name: 'Microsoft', price: 415.86, change: '+1.87%', trend: 'up' },
+      'NVDA': { name: 'NVIDIA', price: 850.42, change: '+5.23%', trend: 'up' },
+      'TSLA': { name: 'Tesla', price: 185.67, change: '-3.12%', trend: 'down' },
+      'AMZN': { name: 'Amazon', price: 158.92, change: '-2.42%', trend: 'down' },
+      'GOOGL': { name: 'Google', price: 142.36, change: '-1.73%', trend: 'down' },
+      'SPY': { name: 'S&P 500 ETF', price: 472.58, change: '+0.34%', trend: 'up' },
+      'QQQ': { name: 'NASDAQ ETF', price: 407.21, change: '+0.89%', trend: 'up' }
+    };
+
+    // Initialize stock zone
+    function initStockZone() {
+      updateStockDisplays();
+      startStockUpdates();
+      playTradingSounds();
+    }
+
+    // Update stock panels with real-time data
+    function updateStockDisplays() {
+      // Update main panels
+      document.getElementById('gainer1').setAttribute('value', 'AAPL ' + stockData.AAPL.change);
+      document.getElementById('gainer2').setAttribute('value', 'MSFT ' + stockData.MSFT.change);
+      document.getElementById('gainer3').setAttribute('value', 'NVDA ' + stockData.NVDA.change);
+      
+      document.getElementById('loser1').setAttribute('value', 'TSLA ' + stockData.TSLA.change);
+      document.getElementById('loser2').setAttribute('value', 'AMZN ' + stockData.AMZN.change);
+      document.getElementById('loser3').setAttribute('value', 'GOOGL ' + stockData.GOOGL.change);
+
+      // Update UI overlay
+      updateStockUI();
+    }
+
+    // Update 2D UI overlay
+    function updateStockUI() {
+      const stockDataDiv = document.getElementById('stock-data');
+      let html = '';
+      
+      // Display current portfolio
+      const portfolio = ['AAPL', 'MSFT', 'NVDA', 'SPY'];
+      portfolio.forEach(symbol => {
+        const stock = stockData[symbol];
+        const trendClass = stock.trend === 'up' ? 'stock-up' : stock.trend === 'down' ? 'stock-down' : 'stock-neutral';
+        html += `<div class="stock-card ${trendClass}">
+          <strong>${symbol}</strong>: $${stock.price.toFixed(2)} 
+          <span style="float: right;">${stock.change}</span>
+          <div style="font-size: 12px; color: #888;">${stock.name}</div>
+        </div>`;
+      });
+      
+      stockDataDiv.innerHTML = html;
+    }
+
+    // Simulate real-time stock updates
+    function startStockUpdates() {
+      setInterval(() => {
+        // Randomly update prices
+        Object.keys(stockData).forEach(symbol => {
+          const change = (Math.random() - 0.5) * 0.8; // -0.4% to +0.4%
+          stockData[symbol].price *= (1 + change/100);
+          
+          if (change > 0.1) {
+            stockData[symbol].trend = 'up';
+            stockData[symbol].change = '+' + change.toFixed(2) + '%';
+          } else if (change < -0.1) {
+            stockData[symbol].trend = 'down';
+            stockData[symbol].change = change.toFixed(2) + '%';
+          } else {
+            stockData[symbol].trend = 'neutral';
+            stockData[symbol].change = change.toFixed(2) + '%';
+          }
+        });
+        
+        updateStockDisplays();
+      }, 5000); // Update every 5 seconds
+    }
+
+    // Play trading floor sounds
+    function playTradingSounds() {
+      const sound = document.getElementById('trading-sounds');
+      sound.volume = 0.3;
+      sound.play().catch(e => console.log('Audio play failed:', e));
+    }
+
+    // Initialize when scene loads
+    document.addEventListener('DOMContentLoaded', initStockZone);
+  </script>
+  <!-- Shared presence tracker + keyboard shortcuts -->
+  <script src="/vr/presence.js"></script>
+  <!-- VR Controller Support -->
+  <script src="/vr/controller-support.js"></script>
+  
+  <!-- VR Navigation Menu -->
+  <script src="/vr/nav-menu.js"></script>
+  <!-- VR Quick Wins -->
+  <script src="/vr/quick-wins.js"></script>
+
+  <!-- Comfort vignette + F1 help -->
+  <script src="/vr/vr-comfort.js"></script>
+  <!-- VR Back Portal + Thumbstick Locomotion -->
+  <script>
+  (function () {
+    // Back portal
+    var vrBack = document.getElementById('vr-back-portal');
+    if (vrBack) {
+      vrBack.addEventListener('mouseenter', function () { vrBack.setAttribute('scale', '1.08 1.08 1.08'); });
+      vrBack.addEventListener('mouseleave', function () { vrBack.setAttribute('scale', '1 1 1'); });
+      vrBack.addEventListener('click', function () { window.location.href = '/vr/'; });
+    }
+
+    // Thumbstick locomotion
+    var rig, camera, moveSpeed = 0.06, turnCooldown = false;
+    function init() {
+      rig = document.getElementById('rig');
+      camera = document.querySelector('a-camera');
+      if (rig) requestAnimationFrame(step);
+    }
+    function step() {
+      var pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      var left = null, right = null;
+      for (var i = 0; i < pads.length; i++) {
+        var p = pads[i];
+        if (!p) continue;
+        if (p.hand === 'left') left = p;
+        if (p.hand === 'right') right = p;
+      }
+      if (left && left.axes.length >= 2) {
+        var x = left.axes[0] || 0, y = left.axes[1] || 0;
+        if (Math.abs(x) > 0.1 || Math.abs(y) > 0.1) {
+          var yaw = camera && camera.object3D ? camera.object3D.rotation.y : 0;
+          var dx = Math.sin(yaw) * -y + Math.cos(yaw) * x;
+          var dz = Math.cos(yaw) * -y - Math.sin(yaw) * x;
+          var pos = rig.getAttribute('position');
+          rig.setAttribute('position', { x: pos.x + dx * moveSpeed, y: pos.y, z: pos.z + dz * moveSpeed });
+        }
+      }
+      if (right && right.axes.length >= 2) {
+        var turn = right.axes[0] || 0;
+        if (!turnCooldown && Math.abs(turn) > 0.7) {
+          var rot = rig.getAttribute('rotation');
+          rig.setAttribute('rotation', { x: rot.x, y: rot.y + (turn > 0 ? -30 : 30), z: rot.z });
+          turnCooldown = true;
+          setTimeout(function () { turnCooldown = false; }, 300);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+  })();
+  </script>
+</body>
+</html>

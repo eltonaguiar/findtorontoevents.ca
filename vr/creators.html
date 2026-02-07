@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FavCreators Live Lounge — VR Zone</title>
+  <meta name="description" content="See your favorite creators' live status in immersive VR. Works on Meta Quest 3 and desktop browsers." />
+
+  <!-- A-Frame 1.6.0 -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+    /* Loading Screen */
+    #loading-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(135deg, #0f0c29 0%, #1a0a2e 50%, #302b63 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #fff; transition: opacity 0.6s ease;
+    }
+    #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+    #loading-screen h1 {
+      font-size: 2rem; margin: 0 0 0.3rem;
+      background: linear-gradient(90deg, #a855f7, #00d4ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #loading-screen p { color: #888; margin: 0.5rem 0; }
+    #loading-screen .spinner {
+      width: 50px; height: 50px; margin-top: 1.5rem;
+      border: 4px solid rgba(168,85,247,0.2); border-top-color: #a855f7;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Creator Detail Overlay */
+    #creator-detail {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 200; max-width: 600px; width: 92%; padding: 28px 24px;
+      background: rgba(15, 12, 41, 0.97); color: #fff;
+      border-radius: 16px; border: 1px solid rgba(168,85,247,0.3);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      display: none; backdrop-filter: blur(12px);
+      max-height: 90vh; overflow-y: auto;
+    }
+    #creator-detail.open { display: block; }
+    #creator-detail::-webkit-scrollbar { width: 6px; }
+    #creator-detail::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 3px; }
+    #creator-detail .close-x {
+      position: absolute; top: 10px; right: 14px; background: none;
+      border: none; color: #aaa; font-size: 1.5rem; cursor: pointer; line-height: 1;
+    }
+    #creator-detail .close-x:hover { color: #fff; }
+    #creator-detail h2 { margin: 0 0 6px; color: #a855f7; font-size: 1.25rem; line-height: 1.3; }
+    #creator-detail .bio { color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; line-height: 1.5; }
+    #creator-detail .live-badge {
+      display: inline-block; background: #ef4444; color: #fff; padding: 4px 12px;
+      border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-bottom: 10px;
+      animation: live-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes live-pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.6; } }
+    #creator-detail .stream-info {
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+      padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.9rem;
+    }
+    #creator-detail .stream-info .title { color: #fca5a5; font-weight: 600; }
+    #creator-detail .stream-info .viewers { color: #94a3b8; font-size: 0.8rem; margin-top: 4px; }
+    #creator-detail .accounts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    #creator-detail .account-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 14px; border-radius: 8px; text-decoration: none; color: #fff;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.2s; font-size: 0.9rem;
+    }
+    #creator-detail .account-link:hover { background: rgba(255,255,255,0.12); }
+    #creator-detail .account-link .platform-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    #creator-detail .account-link .live-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex-shrink: 0;
+      animation: live-pulse 1.5s ease-in-out infinite;
+    }
+    #creator-detail .btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    #creator-detail .btn {
+      padding: 10px 22px; border-radius: 8px; border: none; cursor: pointer;
+      font-size: 0.95rem; font-weight: 600; text-decoration: none; display: inline-block;
+    }
+    #creator-detail .btn-primary { background: #a855f7; color: #fff; }
+    #creator-detail .btn-watch { background: #ef4444; color: #fff; }
+    #creator-detail .btn-secondary { background: rgba(255,255,255,0.08); color: #ccc; }
+    #creator-detail .btn:hover { filter: brightness(1.15); }
+
+    /* Virtual browser overlay (VR-friendly) */
+    #vr-browser {
+      position: fixed; inset: 0; z-index: 220;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(6,8,18,0.85); backdrop-filter: blur(8px);
+    }
+    #vr-browser.open { display: flex; }
+    #vr-browser .browser-card {
+      width: min(94vw, 980px); background: rgba(8,12,24,0.96);
+      border-radius: 16px; border: 1px solid rgba(0,212,255,0.2);
+      box-shadow: 0 25px 80px rgba(0,0,0,0.6); overflow: hidden;
+    }
+    #vr-browser .browser-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: rgba(12,18,34,0.98);
+      color: #cbd5f5; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    #vr-browser .browser-title { font-weight: 600; color: #7dd3fc; }
+    #vr-browser .browser-actions { display: flex; gap: 8px; align-items: center; }
+    #vr-browser .browser-btn {
+      padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.06); color: #e2e8f0; cursor: pointer;
+      font-size: 0.82rem; font-weight: 600;
+    }
+    #vr-browser .browser-btn.primary {
+      background: rgba(0,212,255,0.18); color: #7dd3fc; border-color: rgba(0,212,255,0.35);
+    }
+    #vr-browser iframe {
+      width: 100%; aspect-ratio: 16/9; border: none; display: block; background: #000;
+    }
+
+    /* Stream Preview Embed */
+    #det-stream-preview {
+      margin-bottom: 14px; border-radius: 10px; overflow: hidden;
+      background: #000; position: relative;
+    }
+    #det-stream-preview iframe {
+      width: 100%; aspect-ratio: 16/9; border: none; display: block;
+      border-radius: 10px;
+    }
+    #det-stream-preview .preview-label {
+      position: absolute; top: 8px; left: 10px;
+      background: rgba(239,68,68,0.85); color: #fff; padding: 3px 10px;
+      border-radius: 12px; font-size: 0.72rem; font-weight: 700;
+      pointer-events: none; z-index: 2; letter-spacing: 0.5px;
+    }
+    #det-stream-preview .preview-platform {
+      position: absolute; top: 8px; right: 10px;
+      background: rgba(0,0,0,0.6); color: #94a3b8; padding: 3px 10px;
+      border-radius: 12px; font-size: 0.72rem; font-weight: 500;
+      pointer-events: none; z-index: 2;
+    }
+    #det-stream-preview:empty { display: none; }
+
+    /* Recent Content Section */
+    #det-recent-content { margin-bottom: 14px; }
+    #det-recent-content:empty { display: none; }
+    .recent-header {
+      color: #64748b; font-size: 0.78rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.8px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+    }
+    .recent-header::after {
+      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.06);
+    }
+    .recent-video {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; overflow: hidden; margin-bottom: 8px;
+    }
+    .recent-video iframe {
+      width: 100%; aspect-ratio: 16/9; border: none; display: block;
+    }
+    .recent-video-info {
+      padding: 8px 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .recent-video-info .rv-title {
+      flex: 1; color: #cbd5e1; font-size: 0.82rem; font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .recent-video-info .rv-date { color: #475569; font-size: 0.72rem; white-space: nowrap; }
+    .recent-video-info a {
+      color: #a855f7; text-decoration: none; font-size: 0.78rem; font-weight: 600; white-space: nowrap;
+    }
+    .recent-loading {
+      color: #475569; font-size: 0.8rem; padding: 10px; text-align: center;
+    }
+    /* Watch Content buttons row */
+    .watch-content-row {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
+    }
+    .watch-content-row:empty { display: none; }
+    .wcr-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 8px; text-decoration: none;
+      font-size: 0.8rem; font-weight: 600; color: #fff;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.2s;
+    }
+    .wcr-btn:hover { background: rgba(255,255,255,0.12); }
+    .wcr-btn .wcr-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* HUD Bar */
+    #hud {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(15,12,41,0.9); color: #fff; padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    #hud a { color: #00d4ff; text-decoration: none; }
+    #hud .hint { color: #666; }
+    #hud .live-indicator { color: #22c55e; font-weight: 600; }
+
+    /* Platform Filter Pills (2D) */
+    #platform-strip {
+      position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 100; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+      max-width: 95vw; padding: 6px;
+    }
+    #platform-strip button {
+      background: rgba(30,41,59,0.85); color: #94a3b8; border: 1px solid rgba(255,255,255,0.08);
+      padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.82rem;
+      font-weight: 500; transition: all 0.2s; backdrop-filter: blur(6px);
+    }
+    #platform-strip button:hover { background: rgba(50,60,80,0.9); color: #fff; }
+    #platform-strip button.active { color: #fff; border-color: transparent; }
+    #platform-strip button .count { opacity: 0.6; margin-left: 4px; font-size: 0.75rem; }
+
+    /* Page Controls (2D) */
+    #page-controls {
+      position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+      z-index: 100; display: flex; align-items: center; gap: 14px;
+    }
+    #page-controls button {
+      background: rgba(30,41,59,0.85); color: #a855f7; border: 1px solid rgba(168,85,247,0.2);
+      padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+      font-weight: 600; backdrop-filter: blur(6px); transition: all 0.2s;
+    }
+    #page-controls button:hover { background: rgba(168,85,247,0.15); }
+    #page-controls button:disabled { opacity: 0.3; cursor: default; }
+    #page-controls .page-info { color: #888; font-size: 0.85rem; }
+
+    /* Back & VR buttons */
+    #back-btn {
+      position: fixed; top: 12px; left: 12px; z-index: 150;
+      background: rgba(30,41,59,0.85); color: #00d4ff; border: 1px solid rgba(0,212,255,0.2);
+      padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+      font-weight: 600; backdrop-filter: blur(6px); text-decoration: none;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+    }
+    #back-btn:hover { background: rgba(0,212,255,0.15); }
+
+    #vr-btn {
+      position: fixed; top: 12px; right: 12px; z-index: 150;
+      background: rgba(168,85,247,0.2); color: #a855f7; border: 2px solid #a855f7;
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 700;
+      font-size: 0.85rem; transition: all 0.3s;
+    }
+    #vr-btn:hover { background: rgba(168,85,247,0.4); box-shadow: 0 0 20px rgba(168,85,247,0.4); }
+
+    /* Refresh button */
+    #refresh-btn {
+      position: fixed; top: 12px; right: 130px; z-index: 150;
+      background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3);
+      padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 600;
+      font-size: 0.82rem; transition: all 0.3s;
+    }
+    #refresh-btn:hover { background: rgba(34,197,94,0.3); }
+    #refresh-btn.refreshing { opacity: 0.5; pointer-events: none; }
+
+    /* Refresh Progress Bar */
+    #refresh-progress {
+      position: fixed; top: 46px; left: 50%; transform: translateX(-50%);
+      z-index: 160; width: 320px; max-width: 90vw;
+      background: rgba(15,12,41,0.92); border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 12px; padding: 10px 16px; backdrop-filter: blur(8px);
+      display: none; flex-direction: column; gap: 6px; align-items: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    #refresh-progress.visible { display: flex; }
+    #refresh-progress .progress-label {
+      color: #94a3b8; font-size: 0.78rem; font-weight: 500; white-space: nowrap;
+    }
+    #refresh-progress .progress-track {
+      width: 100%; height: 6px; background: rgba(255,255,255,0.08);
+      border-radius: 3px; overflow: hidden; position: relative;
+    }
+    #refresh-progress .progress-fill {
+      height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80);
+      border-radius: 3px; transition: width 0.3s ease; width: 0%;
+    }
+    #refresh-progress .progress-count {
+      color: #22c55e; font-size: 0.72rem; font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading -->
+  <div id="loading-screen">
+    <h1>FavCreators Live Lounge</h1>
+    <p>Loading your favorite creators...</p>
+    <div class="spinner"></div>
+    <p id="loading-status" style="color:#555; font-size:0.8rem; margin-top:1rem;">Fetching creators...</p>
+  </div>
+
+  <a id="back-btn" href="/vr/">&#8592; Back to Hub</a>
+  <button id="vr-btn" onclick="document.querySelector('a-scene').enterVR()">Enter VR</button>
+  <button id="refresh-btn" onclick="refreshLiveStatus()">Refresh Live</button>
+  <div id="refresh-progress">
+    <span class="progress-label" id="progress-label">Fetching live status...</span>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <span class="progress-count" id="progress-count">0 / 0</span>
+  </div>
+  <div id="platform-strip"></div>
+  <div id="page-controls">
+    <button id="btn-prev" onclick="prevPage()" disabled>&#9664; Prev</button>
+    <span class="page-info" id="page-info">Page 1</span>
+    <button id="btn-next" onclick="nextPage()">Next &#9654;</button>
+  </div>
+
+  <!-- Creator detail overlay -->
+  <div id="creator-detail">
+    <button class="close-x" onclick="closeDetail()">&times;</button>
+    <h2 id="det-name"></h2>
+    <div id="det-live-badge"></div>
+    <div class="bio" id="det-bio"></div>
+    <div id="det-stream-info"></div>
+    <div id="det-stream-preview"></div>
+    <div id="det-recent-content"></div>
+    <div class="watch-content-row" id="det-watch-content"></div>
+    <div class="accounts" id="det-accounts"></div>
+    <div class="btns" id="det-btns"></div>
+  </div>
+
+  <!-- Virtual browser overlay (works in VR via dom-overlay) -->
+  <div id="vr-browser">
+    <div class="browser-card">
+      <div class="browser-header">
+        <div class="browser-title" id="vr-browser-title">Live Preview</div>
+        <div class="browser-actions">
+          <button class="browser-btn primary" id="vr-browser-vr">Enter VR</button>
+          <button class="browser-btn" id="vr-browser-open">Open Stream</button>
+          <button class="browser-btn" id="vr-browser-close">Close</button>
+        </div>
+      </div>
+      <iframe id="vr-browser-frame" title="Creator Stream"></iframe>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <span><strong>FavCreators</strong> &mdash; <a href="https://findtorontoevents.ca/fc/">findtorontoevents.ca/fc</a></span>
+    <span id="hud-live" class="live-indicator"></span>
+    <span class="hint">Click cards for details &bull; Gaze or click in VR &bull; Auto-refreshes every 60s</span>
+  </div>
+
+  <!-- ================================================================
+       A-FRAME SCENE
+       ================================================================ -->
+  <a-scene
+    loading-screen="enabled: false"
+    renderer="antialias: true; colorManagement: true; alpha: true"
+    vr-mode-ui="enabled: true"
+    webxr="optionalFeatures: ['dom-overlay', 'hand-tracking', 'local-floor', 'hit-test', 'layers']; referenceSpaceType: local-floor"
+    background="transparent: true"
+    cursor="rayOrigin: mouse"
+    raycaster="objects: .clickable"
+  >
+
+    <!-- Passthrough Notification -->
+    <a-entity id="passthrough-ui" position="0 4 -8" visible="false">
+      <a-plane width="3.5" height="0.6" color="#000" opacity="0.7" material="transparent: true; shader: flat">
+        <a-text value="Passthrough Active - Creators in Your Room" align="center" width="4" color="#a855f7" position="0 0 0.01"></a-text>
+      </a-plane>
+    </a-entity>
+
+    <!-- Sky & Ground -->
+    <a-sky color="#0a0a1a"></a-sky>
+    <a-plane rotation="-90 0 0" width="100" height="100" color="#110d20" position="0 0 0"></a-plane>
+    <a-plane rotation="-90 0 0" width="80" height="80" color="#1a1040" position="0 0.01 0"
+             material="shader: flat; wireframe: true; opacity: 0.12"></a-plane>
+
+    <!-- Lighting -->
+    <a-light type="ambient" color="#aabbdd" intensity="0.5"></a-light>
+    <a-light type="directional" position="2 4 -3" color="#ffffff" intensity="0.4"></a-light>
+    <a-light type="point" position="0 5 -7" color="#a855f7" intensity="0.5" distance="20"></a-light>
+    <a-light type="point" position="-5 4 -8" color="#22c55e" intensity="0.3" distance="14"></a-light>
+    <a-light type="point" position="5 4 -8" color="#ef4444" intensity="0.3" distance="14"></a-light>
+
+    <!-- Decorative particles -->
+    <a-sphere position="-8 6 -15" radius="0.06" color="#a855f7"
+              animation="property: position; to: -8 7 -15; dur: 3000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="7 5 -12" radius="0.05" color="#22c55e"
+              animation="property: position; to: 7 6.5 -12; dur: 4000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="-5 7 -10" radius="0.07" color="#ef4444"
+              animation="property: position; to: -5 8 -10; dur: 3500; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="10 4 -18" radius="0.04" color="#00d4ff"
+              animation="property: position; to: 10 5.5 -18; dur: 5000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+
+    <!-- Zone Title -->
+    <a-text value="LIVE CREATORS" position="0 4.5 -9" align="center" color="#a855f7" width="9"
+            animation="property: position; to: 0 4.6 -9; dur: 2500; loop: true; dir: alternate; easing: easeInOutSine"></a-text>
+    <a-text value="FavCreators Lounge" position="0 3.9 -9" align="center" color="#ffffff" width="5" opacity="0.7"></a-text>
+
+    <!-- Creator count & live count -->
+    <a-text id="vr-creator-count" value="" position="0 3.4 -9" align="center" color="#666666" width="3.5"></a-text>
+    <a-text id="vr-live-count" value="" position="0 3.1 -9" align="center" color="#22c55e" width="3.5"></a-text>
+
+    <!-- 3D Platform filter bar -->
+    <a-entity id="vr-platform-bar" position="0 2.75 -8.5"></a-entity>
+
+    <!-- Creator cards wall -->
+    <a-entity id="card-wall"></a-entity>
+
+    <!-- 3D Pagination -->
+    <a-entity id="vr-pagination" position="0 0.5 -6">
+      <a-entity id="vr-prev" position="-2.8 0 0" class="clickable">
+        <a-box width="1.4" height="0.55" depth="0.1" color="#1e293b"></a-box>
+        <a-text value="< PREV" position="0 0 0.06" align="center" color="#a855f7" width="2.8"></a-text>
+      </a-entity>
+      <a-text id="vr-page-text" value="Page 1 / 1" position="0 0 0" align="center" color="#888888" width="3"></a-text>
+      <a-entity id="vr-next" position="2.8 0 0" class="clickable">
+        <a-box width="1.4" height="0.55" depth="0.1" color="#1e293b"></a-box>
+        <a-text value="NEXT >" position="0 0 0.06" align="center" color="#a855f7" width="2.8"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- VR Stream Screen (visible in VR mode) -->
+    <a-entity id="vr-stream-screen" position="0 2 -4" visible="false">
+      <a-plane width="5.6" height="3.2" color="#0b1020" material="shader: flat; opacity: 0.9"></a-plane>
+      <a-plane id="vr-stream-surface" width="5.4" height="3" position="0 0 0.02" color="#000" material="shader: flat"></a-plane>
+      <a-entity id="vr-stream-close" position="2.5 1.6 0.06" class="clickable">
+        <a-box width="0.7" height="0.3" depth="0.06" color="#1e293b"></a-box>
+        <a-text value="CLOSE" position="0 0 0.05" align="center" color="#fca5a5" width="2"></a-text>
+      </a-entity>
+      <a-text id="vr-stream-title" value="Live Preview" position="0 1.95 0.05" align="center" color="#7dd3fc" width="6"></a-text>
+    </a-entity>
+
+    <!-- Back to Hub (3D) -->
+    <a-entity position="-6 1.5 -3" class="clickable" id="vr-back-portal">
+      <a-box width="1.8" height="0.7" depth="0.12" color="#1e293b"></a-box>
+      <a-text value="< BACK TO HUB" position="0 0 0.08" align="center" color="#00d4ff" width="3"></a-text>
+    </a-entity>
+
+    <!-- Refresh button (3D) -->
+    <a-entity position="6 1.5 -3" class="clickable" id="vr-refresh">
+      <a-box width="2" height="0.7" depth="0.12" color="#0a1f10"></a-box>
+      <a-text value="REFRESH LIVE" position="0 0 0.08" align="center" color="#22c55e" width="3"></a-text>
+    </a-entity>
+
+    <!-- Floor accent ring -->
+    <a-torus-knot position="0 0.3 -7" radius="4" radius-tubular="0.01" color="#a855f7" opacity="0.2"
+                  segments-tubular="60" segments-radial="4" p="2" q="3"
+                  rotation="-90 0 0"
+                  animation="property: rotation; to: -90 360 0; dur: 60000; loop: true; easing: linear"></a-torus-knot>
+
+    <!-- Camera -->
+    <a-entity id="rig" position="0 1.6 0">
+      <a-camera look-controls wasd-controls="acceleration: 20">
+        <a-cursor
+          fuse="true" fuse-timeout="1200" color="#a855f7"
+          geometry="primitive: ring; radiusInner: 0.005; radiusOuter: 0.012"
+          material="shader: flat; opacity: 0.7"
+          animation__click="property: scale; startEvents: click; from: 0.5 0.5 0.5; to: 1 1 1; dur: 200"
+          animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.5 0.5 0.5; dur: 1200"
+          animation__leave="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 150"
+          raycaster="objects: .clickable"
+        ></a-cursor>
+        <a-cursor id="mouse-cursor"
+          rayOrigin="mouse"
+          fuse="false"
+          raycaster="objects: .clickable"
+          material="color: #c084fc; shader: flat; opacity: 0.0">
+        </a-cursor>
+      </a-camera>
+      <a-entity id="left-hand"
+                laser-controls="hand: left"
+                raycaster="objects: .clickable; far: 25; lineColor: #00d4ff; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+      <a-entity id="right-hand"
+                laser-controls="hand: right"
+                raycaster="objects: .clickable; far: 25; lineColor: #a855f7; lineOpacity: 0.5"
+                cursor="rayOrigin: entity; fuse: false"></a-entity>
+    </a-entity>
+
+  </a-scene>
+
+  <!-- ================================================================
+       APPLICATION LOGIC
+       ================================================================ -->
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── Constants ── */
+    var API_BASE = 'https://findtorontoevents.ca/fc';
+    var AVATAR_FALLBACK = 'https://api.dicebear.com/7.x/pixel-art/svg?seed=';
+    var PER_PAGE = 12;
+    var CURVE_RADIUS = 7;
+    var COLS = 4;
+    var CARD_W = 2.4;
+    var CARD_H = 1.7;
+    var GAP_Y = 0.4;
+    var ARC = Math.PI * 0.55;
+    var REFRESH_INTERVAL = 60000; // 60 seconds
+
+    var PLATFORM_COLORS = {
+      tiktok:    '#ff0050',
+      twitch:    '#9146ff',
+      kick:      '#53fc18',
+      youtube:   '#ff0000',
+      instagram: '#e4405f',
+      spotify:   '#1db954',
+      twitter:   '#1da1f2',
+      other:     '#6b7280'
+    };
+
+    var PLATFORM_ICONS = {
+      tiktok:    'TikTok',
+      twitch:    'Twitch',
+      kick:      'Kick',
+      youtube:   'YouTube',
+      instagram: 'Instagram',
+      spotify:   'Spotify',
+      twitter:   'Twitter',
+      other:     'Other'
+    };
+
+    var LIVE_PLATFORMS = ['tiktok', 'twitch', 'kick', 'youtube', 'instagram'];
+
+    /* ── Embed URL builder ── */
+    function getEmbedUrl(account) {
+      var p = (account.platform || '').toLowerCase();
+      var username = account.username || '';
+      var url = account.url || '';
+
+      // Extract username from URL if not provided
+      if (!username && url) {
+        var m = url.match(/(?:twitch\.tv|kick\.com|youtube\.com\/@?)([^\/\?#]+)/i);
+        if (m) username = m[1].replace('@', '');
+      }
+      if (!username) return null;
+
+      if (p === 'twitch') {
+        return 'https://player.twitch.tv/?channel=' + encodeURIComponent(username)
+          + '&parent=findtorontoevents.ca&parent=localhost&muted=true';
+      }
+      if (p === 'kick') {
+        return 'https://player.kick.com/' + encodeURIComponent(username);
+      }
+      if (p === 'youtube') {
+        // YouTube live embed — works with channel handle
+        return 'https://www.youtube.com/embed/live_stream?channel='
+          + encodeURIComponent(username);
+      }
+      return null;
+    }
+
+    function getWatchUrl(account) {
+      if (!account) return null;
+      return account.url || null;
+    }
+
+    function isVRMode() {
+      var scene = document.querySelector('a-scene');
+      return !!(scene && scene.is && scene.is('vr-mode'));
+    }
+
+    /* ── State ── */
+    var allCreators = [];
+    var filteredCreators = [];
+    var liveStatusMap = {}; // key: "creatorId_platform" → { is_live, stream_title, viewer_count, last_seen_online }
+    var currentPlatform = 'all';
+    var currentPage = 0;
+    var refreshTimer = null;
+
+    /* ── Fetch Creators ── */
+    function fetchCreators() {
+      document.getElementById('loading-status').textContent = 'Fetching creators list...';
+      fetch(API_BASE + '/api/get_my_creators.php?user_id=0')
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.json();
+        })
+        .then(function (data) {
+          if (!data.creators || !Array.isArray(data.creators)) throw new Error('invalid');
+          allCreators = data.creators.map(ensureAvatar);
+          document.getElementById('loading-status').textContent = 'Loaded ' + allCreators.length + ' creators. Checking live status...';
+          return fetchLiveStatus();
+        })
+        .then(function () {
+          mergeLiveStatus(); // use standard merge for initial load (no progress bar yet)
+          sortCreators();
+          filteredCreators = allCreators.slice();
+          applyFilter();
+          onDataReady();
+        })
+        .catch(function (err) {
+          console.error('[VR Creators] Fetch error:', err);
+          document.getElementById('loading-status').textContent = 'Error loading creators. Retrying...';
+          // Retry once from live site
+          setTimeout(function () { fetchCreatorsFallback(); }, 2000);
+        });
+    }
+
+    function fetchCreatorsFallback() {
+      fetch(API_BASE + '/api/get_my_creators.php?user_id=0')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          allCreators = (data.creators || []).map(ensureAvatar);
+          filteredCreators = allCreators.slice();
+          sortCreators();
+          applyFilter();
+          onDataReady();
+        })
+        .catch(function () {
+          document.getElementById('loading-status').textContent = 'Could not load creators. Please try refreshing.';
+        });
+    }
+
+    /* ── Fetch Live Status from DB ── */
+    function fetchLiveStatus() {
+      return fetch(API_BASE + '/api/get_streamer_status.php?limit=500')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data.ok || !data.streamers) return;
+          liveStatusMap = {};
+          data.streamers.forEach(function (s) {
+            var key = s.creator_id + '_' + s.platform;
+            liveStatusMap[key] = {
+              is_live: s.is_live === 1 || s.is_live === '1',
+              last_seen_online: s.last_seen_online,
+              last_checked: s.last_checked,
+              stream_title: s.stream_title || '',
+              viewer_count: s.viewer_count || 0
+            };
+          });
+          var liveCount = data.stats ? data.stats.currently_live : 0;
+          console.log('[VR Creators] Live status for', Object.keys(liveStatusMap).length, 'accounts,', liveCount, 'currently live');
+        })
+        .catch(function (err) {
+          console.warn('[VR Creators] Could not fetch live status:', err);
+        });
+    }
+
+    /* ── Merge live status into creator objects ── */
+    function mergeLiveStatus() {
+      allCreators.forEach(function (creator) {
+        var anyLive = false;
+        (creator.accounts || []).forEach(function (acc) {
+          var key = creator.id + '_' + (acc.platform || '').toLowerCase();
+          var status = liveStatusMap[key];
+          if (status) {
+            acc._vrIsLive = status.is_live;
+            acc._vrStreamTitle = status.stream_title;
+            acc._vrViewerCount = status.viewer_count;
+            acc._vrLastSeen = status.last_seen_online;
+            if (status.is_live) anyLive = true;
+          } else {
+            acc._vrIsLive = false;
+          }
+        });
+        creator._vrIsLive = anyLive;
+      });
+    }
+
+    /* ── Sort: live first, then favorites, then by name ── */
+    function sortCreators() {
+      allCreators.sort(function (a, b) {
+        if (a._vrIsLive && !b._vrIsLive) return -1;
+        if (!a._vrIsLive && b._vrIsLive) return 1;
+        if (a.isFavorite && !b.isFavorite) return -1;
+        if (!a.isFavorite && b.isFavorite) return 1;
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        return (a.name || '').localeCompare(b.name || '');
+      });
+    }
+
+    /* ── Avatar fallback ── */
+    function ensureAvatar(creator) {
+      if (!creator.avatarUrl || !creator.avatarUrl.trim()) {
+        creator.avatarUrl = AVATAR_FALLBACK + encodeURIComponent(creator.name || creator.id || 'creator');
+      }
+      return creator;
+    }
+
+    /* ── Data ready ── */
+    function onDataReady() {
+      build2DPlatformStrip();
+      buildVRPlatformBar();
+      renderCards();
+      updatePagination();
+      updateHUD();
+
+      var ls = document.getElementById('loading-screen');
+      ls.classList.add('fade-out');
+      setTimeout(function () { ls.style.display = 'none'; }, 700);
+
+      // Start auto-refresh
+      startAutoRefresh();
+    }
+
+    /* ── 2D Platform Filter Strip ── */
+    function build2DPlatformStrip() {
+      var strip = document.getElementById('platform-strip');
+      strip.innerHTML = '';
+
+      var platforms = ['all'].concat(LIVE_PLATFORMS);
+      platforms.forEach(function (plat) {
+        var btn = document.createElement('button');
+        var cnt = countForPlatform(plat);
+        var label = (plat === 'all') ? 'All' : PLATFORM_ICONS[plat] || plat;
+        btn.innerHTML = label + '<span class="count">(' + cnt + ')</span>';
+        if (plat === currentPlatform) {
+          btn.classList.add('active');
+          btn.style.background = (plat === 'all') ? '#a855f7' : (PLATFORM_COLORS[plat] || '#a855f7');
+        }
+        btn.onclick = function () { filterByPlatform(plat); };
+        strip.appendChild(btn);
+      });
+    }
+
+    /* ── 3D Platform Filter Bar ── */
+    function buildVRPlatformBar() {
+      var bar = document.getElementById('vr-platform-bar');
+      while (bar.firstChild) bar.removeChild(bar.firstChild);
+
+      var platforms = ['all'].concat(LIVE_PLATFORMS);
+      var totalW = platforms.length * 1.6;
+      var startX = -totalW / 2 + 0.8;
+
+      platforms.forEach(function (plat, i) {
+        var wrap = document.createElement('a-entity');
+        wrap.setAttribute('position', (startX + i * 1.6) + ' 0 0');
+        wrap.classList.add('clickable');
+
+        var active = (plat === currentPlatform);
+        var col = (plat === 'all') ? '#a855f7' : (PLATFORM_COLORS[plat] || '#666');
+        var label = (plat === 'all') ? 'All' : PLATFORM_ICONS[plat] || plat;
+
+        var pill = document.createElement('a-box');
+        pill.setAttribute('width', '1.4');
+        pill.setAttribute('height', '0.38');
+        pill.setAttribute('depth', '0.06');
+        pill.setAttribute('color', active ? col : '#1e293b');
+        pill.setAttribute('opacity', active ? '1' : '0.8');
+        wrap.appendChild(pill);
+
+        var txt = document.createElement('a-text');
+        txt.setAttribute('value', label);
+        txt.setAttribute('position', '0 0 0.04');
+        txt.setAttribute('align', 'center');
+        txt.setAttribute('color', active ? '#ffffff' : '#999999');
+        txt.setAttribute('width', '2.2');
+        wrap.appendChild(txt);
+
+        wrap.addEventListener('mouseenter', function () {
+          pill.setAttribute('color', col);
+          pill.setAttribute('opacity', '1');
+          wrap.setAttribute('scale', '1.08 1.08 1.08');
+        });
+        wrap.addEventListener('mouseleave', function () {
+          pill.setAttribute('color', active ? col : '#1e293b');
+          pill.setAttribute('opacity', active ? '1' : '0.8');
+          wrap.setAttribute('scale', '1 1 1');
+        });
+        wrap.addEventListener('click', function () { filterByPlatform(plat); });
+
+        bar.appendChild(wrap);
+      });
+    }
+
+    /* ── Filter ── */
+    function countForPlatform(plat) {
+      if (plat === 'all') return allCreators.length;
+      return allCreators.filter(function (c) {
+        return (c.accounts || []).some(function (a) { return a.platform === plat; });
+      }).length;
+    }
+
+    function applyFilter() {
+      currentPage = 0;
+      if (currentPlatform === 'all') {
+        filteredCreators = allCreators.slice();
+      } else {
+        filteredCreators = allCreators.filter(function (c) {
+          return (c.accounts || []).some(function (a) { return a.platform === currentPlatform; });
+        });
+      }
+    }
+
+    window.filterByPlatform = function (plat) {
+      currentPlatform = plat;
+      applyFilter();
+      build2DPlatformStrip();
+      buildVRPlatformBar();
+      renderCards();
+      updatePagination();
+    };
+
+    /* ── Render Creator Cards ── */
+    var SECTION_GAP = 1.2; // extra Y gap between live and offline sections
+
+    function renderCards() {
+      var wall = document.getElementById('card-wall');
+      while (wall.firstChild) wall.removeChild(wall.firstChild);
+
+      var start = currentPage * PER_PAGE;
+      var end = Math.min(start + PER_PAGE, filteredCreators.length);
+      var slice = filteredCreators.slice(start, end);
+
+      // Split into live and offline
+      var liveSlice = [];
+      var offlineSlice = [];
+      slice.forEach(function (c, i) {
+        if (c._vrIsLive) liveSlice.push({ creator: c, gIdx: start + i });
+        else offlineSlice.push({ creator: c, gIdx: start + i });
+      });
+
+      // Update VR counts
+      var liveCount = allCreators.filter(function (c) { return c._vrIsLive; }).length;
+      var offlineCount = allCreators.length - liveCount;
+      var countEl = document.getElementById('vr-creator-count');
+      var suffix = (currentPlatform !== 'all') ? ' on ' + PLATFORM_ICONS[currentPlatform] : '';
+      countEl.setAttribute('value', filteredCreators.length + ' creators' + suffix);
+
+      var liveEl = document.getElementById('vr-live-count');
+      liveEl.setAttribute('value', liveCount > 0 ? liveCount + ' LIVE NOW' : '');
+
+      var halfArc = ARC / 2;
+      var runningRow = 0; // tracks which logical row we're at
+
+      // ── Section: LIVE ──
+      if (liveSlice.length > 0) {
+        // Section header
+        var liveHeader = document.createElement('a-entity');
+        liveHeader.setAttribute('position', '0 ' + (3.0 - runningRow * (CARD_H + GAP_Y)) + ' -9');
+        var liveHdrBg = document.createElement('a-plane');
+        liveHdrBg.setAttribute('width', '6');
+        liveHdrBg.setAttribute('height', '0.4');
+        liveHdrBg.setAttribute('color', '#1a0505');
+        liveHdrBg.setAttribute('opacity', '0.6');
+        liveHdrBg.setAttribute('material', 'shader: flat');
+        liveHeader.appendChild(liveHdrBg);
+        var liveHdrDot = document.createElement('a-sphere');
+        liveHdrDot.setAttribute('position', '-2.2 0 0.02');
+        liveHdrDot.setAttribute('radius', '0.07');
+        liveHdrDot.setAttribute('color', '#ef4444');
+        liveHdrDot.setAttribute('animation', 'property: scale; from: 0.8 0.8 0.8; to: 1.3 1.3 1.3; dur: 600; loop: true; dir: alternate');
+        liveHeader.appendChild(liveHdrDot);
+        var liveHdrText = document.createElement('a-text');
+        liveHdrText.setAttribute('value', 'LIVE NOW  (' + liveSlice.length + ')');
+        liveHdrText.setAttribute('position', '0 0 0.02');
+        liveHdrText.setAttribute('align', 'center');
+        liveHdrText.setAttribute('color', '#ef4444');
+        liveHdrText.setAttribute('width', '5');
+        liveHeader.appendChild(liveHdrText);
+        wall.appendChild(liveHeader);
+
+        // Live cards
+        liveSlice.forEach(function (item, i) {
+          var col = i % COLS;
+          var row = Math.floor(i / COLS);
+          var colFrac = (COLS > 1) ? col / (COLS - 1) : 0.5;
+          var angle = -halfArc + colFrac * ARC;
+          var x = Math.sin(angle) * CURVE_RADIUS;
+          var z = -Math.cos(angle) * CURVE_RADIUS;
+          var y = 2.6 - row * (CARD_H + GAP_Y);
+          var rotY = angle * 180 / Math.PI;
+          wall.appendChild(buildCreatorCard(item.creator, item.gIdx, x, y, z, rotY));
+        });
+        runningRow = Math.ceil(liveSlice.length / COLS);
+      }
+
+      // ── Section: OFFLINE ──
+      if (offlineSlice.length > 0) {
+        // Extra gap between live and offline
+        var offlineStartY = 2.6 - runningRow * (CARD_H + GAP_Y);
+        if (liveSlice.length > 0) offlineStartY -= SECTION_GAP;
+
+        // Section header
+        var offHeader = document.createElement('a-entity');
+        offHeader.setAttribute('position', '0 ' + (offlineStartY + CARD_H / 2 + 0.45) + ' -9');
+        var offHdrBg = document.createElement('a-plane');
+        offHdrBg.setAttribute('width', '6');
+        offHdrBg.setAttribute('height', '0.35');
+        offHdrBg.setAttribute('color', '#12101f');
+        offHdrBg.setAttribute('opacity', '0.5');
+        offHdrBg.setAttribute('material', 'shader: flat');
+        offHeader.appendChild(offHdrBg);
+        // Divider line
+        var divider = document.createElement('a-plane');
+        divider.setAttribute('width', '10');
+        divider.setAttribute('height', '0.015');
+        divider.setAttribute('position', '0 0.25 0');
+        divider.setAttribute('color', '#334155');
+        divider.setAttribute('opacity', '0.5');
+        divider.setAttribute('material', 'shader: flat');
+        offHeader.appendChild(divider);
+        var offHdrText = document.createElement('a-text');
+        offHdrText.setAttribute('value', 'OFFLINE  (' + offlineSlice.length + ')');
+        offHdrText.setAttribute('position', '0 0 0.02');
+        offHdrText.setAttribute('align', 'center');
+        offHdrText.setAttribute('color', '#475569');
+        offHdrText.setAttribute('width', '4.5');
+        offHeader.appendChild(offHdrText);
+        wall.appendChild(offHeader);
+
+        // Offline cards
+        offlineSlice.forEach(function (item, i) {
+          var col = i % COLS;
+          var row = Math.floor(i / COLS);
+          var colFrac = (COLS > 1) ? col / (COLS - 1) : 0.5;
+          var angle = -halfArc + colFrac * ARC;
+          var x = Math.sin(angle) * CURVE_RADIUS;
+          var z = -Math.cos(angle) * CURVE_RADIUS;
+          var y = offlineStartY - row * (CARD_H + GAP_Y);
+          var rotY = angle * 180 / Math.PI;
+          wall.appendChild(buildCreatorCard(item.creator, item.gIdx, x, y, z, rotY));
+        });
+      }
+
+      // If nothing at all
+      if (slice.length === 0) {
+        var emptyText = document.createElement('a-text');
+        emptyText.setAttribute('value', 'No creators found');
+        emptyText.setAttribute('position', '0 2.5 -8');
+        emptyText.setAttribute('align', 'center');
+        emptyText.setAttribute('color', '#475569');
+        emptyText.setAttribute('width', '4');
+        wall.appendChild(emptyText);
+      }
+
+      // ENH-005: Update JOIN LIVE floating button
+      updateJoinLiveButton();
+    }
+
+    function buildCreatorCard(creator, gIdx, x, y, z, rotY) {
+      var w = CARD_W, h = CARD_H;
+      var isLive = creator._vrIsLive;
+
+      var wrap = document.createElement('a-entity');
+      wrap.setAttribute('position', x + ' ' + y + ' ' + z);
+      wrap.setAttribute('rotation', '0 ' + rotY + ' 0');
+      wrap.classList.add('clickable');
+
+      // Hover interaction
+      wrap.addEventListener('mouseenter', function () { wrap.setAttribute('scale', '1.06 1.06 1.06'); });
+      wrap.addEventListener('mouseleave', function () { wrap.setAttribute('scale', '1 1 1'); });
+      wrap.addEventListener('click', function () { showCreatorDetail(gIdx); });
+
+      // Card background
+      var bgCol = isLive ? '#1a0a0a' : '#0d0b18';
+      var bg = document.createElement('a-box');
+      bg.setAttribute('width', '' + w);
+      bg.setAttribute('height', '' + h);
+      bg.setAttribute('depth', '0.05');
+      bg.setAttribute('color', bgCol);
+      bg.setAttribute('opacity', isLive ? '1' : '0.8');
+      wrap.appendChild(bg);
+
+      // Border glow
+      var borderCol = isLive ? '#ef4444' : '#1e293b';
+      var border = document.createElement('a-box');
+      border.setAttribute('width', '' + (w + 0.06));
+      border.setAttribute('height', '' + (h + 0.06));
+      border.setAttribute('depth', '0.02');
+      border.setAttribute('position', '0 0 -0.02');
+      border.setAttribute('color', borderCol);
+      border.setAttribute('opacity', isLive ? '0.5' : '0.2');
+      if (isLive) {
+        border.setAttribute('animation', 'property: opacity; from: 0.3; to: 0.7; dur: 800; loop: true; dir: alternate');
+      }
+      wrap.appendChild(border);
+
+      // Live indicator (left side)
+      if (isLive) {
+        var liveDot = document.createElement('a-sphere');
+        liveDot.setAttribute('position', (-w / 2 + 0.2) + ' ' + (h / 2 - 0.25) + ' 0.04');
+        liveDot.setAttribute('radius', '0.08');
+        liveDot.setAttribute('color', '#ef4444');
+        liveDot.setAttribute('animation', 'property: scale; from: 0.8 0.8 0.8; to: 1.3 1.3 1.3; dur: 600; loop: true; dir: alternate');
+        wrap.appendChild(liveDot);
+
+        var liveText = document.createElement('a-text');
+        liveText.setAttribute('value', 'LIVE');
+        liveText.setAttribute('position', (-w / 2 + 0.45) + ' ' + (h / 2 - 0.25) + ' 0.04');
+        liveText.setAttribute('align', 'left');
+        liveText.setAttribute('color', '#ef4444');
+        liveText.setAttribute('width', '' + (w * 1.2));
+        wrap.appendChild(liveText);
+      }
+
+      // Offline indicator
+      if (!isLive) {
+        var offDot = document.createElement('a-sphere');
+        offDot.setAttribute('position', (-w / 2 + 0.2) + ' ' + (h / 2 - 0.25) + ' 0.04');
+        offDot.setAttribute('radius', '0.06');
+        offDot.setAttribute('color', '#475569');
+        wrap.appendChild(offDot);
+
+        var offText = document.createElement('a-text');
+        offText.setAttribute('value', 'OFFLINE');
+        offText.setAttribute('position', (-w / 2 + 0.4) + ' ' + (h / 2 - 0.25) + ' 0.04');
+        offText.setAttribute('align', 'left');
+        offText.setAttribute('color', '#475569');
+        offText.setAttribute('width', '' + (w * 1.0));
+        wrap.appendChild(offText);
+      }
+
+      // Creator name
+      var nameText = document.createElement('a-text');
+      var name = (creator.name || 'Unknown');
+      if (name.length > 22) name = name.substring(0, 20) + '..';
+      nameText.setAttribute('value', name);
+      nameText.setAttribute('position', (-w / 2 + 0.15) + ' ' + (isLive ? (h / 2 - 0.6) : (h / 2 - 0.55)) + ' 0.04');
+      nameText.setAttribute('align', 'left');
+      nameText.setAttribute('color', isLive ? '#ffffff' : '#94a3b8');
+      nameText.setAttribute('width', '' + (w * 1.7));
+      wrap.appendChild(nameText);
+
+      // Platform badges
+      var platforms = (creator.accounts || []).map(function (a) { return a.platform; });
+      var uniquePlats = [];
+      platforms.forEach(function (p) { if (uniquePlats.indexOf(p) === -1) uniquePlats.push(p); });
+
+      var platY = isLive ? (h / 2 - 0.9) : (h / 2 - 0.85);
+      uniquePlats.slice(0, 5).forEach(function (plat, pi) {
+        var platText = document.createElement('a-text');
+        platText.setAttribute('value', PLATFORM_ICONS[plat] || plat);
+        platText.setAttribute('position', (-w / 2 + 0.15 + pi * 0.85) + ' ' + platY + ' 0.04');
+        platText.setAttribute('align', 'left');
+        platText.setAttribute('color', PLATFORM_COLORS[plat] || '#888');
+        platText.setAttribute('width', '' + (w * 1.1));
+        wrap.appendChild(platText);
+      });
+
+      // Stream title (if live)
+      if (isLive) {
+        var liveAccount = (creator.accounts || []).find(function (a) { return a._vrIsLive; });
+        if (liveAccount && liveAccount._vrStreamTitle) {
+          var titleStr = liveAccount._vrStreamTitle;
+          if (titleStr.length > 35) titleStr = titleStr.substring(0, 33) + '..';
+          var streamTitle = document.createElement('a-text');
+          streamTitle.setAttribute('value', titleStr);
+          streamTitle.setAttribute('position', (-w / 2 + 0.15) + ' ' + (-h / 2 + 0.55) + ' 0.04');
+          streamTitle.setAttribute('align', 'left');
+          streamTitle.setAttribute('color', '#fca5a5');
+          streamTitle.setAttribute('width', '' + (w * 1.3));
+          wrap.appendChild(streamTitle);
+        }
+        if (liveAccount && liveAccount._vrViewerCount > 0) {
+          var viewerText = document.createElement('a-text');
+          viewerText.setAttribute('value', liveAccount._vrViewerCount + ' viewers');
+          viewerText.setAttribute('position', (w / 2 - 0.15) + ' ' + (-h / 2 + 0.25) + ' 0.04');
+          viewerText.setAttribute('align', 'right');
+          viewerText.setAttribute('color', '#94a3b8');
+          viewerText.setAttribute('width', '' + (w * 1.1));
+          wrap.appendChild(viewerText);
+        }
+      }
+
+      // Category / tags
+      var catLabel = creator.category || '';
+      if (catLabel) {
+        var catText = document.createElement('a-text');
+        catText.setAttribute('value', catLabel);
+        catText.setAttribute('position', (w / 2 - 0.15) + ' ' + (h / 2 - 0.35) + ' 0.04');
+        catText.setAttribute('align', 'right');
+        catText.setAttribute('color', '#64748b');
+        catText.setAttribute('width', '' + (w * 1.1));
+        wrap.appendChild(catText);
+      }
+
+      // Favorite indicator
+      if (creator.isFavorite) {
+        var favText = document.createElement('a-text');
+        favText.setAttribute('value', 'FAV');
+        favText.setAttribute('position', (w / 2 - 0.15) + ' ' + (-h / 2 + 0.25) + ' 0.04');
+        favText.setAttribute('align', 'right');
+        favText.setAttribute('color', '#f59e0b');
+        favText.setAttribute('width', '' + (w * 1.0));
+        if (!isLive) wrap.appendChild(favText);
+      }
+
+      return wrap;
+    }
+
+    /* ── ENH-005: JOIN LIVE floating button ── */
+    var joinLiveEl = null;
+
+    function updateJoinLiveButton() {
+      var camera = document.querySelector('a-camera');
+      if (!camera) return;
+
+      // Find first live creator (sorted live-first, so index 0)
+      var liveCreators = filteredCreators.filter(function (c) { return c._vrIsLive; });
+      if (liveCreators.length === 0) {
+        if (joinLiveEl) joinLiveEl.setAttribute('visible', false);
+        return;
+      }
+
+      var firstLive = liveCreators[0];
+      var liveIdx = filteredCreators.indexOf(firstLive);
+      var liveAccount = (firstLive.accounts || []).find(function (a) { return a._vrIsLive; });
+      var streamTitle = (liveAccount && liveAccount._vrStreamTitle) ? liveAccount._vrStreamTitle : '';
+      if (streamTitle.length > 30) streamTitle = streamTitle.substring(0, 28) + '..';
+      var displayName = firstLive.name || 'Creator';
+      var viewerCount = (liveAccount && liveAccount._vrViewerCount > 0) ? (' | ' + liveAccount._vrViewerCount + ' viewers') : '';
+
+      if (!joinLiveEl) {
+        joinLiveEl = document.createElement('a-entity');
+        joinLiveEl.id = 'join-live-btn';
+        joinLiveEl.setAttribute('position', '0 -0.35 -1.8');
+        camera.appendChild(joinLiveEl);
+      }
+
+      joinLiveEl.setAttribute('visible', true);
+      joinLiveEl.innerHTML = '' +
+        // Background pill
+        '<a-box width="1.6" height="0.35" depth="0.03" color="#1a0505" opacity="0.92" material="shader: flat"></a-box>' +
+        '<a-box width="1.62" height="0.37" depth="0.01" position="0 0 -0.01" color="#ef4444" opacity="0.4" material="shader: flat"' +
+        '  animation="property: opacity; from: 0.3; to: 0.6; dur: 800; loop: true; dir: alternate"></a-box>' +
+        // Pulsing live dot
+        '<a-sphere position="-0.65 0.08 0.03" radius="0.03" color="#ef4444"' +
+        '  animation="property: scale; from: 0.8 0.8 0.8; to: 1.4 1.4 1.4; dur: 500; loop: true; dir: alternate"></a-sphere>' +
+        // Text
+        '<a-text value="JOIN LIVE" position="0 0.08 0.03" align="center" color="#ef4444" width="3.5" font="mozillavr"></a-text>' +
+        '<a-text value="' + displayName + viewerCount + '" position="0 -0.07 0.03" align="center" color="#fca5a5" width="2.6"></a-text>' +
+        // Clickable overlay
+        '<a-box width="1.6" height="0.35" depth="0.06" position="0 0 0.02" opacity="0" class="clickable"></a-box>';
+
+      // Click handler: open VR preview (fallback to detail)
+      var clickTarget = joinLiveEl.querySelector('.clickable');
+      if (clickTarget) {
+        clickTarget.removeEventListener('click', joinLiveEl._clickHandler);
+        joinLiveEl._clickHandler = function () {
+          if (liveAccount) {
+            var embedUrl = getEmbedUrl(liveAccount);
+            if (embedUrl || liveAccount.url) {
+              openStreamExperience(embedUrl || liveAccount.url, displayName || 'Live Preview', liveAccount.url);
+              return;
+            }
+          }
+          showCreatorDetail(liveIdx);
+        };
+        clickTarget.addEventListener('click', joinLiveEl._clickHandler);
+      }
+
+      // Dismiss after 15 seconds to avoid clutter
+      clearTimeout(joinLiveEl._dismissTimer);
+      joinLiveEl._dismissTimer = setTimeout(function () {
+        if (joinLiveEl) joinLiveEl.setAttribute('visible', false);
+      }, 15000);
+    }
+
+    /* ── Creator Detail (2D overlay) ── */
+    window.showCreatorDetail = function (gIdx) {
+      var creator = filteredCreators[gIdx];
+      if (!creator) return;
+
+      document.getElementById('det-name').textContent = creator.name || 'Unknown Creator';
+      document.getElementById('det-bio').textContent = creator.bio || creator.reason || 'No bio available.';
+
+      // Live badge
+      var liveDiv = document.getElementById('det-live-badge');
+      liveDiv.innerHTML = '';
+      if (creator._vrIsLive) {
+        var badge = document.createElement('span');
+        badge.className = 'live-badge';
+        badge.textContent = 'LIVE NOW';
+        liveDiv.appendChild(badge);
+      }
+
+      // Stream info
+      var streamDiv = document.getElementById('det-stream-info');
+      streamDiv.innerHTML = '';
+      if (creator._vrIsLive) {
+        var liveAcc = (creator.accounts || []).find(function (a) { return a._vrIsLive; });
+        if (liveAcc) {
+          var info = document.createElement('div');
+          info.className = 'stream-info';
+          var titleEl = document.createElement('div');
+          titleEl.className = 'title';
+          titleEl.textContent = liveAcc._vrStreamTitle || 'Live on ' + (PLATFORM_ICONS[liveAcc.platform] || liveAcc.platform);
+          info.appendChild(titleEl);
+          if (liveAcc._vrViewerCount > 0) {
+            var viewerEl = document.createElement('div');
+            viewerEl.className = 'viewers';
+            viewerEl.textContent = liveAcc._vrViewerCount + ' viewers';
+            info.appendChild(viewerEl);
+          }
+          streamDiv.appendChild(info);
+        }
+      }
+
+      // Stream preview embed
+      var previewDiv = document.getElementById('det-stream-preview');
+      previewDiv.innerHTML = '';
+      if (creator._vrIsLive) {
+        var liveAccEmbed = (creator.accounts || []).find(function (a) { return a._vrIsLive; });
+        if (liveAccEmbed) {
+          var embedUrl = getEmbedUrl(liveAccEmbed);
+          if (embedUrl) {
+            var labelSpan = document.createElement('span');
+            labelSpan.className = 'preview-label';
+            labelSpan.textContent = 'LIVE';
+            previewDiv.appendChild(labelSpan);
+
+            var platSpan = document.createElement('span');
+            platSpan.className = 'preview-platform';
+            platSpan.textContent = PLATFORM_ICONS[liveAccEmbed.platform] || liveAccEmbed.platform;
+            previewDiv.appendChild(platSpan);
+
+            var iframe = document.createElement('iframe');
+            iframe.src = embedUrl;
+            iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+            iframe.allowFullscreen = true;
+            iframe.title = 'Live stream preview — ' + (creator.name || 'Creator');
+            previewDiv.appendChild(iframe);
+          }
+        }
+      }
+
+      // Recent content (YouTube latest videos, platform watch links)
+      var recentDiv = document.getElementById('det-recent-content');
+      recentDiv.innerHTML = '';
+      var watchRow = document.getElementById('det-watch-content');
+      watchRow.innerHTML = '';
+
+      var accounts = creator.accounts || [];
+      var ytAccount = accounts.find(function (a) { return (a.platform || '').toLowerCase() === 'youtube'; });
+      var hasEmbeddedRecent = false;
+
+      // For YouTube accounts: fetch & embed latest video
+      if (ytAccount && !creator._vrIsLive) {
+        hasEmbeddedRecent = true;
+        var headerEl = document.createElement('div');
+        headerEl.className = 'recent-header';
+        headerEl.textContent = 'Recent Content';
+        recentDiv.appendChild(headerEl);
+
+        var loadingEl = document.createElement('div');
+        loadingEl.className = 'recent-loading';
+        loadingEl.textContent = 'Loading latest videos...';
+        recentDiv.appendChild(loadingEl);
+
+        // Resolve handle from URL or username
+        var ytHandle = ytAccount.username || '';
+        if (!ytHandle && ytAccount.url) {
+          var hm = (ytAccount.url || '').match(/youtube\.com\/@?([^\/\?#]+)/i);
+          if (hm) ytHandle = hm[1].replace('@', '');
+        }
+
+        if (ytHandle) {
+          fetch(API_BASE + '/api/youtube_latest.php?handle=' + encodeURIComponent(ytHandle) + '&limit=3')
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              loadingEl.remove();
+              if (!data.ok || !data.videos || data.videos.length === 0) {
+                var noVid = document.createElement('div');
+                noVid.className = 'recent-loading';
+                noVid.textContent = 'No recent videos found.';
+                recentDiv.appendChild(noVid);
+                return;
+              }
+              // Embed the first (most recent) video
+              var vid = data.videos[0];
+              var vidWrap = document.createElement('div');
+              vidWrap.className = 'recent-video';
+              var iframe = document.createElement('iframe');
+              iframe.src = vid.embed_url;
+              iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+              iframe.allowFullscreen = true;
+              iframe.title = vid.title;
+              vidWrap.appendChild(iframe);
+
+              var infoRow = document.createElement('div');
+              infoRow.className = 'recent-video-info';
+              var titleSpan = document.createElement('span');
+              titleSpan.className = 'rv-title';
+              titleSpan.textContent = vid.title;
+              titleSpan.title = vid.title;
+              infoRow.appendChild(titleSpan);
+
+              if (vid.published) {
+                var dateSpan = document.createElement('span');
+                dateSpan.className = 'rv-date';
+                var d = new Date(vid.published);
+                dateSpan.textContent = d.toLocaleDateString();
+                infoRow.appendChild(dateSpan);
+              }
+
+              var watchLink = document.createElement('a');
+              watchLink.href = vid.watch_url;
+              watchLink.target = '_blank';
+              watchLink.rel = 'noopener noreferrer';
+              watchLink.textContent = 'Open';
+              infoRow.appendChild(watchLink);
+
+              vidWrap.appendChild(infoRow);
+              recentDiv.appendChild(vidWrap);
+
+              // Show remaining videos as text links
+              if (data.videos.length > 1) {
+                for (var vi = 1; vi < data.videos.length; vi++) {
+                  var v = data.videos[vi];
+                  var row = document.createElement('a');
+                  row.className = 'account-link';
+                  row.href = v.watch_url;
+                  row.target = '_blank';
+                  row.rel = 'noopener noreferrer';
+                  row.style.fontSize = '0.82rem';
+                  var dot = document.createElement('span');
+                  dot.className = 'platform-dot';
+                  dot.style.background = '#ff0000';
+                  row.appendChild(dot);
+                  var tSpan = document.createElement('span');
+                  tSpan.style.flex = '1';
+                  tSpan.style.overflow = 'hidden';
+                  tSpan.style.textOverflow = 'ellipsis';
+                  tSpan.style.whiteSpace = 'nowrap';
+                  tSpan.textContent = v.title;
+                  tSpan.title = v.title;
+                  row.appendChild(tSpan);
+                  if (v.published) {
+                    var ds = document.createElement('span');
+                    ds.style.color = '#475569';
+                    ds.style.fontSize = '0.72rem';
+                    ds.style.whiteSpace = 'nowrap';
+                    var dd = new Date(v.published);
+                    ds.textContent = dd.toLocaleDateString();
+                    row.appendChild(ds);
+                  }
+                  recentDiv.appendChild(row);
+                }
+              }
+            })
+            .catch(function () {
+              loadingEl.textContent = 'Could not load videos.';
+            });
+        } else {
+          loadingEl.textContent = 'No YouTube handle found.';
+        }
+      }
+
+      // If live and we already showed the stream embed, also show recent content header for YouTube
+      if (ytAccount && creator._vrIsLive) {
+        // YouTube account exists but creator is live — show recent content below the live embed
+        var ytHandle2 = ytAccount.username || '';
+        if (!ytHandle2 && ytAccount.url) {
+          var hm2 = (ytAccount.url || '').match(/youtube\.com\/@?([^\/\?#]+)/i);
+          if (hm2) ytHandle2 = hm2[1].replace('@', '');
+        }
+        if (ytHandle2) {
+          var headerEl2 = document.createElement('div');
+          headerEl2.className = 'recent-header';
+          headerEl2.textContent = 'Recent Videos';
+          recentDiv.appendChild(headerEl2);
+
+          var loadingEl2 = document.createElement('div');
+          loadingEl2.className = 'recent-loading';
+          loadingEl2.textContent = 'Loading...';
+          recentDiv.appendChild(loadingEl2);
+
+          fetch(API_BASE + '/api/youtube_latest.php?handle=' + encodeURIComponent(ytHandle2) + '&limit=3')
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              loadingEl2.remove();
+              if (!data.ok || !data.videos || data.videos.length === 0) return;
+              data.videos.forEach(function (v) {
+                var row = document.createElement('a');
+                row.className = 'account-link';
+                row.href = v.watch_url;
+                row.target = '_blank';
+                row.rel = 'noopener noreferrer';
+                row.style.fontSize = '0.82rem';
+                var dot = document.createElement('span');
+                dot.className = 'platform-dot';
+                dot.style.background = '#ff0000';
+                row.appendChild(dot);
+                var tSpan = document.createElement('span');
+                tSpan.style.flex = '1';
+                tSpan.style.overflow = 'hidden';
+                tSpan.style.textOverflow = 'ellipsis';
+                tSpan.style.whiteSpace = 'nowrap';
+                tSpan.textContent = v.title;
+                tSpan.title = v.title;
+                row.appendChild(tSpan);
+                if (v.published) {
+                  var ds = document.createElement('span');
+                  ds.style.color = '#475569';
+                  ds.style.fontSize = '0.72rem';
+                  ds.style.whiteSpace = 'nowrap';
+                  var dd = new Date(v.published);
+                  ds.textContent = dd.toLocaleDateString();
+                  row.appendChild(ds);
+                }
+                recentDiv.appendChild(row);
+              });
+            })
+            .catch(function () { loadingEl2.textContent = ''; });
+        }
+      }
+
+      // Watch Content buttons for all platforms (VODs, clips, channel pages)
+      accounts.forEach(function (acc) {
+        var p = (acc.platform || '').toLowerCase();
+        var username = acc.username || '';
+        var url = acc.url || '';
+        var vodUrl = null;
+        var label = '';
+
+        if (p === 'youtube' && username) {
+          vodUrl = 'https://www.youtube.com/@' + username + '/videos';
+          label = 'YouTube Videos';
+        } else if (p === 'twitch' && username) {
+          vodUrl = 'https://www.twitch.tv/' + username + '/videos';
+          label = 'Twitch VODs';
+        } else if (p === 'kick' && username) {
+          vodUrl = 'https://kick.com/' + username;
+          label = 'Kick Channel';
+        } else if (p === 'tiktok') {
+          vodUrl = url || ('https://www.tiktok.com/@' + username);
+          label = 'TikTok Videos';
+        } else if (p === 'instagram') {
+          vodUrl = url || ('https://www.instagram.com/' + username);
+          label = 'Instagram';
+        }
+
+        if (vodUrl && label) {
+          var btn = document.createElement('a');
+          btn.className = 'wcr-btn';
+          btn.href = vodUrl;
+          btn.target = '_blank';
+          btn.rel = 'noopener noreferrer';
+          var dot = document.createElement('span');
+          dot.className = 'wcr-dot';
+          dot.style.background = PLATFORM_COLORS[p] || '#666';
+          btn.appendChild(dot);
+          btn.appendChild(document.createTextNode(label));
+          watchRow.appendChild(btn);
+        }
+      });
+
+      // Accounts list
+      var accDiv = document.getElementById('det-accounts');
+      accDiv.innerHTML = '';
+      (creator.accounts || []).forEach(function (acc) {
+        var link = document.createElement('a');
+        link.className = 'account-link';
+        link.href = acc.url || '#';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+
+        var dot = document.createElement('span');
+        if (acc._vrIsLive) {
+          dot.className = 'live-dot';
+        } else {
+          dot.className = 'platform-dot';
+          dot.style.background = PLATFORM_COLORS[acc.platform] || '#666';
+        }
+        link.appendChild(dot);
+
+        var platLabel = document.createElement('span');
+        platLabel.textContent = (PLATFORM_ICONS[acc.platform] || acc.platform) + ' — @' + (acc.username || '');
+        platLabel.style.flex = '1';
+        link.appendChild(platLabel);
+
+        if (acc._vrIsLive) {
+          var liveSpan = document.createElement('span');
+          liveSpan.textContent = 'LIVE';
+          liveSpan.style.color = '#22c55e';
+          liveSpan.style.fontWeight = '700';
+          liveSpan.style.fontSize = '0.8rem';
+          link.appendChild(liveSpan);
+        }
+
+        if (acc.followers) {
+          var followSpan = document.createElement('span');
+          followSpan.textContent = acc.followers;
+          followSpan.style.color = '#64748b';
+          followSpan.style.fontSize = '0.8rem';
+          link.appendChild(followSpan);
+        }
+
+        accDiv.appendChild(link);
+      });
+
+      // Buttons
+      var btnsDiv = document.getElementById('det-btns');
+      btnsDiv.innerHTML = '';
+
+      if (creator._vrIsLive) {
+        var liveAcc2 = (creator.accounts || []).find(function (a) { return a._vrIsLive; });
+        if (liveAcc2 && liveAcc2.url) {
+          var vrBtn = document.createElement('button');
+          vrBtn.className = 'btn btn-primary';
+          vrBtn.textContent = 'VR Preview';
+          vrBtn.onclick = function () {
+            var embedUrl = getEmbedUrl(liveAcc2);
+            openStreamExperience(embedUrl || liveAcc2.url, creator.name || 'Live Preview', liveAcc2.url);
+          };
+          btnsDiv.appendChild(vrBtn);
+
+          var watchBtn = document.createElement('a');
+          watchBtn.href = liveAcc2.url;
+          watchBtn.target = '_blank';
+          watchBtn.rel = 'noopener noreferrer';
+          watchBtn.className = 'btn btn-watch';
+          watchBtn.textContent = 'Watch Live';
+          btnsDiv.appendChild(watchBtn);
+        }
+      }
+
+      // YouTube video button for offline creators
+      if (!creator._vrIsLive) {
+        var ytAcc = (creator.accounts || []).find(function (a) { return a.platform === 'youtube'; });
+        if (ytAcc && ytAcc.url) {
+          var ytUsername = '';
+          var ytMatch = ytAcc.url.match(/youtube\.com\/@?([^\/\?#]+)/i);
+          if (ytMatch) ytUsername = ytMatch[1].replace('@', '');
+          if (ytUsername) {
+            var ytVrBtn = document.createElement('button');
+            ytVrBtn.className = 'btn btn-primary';
+            ytVrBtn.textContent = 'Watch YouTube';
+            ytVrBtn.style.background = '#ff0000';
+            ytVrBtn.onclick = function () {
+              var ytEmbedUrl = 'https://www.youtube.com/embed?listType=user_uploads&list=' + encodeURIComponent(ytUsername);
+              playCreatorVideo(ytEmbedUrl, (creator.name || 'Creator') + ' — YouTube');
+            };
+            btnsDiv.appendChild(ytVrBtn);
+          }
+        }
+      }
+
+      var firstUrl = (creator.accounts && creator.accounts[0]) ? creator.accounts[0].url : '#';
+      var profileBtn = document.createElement('a');
+      profileBtn.href = firstUrl;
+      profileBtn.target = '_blank';
+      profileBtn.rel = 'noopener noreferrer';
+      profileBtn.className = 'btn btn-primary';
+      profileBtn.textContent = 'View Profile';
+      btnsDiv.appendChild(profileBtn);
+
+      var closeBtn = document.createElement('button');
+      closeBtn.className = 'btn btn-secondary';
+      closeBtn.textContent = 'Close';
+      closeBtn.onclick = function () { closeDetail(); };
+      btnsDiv.appendChild(closeBtn);
+
+      document.getElementById('creator-detail').classList.add('open');
+    };
+
+    window.closeDetail = function () {
+      // Stop stream / video playback by clearing all iframes
+      var previewDiv = document.getElementById('det-stream-preview');
+      if (previewDiv) previewDiv.innerHTML = '';
+      var recentDiv = document.getElementById('det-recent-content');
+      if (recentDiv) recentDiv.innerHTML = '';
+      document.getElementById('creator-detail').classList.remove('open');
+    };
+
+    // Virtual browser (VR-friendly overlay)
+    var vrBrowser = document.getElementById('vr-browser');
+    var vrBrowserFrame = document.getElementById('vr-browser-frame');
+    var vrBrowserTitle = document.getElementById('vr-browser-title');
+    var vrBrowserOpen = document.getElementById('vr-browser-open');
+    var vrBrowserVr = document.getElementById('vr-browser-vr');
+    var vrBrowserClose = document.getElementById('vr-browser-close');
+
+    function openVirtualBrowser(url, title, openUrl) {
+      if (!url) return;
+      vrBrowserFrame.src = url;
+      vrBrowserTitle.textContent = title || 'Live Preview';
+      vrBrowserOpen.onclick = function () {
+        if (openUrl) window.open(openUrl, '_blank', 'noopener');
+      };
+      vrBrowserVr.onclick = function () {
+        var scene = document.querySelector('a-scene');
+        if (scene && !scene.is('vr-mode')) scene.enterVR();
+      };
+      vrBrowser.classList.add('open');
+    }
+
+    // VR stream panel (in-scene)
+    var vrStreamScreen = document.getElementById('vr-stream-screen');
+    var vrStreamSurface = document.getElementById('vr-stream-surface');
+    var vrStreamClose = document.getElementById('vr-stream-close');
+    var vrStreamTitle = document.getElementById('vr-stream-title');
+    var vrStreamIframe = null;
+
+    function openVRStreamScreen(url, title) {
+      if (!url || !vrStreamScreen) return;
+      if (vrStreamIframe) vrStreamIframe.remove();
+      vrStreamIframe = document.createElement('a-entity');
+      vrStreamIframe.setAttribute('geometry', 'primitive: plane; width: 5.2; height: 2.9');
+      vrStreamIframe.setAttribute('material', 'shader: flat; transparent: true; opacity: 1');
+      vrStreamIframe.setAttribute('position', '0 0 0.03');
+      vrStreamIframe.setAttribute('class', 'clickable');
+      vrStreamIframe.setAttribute('iframe', 'src: ' + url + '; transparent: true');
+      vrStreamSurface.appendChild(vrStreamIframe);
+      if (vrStreamTitle) vrStreamTitle.setAttribute('value', title || 'Live Preview');
+      vrStreamScreen.setAttribute('visible', true);
+    }
+
+    function closeVRStreamScreen() {
+      if (vrStreamIframe) {
+        vrStreamIframe.remove();
+        vrStreamIframe = null;
+      }
+      if (vrStreamScreen) vrStreamScreen.setAttribute('visible', false);
+    }
+
+    function openStreamExperience(url, title, openUrl) {
+      if (isVRMode()) {
+        openVRStreamScreen(url, title);
+      } else {
+        openVirtualBrowser(url, title, openUrl);
+      }
+    }
+
+    // Play offline creator YouTube video on VR screen or overlay
+    function playCreatorVideo(videoUrl, title) {
+      if (isVRMode()) {
+        openVRStreamScreen(videoUrl, title);
+      } else {
+        openVirtualBrowser(videoUrl, title, null);
+      }
+    }
+
+    function closeVirtualBrowser() {
+      vrBrowserFrame.src = '';
+      vrBrowser.classList.remove('open');
+    }
+
+    vrBrowserClose.addEventListener('click', closeVirtualBrowser);
+    vrBrowser.addEventListener('click', function (e) {
+      if (e.target === vrBrowser) closeVirtualBrowser();
+    });
+
+    // Embed fallback: if iframe fails to load, show error + open external
+    if (vrBrowserFrame) {
+      vrBrowserFrame.addEventListener('error', function () {
+        vrBrowserTitle.textContent = 'Stream unavailable in preview';
+        vrBrowserFrame.style.display = 'none';
+        var fallbackMsg = document.createElement('div');
+        fallbackMsg.style.cssText = 'padding:40px;text-align:center;color:#94a3b8;font-size:1rem;';
+        fallbackMsg.innerHTML = 'This stream cannot be embedded.<br><br>Click <b>Open Stream</b> to watch in a new tab.';
+        vrBrowserFrame.parentNode.appendChild(fallbackMsg);
+      });
+    }
+
+    if (vrStreamClose) {
+      vrStreamClose.addEventListener('click', closeVRStreamScreen);
+    }
+
+    var sceneEl = document.querySelector('a-scene');
+    if (sceneEl) {
+      sceneEl.addEventListener('exit-vr', function () {
+        closeVRStreamScreen();
+      });
+    }
+
+    /* ── Pagination ── */
+    function totalPages() { return Math.max(1, Math.ceil(filteredCreators.length / PER_PAGE)); }
+
+    function updatePagination() {
+      var tp = totalPages();
+      document.getElementById('page-info').textContent = 'Page ' + (currentPage + 1) + ' of ' + tp;
+      document.getElementById('btn-prev').disabled = (currentPage <= 0);
+      document.getElementById('btn-next').disabled = (currentPage >= tp - 1);
+      var vrPt = document.getElementById('vr-page-text');
+      if (vrPt) vrPt.setAttribute('value', 'Page ' + (currentPage + 1) + ' / ' + tp);
+    }
+
+    window.nextPage = function () {
+      if (currentPage < totalPages() - 1) { currentPage++; renderCards(); updatePagination(); }
+    };
+    window.prevPage = function () {
+      if (currentPage > 0) { currentPage--; renderCards(); updatePagination(); }
+    };
+
+    /* ── HUD ── */
+    function updateHUD() {
+      var liveCount = allCreators.filter(function (c) { return c._vrIsLive; }).length;
+      var hudLive = document.getElementById('hud-live');
+      if (liveCount > 0) {
+        hudLive.textContent = liveCount + ' creator' + (liveCount > 1 ? 's' : '') + ' LIVE';
+      } else {
+        hudLive.textContent = 'No creators live right now';
+        hudLive.style.color = '#666';
+      }
+    }
+
+    /* ── Refresh Progress Bar ── */
+    function showProgress(show) {
+      var el = document.getElementById('refresh-progress');
+      if (show) el.classList.add('visible');
+      else el.classList.remove('visible');
+    }
+    function setProgress(current, total, label) {
+      var pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-count').textContent = current + ' / ' + total;
+      if (label) document.getElementById('progress-label').textContent = label;
+    }
+
+    function animateMergeProgress(callback) {
+      var total = allCreators.length;
+      if (total === 0) { callback(); return; }
+      var i = 0;
+      var batchSize = Math.max(1, Math.ceil(total / 30)); // ~30 visual ticks
+      function tick() {
+        var end = Math.min(i + batchSize, total);
+        for (; i < end; i++) {
+          var creator = allCreators[i];
+          var anyLive = false;
+          (creator.accounts || []).forEach(function (acc) {
+            var key = creator.id + '_' + (acc.platform || '').toLowerCase();
+            var status = liveStatusMap[key];
+            if (status) {
+              acc._vrIsLive = status.is_live;
+              acc._vrStreamTitle = status.stream_title;
+              acc._vrViewerCount = status.viewer_count;
+              acc._vrLastSeen = status.last_seen_online;
+              if (status.is_live) anyLive = true;
+            } else {
+              acc._vrIsLive = false;
+            }
+          });
+          creator._vrIsLive = anyLive;
+        }
+        setProgress(i, total, 'Checking creators...');
+        if (i < total) {
+          requestAnimationFrame(tick);
+        } else {
+          setProgress(total, total, 'Done!');
+          setTimeout(callback, 400);
+        }
+      }
+      tick();
+    }
+
+    /* ── Refresh Live Status ── */
+    window.refreshLiveStatus = function () {
+      var btn = document.getElementById('refresh-btn');
+      btn.classList.add('refreshing');
+      btn.textContent = 'Refreshing...';
+
+      var total = allCreators.length;
+      showProgress(true);
+      setProgress(0, total, 'Fetching live status...');
+
+      fetchLiveStatus().then(function () {
+        // Animate the merge step with progress
+        setProgress(0, total, 'Checking creators...');
+        animateMergeProgress(function () {
+          sortCreators();
+          applyFilter();
+          renderCards();
+          updatePagination();
+          updateHUD();
+
+          var liveCount = allCreators.filter(function (c) { return c._vrIsLive; }).length;
+          setProgress(total, total, liveCount > 0 ? liveCount + ' creator' + (liveCount > 1 ? 's' : '') + ' live!' : 'No one live right now');
+          setTimeout(function () {
+            showProgress(false);
+            btn.classList.remove('refreshing');
+            btn.textContent = 'Refresh Live';
+          }, 1200);
+        });
+      });
+    };
+
+    /* ── Auto Refresh ── */
+    function startAutoRefresh() {
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(function () {
+        console.log('[VR Creators] Auto-refreshing live status...');
+        refreshLiveStatus();
+      }, REFRESH_INTERVAL);
+    }
+
+    /* ── Passthrough AR Detection ── */
+    function setupPassthrough() {
+      var scene = document.querySelector('a-scene');
+      if (!scene) return;
+      scene.addEventListener('enter-vr', function () {
+        if (scene.xrSession) {
+          var env = scene.xrSession.environmentBlendMode;
+          if (env === 'alpha-blend' || env === 'additive') {
+            // Passthrough is active — hide sky/ground, show notification
+            var sky = document.querySelector('a-sky');
+            var ground = document.querySelector('a-plane[rotation="-90 0 0"]');
+            if (sky) sky.setAttribute('visible', false);
+            if (ground) ground.setAttribute('visible', false);
+            var ptUI = document.getElementById('passthrough-ui');
+            if (ptUI) ptUI.setAttribute('visible', true);
+          }
+        }
+      });
+      scene.addEventListener('exit-vr', function () {
+        var sky = document.querySelector('a-sky');
+        var ground = document.querySelector('a-plane[rotation="-90 0 0"]');
+        if (sky) sky.setAttribute('visible', true);
+        if (ground) ground.setAttribute('visible', true);
+        var ptUI = document.getElementById('passthrough-ui');
+        if (ptUI) ptUI.setAttribute('visible', false);
+      });
+    }
+    setupPassthrough();
+
+    /* ── Keyboard Controls ── */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDetail();
+      if (e.key === 'ArrowRight') nextPage();
+      if (e.key === 'ArrowLeft') prevPage();
+    });
+
+    /* ── VR Nav ── */
+    document.addEventListener('DOMContentLoaded', function () {
+      // VR Pagination
+      var vrPrev = document.getElementById('vr-prev');
+      var vrNext = document.getElementById('vr-next');
+      if (vrPrev) {
+        vrPrev.addEventListener('mouseenter', function () { vrPrev.setAttribute('scale', '1.1 1.1 1.1'); });
+        vrPrev.addEventListener('mouseleave', function () { vrPrev.setAttribute('scale', '1 1 1'); });
+        vrPrev.addEventListener('click', function () { prevPage(); });
+      }
+      if (vrNext) {
+        vrNext.addEventListener('mouseenter', function () { vrNext.setAttribute('scale', '1.1 1.1 1.1'); });
+        vrNext.addEventListener('mouseleave', function () { vrNext.setAttribute('scale', '1 1 1'); });
+        vrNext.addEventListener('click', function () { nextPage(); });
+      }
+
+      // VR Back to Hub
+      var vrBack = document.getElementById('vr-back-portal');
+      if (vrBack) {
+        vrBack.addEventListener('mouseenter', function () { vrBack.setAttribute('scale', '1.08 1.08 1.08'); });
+        vrBack.addEventListener('mouseleave', function () { vrBack.setAttribute('scale', '1 1 1'); });
+        vrBack.addEventListener('click', function () { window.location.href = '/vr/'; });
+      }
+
+      // VR Refresh
+      var vrRefresh = document.getElementById('vr-refresh');
+      if (vrRefresh) {
+        vrRefresh.addEventListener('mouseenter', function () { vrRefresh.setAttribute('scale', '1.08 1.08 1.08'); });
+        vrRefresh.addEventListener('mouseleave', function () { vrRefresh.setAttribute('scale', '1 1 1'); });
+        vrRefresh.addEventListener('click', function () { refreshLiveStatus(); });
+      }
+
+      // Start loading
+      fetchCreators();
+    });
+
+    // Fallback: hide loading after 15s
+    setTimeout(function () {
+      var ls = document.getElementById('loading-screen');
+      if (ls && !ls.classList.contains('fade-out')) {
+        ls.classList.add('fade-out');
+        setTimeout(function () { ls.style.display = 'none'; }, 700);
+      }
+    }, 15000);
+
+  })();
+  </script>
+  <!-- Shared presence tracker + keyboard shortcuts -->
+  <script src="/vr/presence.js"></script>
+  <!-- VR Controller Support -->
+  <script src="/vr/controller-support.js"></script>
+  
+  <!-- VR Navigation Menu -->
+  <script src="/vr/nav-menu.js"></script>
+  <!-- VR Quick Wins -->
+  <script src="/vr/quick-wins.js"></script>
+
+  <!-- Comfort vignette + F1 help -->
+  <script src="/vr/vr-comfort.js"></script>
+  <!-- Quest Thumbstick Locomotion -->
+  <script>
+  (function () {
+    var rig, camera, moveSpeed = 0.06, turnCooldown = false;
+    function init() {
+      rig = document.getElementById('rig');
+      camera = document.querySelector('a-camera');
+      if (rig) requestAnimationFrame(step);
+    }
+    function step() {
+      var pads = navigator.getGamepads ? navigator.getGamepads() : [];
+      var left = null, right = null;
+      for (var i = 0; i < pads.length; i++) {
+        var p = pads[i];
+        if (!p) continue;
+        if (p.hand === 'left') left = p;
+        if (p.hand === 'right') right = p;
+      }
+      if (left && left.axes.length >= 2) {
+        var x = left.axes[0] || 0, y = left.axes[1] || 0;
+        if (Math.abs(x) > 0.1 || Math.abs(y) > 0.1) {
+          var yaw = camera && camera.object3D ? camera.object3D.rotation.y : 0;
+          var dx = Math.sin(yaw) * -y + Math.cos(yaw) * x;
+          var dz = Math.cos(yaw) * -y - Math.sin(yaw) * x;
+          var pos = rig.getAttribute('position');
+          rig.setAttribute('position', { x: pos.x + dx * moveSpeed, y: pos.y, z: pos.z + dz * moveSpeed });
+        }
+      }
+      if (right && right.axes.length >= 2) {
+        var turn = right.axes[0] || 0;
+        if (!turnCooldown && Math.abs(turn) > 0.7) {
+          var rot = rig.getAttribute('rotation');
+          rig.setAttribute('rotation', { x: rot.x, y: rot.y + (turn > 0 ? -30 : 30), z: rot.z });
+          turnCooldown = true;
+          setTimeout(function () { turnCooldown = false; }, 300);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+    if (document.readyState === 'complete') init();
+    else window.addEventListener('load', init);
+  })();
+  </script>
+</body>
+</html>
