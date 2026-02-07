@@ -285,21 +285,39 @@
       </a-entity>
     </a-entity>
 
-    <!-- ===== COMING SOON PORTAL ===== -->
+    <!-- ===== GAME PORTAL: FPS ARENA (18+ PvP Multiplayer) ===== -->
     <a-entity position="0 0 -10">
-      <a-box position="0 2 0" width="2.5" height="2.5" depth="2.5"
-             color="#475569" opacity="0.4"
-             animation="property: rotation; to: 0 360 0; dur: 35000; loop: true; easing: linear">
-        <a-text value="?" align="center" position="0 0 1.26" width="8" color="#94a3b8" font="mozillavr"></a-text>
-        <a-text value="Coming\nSoon" align="center" position="0 -0.4 1.26" width="3" color="#64748b"></a-text>
-        <a-text value="?" align="center" position="0 0 -1.26" rotation="0 180 0" width="8" color="#94a3b8" font="mozillavr"></a-text>
+      <!-- Floating weapon-shaped cube -->
+      <a-box class="clickable" position="0 2 0" width="2.5" height="2.5" depth="2.5"
+             color="#ef4444" opacity="0.85"
+             zone-link="url: /vr/game-arena/fps-arena.html"
+             hover-glow="color: #ef4444"
+             animation="property: rotation; to: 0 360 0; dur: 20000; loop: true; easing: linear">
+        <a-text value="FPS" align="center" position="0 0.3 1.26" width="6" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Arena\n18+" align="center" position="0 -0.4 1.26" width="3" color="#fecaca"></a-text>
+        <a-text value="FPS" align="center" position="0 0.3 -1.26" rotation="0 180 0" width="6" color="#fff" font="mozillavr"></a-text>
+        <a-text value="Arena\n18+" align="center" position="0 -0.4 -1.26" rotation="0 180 0" width="3" color="#fecaca"></a-text>
+        <a-text value="PvP" align="center" position="1.26 0.3 0" rotation="0 90 0" width="6" color="#fff" font="mozillavr"></a-text>
+        <a-text value="PvP" align="center" position="-1.26 0.3 0" rotation="0 -90 0" width="6" color="#fff" font="mozillavr"></a-text>
       </a-box>
-      <a-entity position="0 4 0" look-at-camera>
-        <a-text value="More Games Coming" align="center" width="5" color="#64748b"></a-text>
-        <a-text value="Stay Tuned!" align="center" width="3" color="#475569" position="0 -0.35 0"></a-text>
+      <!-- ENTER button -->
+      <a-entity position="0 -0.2 1.5" look-at-camera>
+        <a-plane class="clickable" width="2.6" height="0.55" color="#ef4444" opacity="0.9"
+                 zone-link="url: /vr/game-arena/fps-arena.html"
+                 animation="property: position; from: 0 0 0; to: 0 0.08 0; dur: 1500; dir: alternate; loop: true; easing: easeInOutSine">
+          <a-text value="PLAY FPS ARENA (18+)" align="center" width="4.5" color="#fff" position="0 0 0.01" font="mozillavr"></a-text>
+        </a-plane>
       </a-entity>
-      <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="1.8" radius-outer="2" color="#475569" opacity="0.2"
-              animation="property: rotation; to: -90 360 0; dur: 12000; loop: true; easing: linear"></a-ring>
+      <!-- Ground ring -->
+      <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="1.8" radius-outer="2" color="#ef4444" opacity="0.5"
+              animation="property: rotation; to: -90 360 0; dur: 8000; loop: true; easing: linear"></a-ring>
+      <a-cylinder position="0 0.01 0" radius="1.8" height="0.02" color="#ef4444" opacity="0.12"
+                  class="clickable" zone-link="url: /vr/game-arena/fps-arena.html"></a-cylinder>
+      <!-- Floating label -->
+      <a-entity position="0 4 0" look-at-camera>
+        <a-text value="FPS Arena" align="center" width="5" color="#ef4444"></a-text>
+        <a-text value="18+ | PvP Multiplayer | AI Bots | Ranked" align="center" width="4" color="#888" position="0 -0.35 0"></a-text>
+      </a-entity>
     </a-entity>
 
     <!-- ===== LEADERBOARD PANEL ===== -->
@@ -554,7 +572,7 @@
       var delay = 20000 + Math.random() * 40000;
       setTimeout(function() {
         var challenger = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
-        var games = [{ name: 'Tic-Tac-Toe', url: '/vr/game-arena/tic-tac-toe.html' }, { name: 'Soccer Shootout', url: '/vr/game-arena/soccer-shootout.html' }];
+        var games = [{ name: 'Tic-Tac-Toe', url: '/vr/game-arena/tic-tac-toe.html' }, { name: 'Soccer Shootout', url: '/vr/game-arena/soccer-shootout.html' }, { name: 'FPS Arena', url: '/vr/game-arena/fps-arena.html' }];
         var game = games[Math.floor(Math.random() * games.length)];
         var c = document.getElementById('toast-container');
         var t = document.createElement('div');

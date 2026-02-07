@@ -46,7 +46,7 @@
     stocks:   [{ label: 'Refresh Prices',    action: 'refresh' }],
     wellness: [{ label: 'Breathing Exercise', action: 'breathe' },   { label: 'Ambient Sounds',  action: 'ambient' }],
     weather:  [{ label: 'Refresh Weather',   action: 'refresh' }],
-    gamearena: [{ label: 'New Game',          action: 'newGame' }, { label: 'Soccer Shootout', action: 'soccer' }],
+    gamearena: [{ label: 'New Game',          action: 'newGame' }, { label: 'Soccer Shootout', action: 'soccer' }, { label: 'FPS Arena (18+)', action: 'fpsArena' }],
     tutorial: [{ label: 'Restart Tutorial',  action: 'resetPos' }],
     antrush:  [{ label: 'Quick Mode',          action: 'quickMode' }, { label: 'Bed Challenge', action: 'bedChallenge' }]
   };
@@ -215,6 +215,9 @@
         break;
       case 'ambient':
         toggleMusic();
+        break;
+      case 'fpsArena':
+        window.location.href = '/vr/game-arena/fps-arena.html';
         break;
       case 'toggleLabels':
         document.querySelectorAll('a-text[value]').forEach(function (t) {
