@@ -516,6 +516,30 @@
     <a-light type="point" position="5 7.5 -6" color="#a855f7" intensity="0.2" distance="14"></a-light>
     <a-light type="point" position="0 7.5 -10" color="#00d4ff" intensity="0.15" distance="14"></a-light>
 
+    <!-- ===== CINEMA THEME SELECTOR ===== -->
+    <a-entity id="theme-selector" position="6 1.8 1">
+      <a-plane width="2.2" height="2.4" color="#0a0a1a" opacity="0.92" material="shader: flat"></a-plane>
+      <a-text value="CINEMA THEME" position="0 0.9 0.01" align="center" color="#4ecdc4" width="3"></a-text>
+      <a-entity class="clickable" id="theme-classic" position="0 0.4 0.01">
+        <a-plane width="1.8" height="0.5" color="#1a1020" opacity="0.9"
+                 animation__hover="property: color; to: #2a1a30; dur: 150; startEvents: mouseenter"
+                 animation__leave="property: color; to: #1a1020; dur: 150; startEvents: mouseleave"></a-plane>
+        <a-text value="Classic Cinema" align="center" color="#f59e0b" width="2.5" position="0 0 0.01"></a-text>
+      </a-entity>
+      <a-entity class="clickable" id="theme-imax" position="0 -0.2 0.01">
+        <a-plane width="1.8" height="0.5" color="#0a1a2e" opacity="0.9"
+                 animation__hover="property: color; to: #0a2a3e; dur: 150; startEvents: mouseenter"
+                 animation__leave="property: color; to: #0a1a2e; dur: 150; startEvents: mouseleave"></a-plane>
+        <a-text value="IMAX Experience" align="center" color="#00d4ff" width="2.5" position="0 0 0.01"></a-text>
+      </a-entity>
+      <a-entity class="clickable" id="theme-drivein" position="0 -0.8 0.01">
+        <a-plane width="1.8" height="0.5" color="#0a1a0a" opacity="0.9"
+                 animation__hover="property: color; to: #0a2a0a; dur: 150; startEvents: mouseenter"
+                 animation__leave="property: color; to: #0a1a0a; dur: 150; startEvents: mouseleave"></a-plane>
+        <a-text value="Drive-In" align="center" color="#22c55e" width="2.5" position="0 0 0.01"></a-text>
+      </a-entity>
+    </a-entity>
+
     <!-- ===== DECORATIVE ELEMENTS ===== -->
     <a-box position="-6 0.02 -6" width="0.05" height="0.02" depth="20" color="#4ecdc4" opacity="0.3"></a-box>
     <a-box position="6 0.02 -6" width="0.05" height="0.02" depth="20" color="#4ecdc4" opacity="0.3"></a-box>
@@ -1418,6 +1442,82 @@
         skipToNext();
       }
     });
+
+    // ===== CINEMA THEME SELECTOR =====
+    var cinemaThemes = {
+      classic: {
+        floor: '#1a0a0a', ceiling: '#0a0508', walls: '#120808',
+        ambient: '#332222', screenGlow: '#f59e0b', seatColor: '#2a1515',
+        accent: '#f59e0b', label: 'Classic Cinema'
+      },
+      imax: {
+        floor: '#050510', ceiling: '#020208', walls: '#030310',
+        ambient: '#111133', screenGlow: '#00d4ff', seatColor: '#0a0a20',
+        accent: '#00d4ff', label: 'IMAX Experience'
+      },
+      drivein: {
+        floor: '#0a1a0a', ceiling: '#000000', walls: '#000000',
+        ambient: '#112211', screenGlow: '#22c55e', seatColor: '#1a2a1a',
+        accent: '#22c55e', label: 'Drive-In Theater'
+      }
+    };
+
+    function applyCinemaTheme(name) {
+      var t = cinemaThemes[name];
+      if (!t) return;
+      // Floor
+      var floor = document.querySelector('a-scene a-plane[rotation="-90 0 0"][width="30"]');
+      if (floor) floor.setAttribute('color', t.floor);
+      // Ceiling
+      var ceil = document.querySelector('a-scene a-plane[rotation="90 0 0"]');
+      if (ceil) ceil.setAttribute('color', t.ceiling);
+      // Walls
+      document.querySelectorAll('a-scene > a-plane[width="30"][height="8"], a-scene > a-plane[width="24"][height="8"]').forEach(function(w) {
+        w.setAttribute('color', t.walls);
+      });
+      // Ambient light
+      var amb = document.querySelector('a-light[type="ambient"]');
+      if (amb) amb.setAttribute('color', t.ambient);
+      // Screen glow
+      var glow = document.getElementById('screen-glow');
+      if (glow) glow.setAttribute('color', t.screenGlow);
+      // Seats
+      document.querySelectorAll('#seats a-box').forEach(function(s) {
+        s.setAttribute('color', t.seatColor);
+      });
+      // Drive-in: hide ceiling + show stars
+      if (name === 'drivein') {
+        if (ceil) ceil.setAttribute('visible', 'false');
+        // Make seats look like cars
+        document.querySelectorAll('#seats a-box').forEach(function(s) {
+          s.setAttribute('height', '1.2');
+          s.setAttribute('depth', '1.8');
+        });
+      } else {
+        if (ceil) ceil.setAttribute('visible', 'true');
+        document.querySelectorAll('#seats a-box').forEach(function(s) {
+          s.setAttribute('height', '0.7');
+          s.setAttribute('depth', '0.8');
+        });
+      }
+      // Floor strips
+      document.querySelectorAll('a-scene > a-box[height="0.02"]').forEach(function(strip) {
+        strip.setAttribute('color', t.accent);
+      });
+      // Notification
+      if (window.VRAudio) window.VRAudio.success();
+      console.log('[Cinema] Theme: ' + t.label);
+    }
+
+    // Attach click handlers
+    document.addEventListener('DOMContentLoaded', function() {
+      var classic = document.getElementById('theme-classic');
+      var imax = document.getElementById('theme-imax');
+      var drivein = document.getElementById('theme-drivein');
+      if (classic) classic.addEventListener('click', function() { applyCinemaTheme('classic'); });
+      if (imax) imax.addEventListener('click', function() { applyCinemaTheme('imax'); });
+      if (drivein) drivein.addEventListener('click', function() { applyCinemaTheme('drivein'); });
+    });
   </script>
 
   <!-- YouTube IFrame API for auto-advance -->
@@ -1465,6 +1565,7 @@
   <script src="/vr/advanced-ux.js"></script>
   <script src="/vr/comfort-intelligence.js"></script>
   <script src="/vr/content-depth.js"></script>
+  <script src="/vr/polish-productivity.js"></script>
 
   <!-- Comfort vignette + F1 help -->
   <script src="/vr/vr-comfort.js"></script>

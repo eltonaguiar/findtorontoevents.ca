@@ -319,11 +319,71 @@
       <a-text id="vr-feels-desc" value="Loading comfort info..." position="0 0 0.08" align="center" width="6" color="#ffffff" wrap-count="50"></a-text>
     </a-entity>
 
-    <!-- Forecast Panel -->
+    <!-- Forecast Panel (interactive cards) -->
     <a-entity position="8 3 0" rotation="0 -30 0">
       <a-box width="4.5" height="6" depth="0.2" color="#0a0a1a" material="opacity: 0.9; transparent: true"></a-box>
       <a-text value="7-DAY FORECAST" position="0 2.5 0.15" align="center" width="5" color="#00d4ff"></a-text>
       <a-text id="vr-forecast" value="Loading..." position="0 -0.5 0.15" align="center" width="3.5" color="#cccccc"></a-text>
+      <!-- Individual clickable day cards overlaid on the panel -->
+      <a-entity id="forecast-cards">
+        <a-entity class="clickable forecast-card" data-day="0" position="0 1.8 0.16">
+          <a-plane width="3.8" height="0.6" color="#111122" opacity="0.8"
+                   animation__hover="property: color; to: #1a1a3a; dur: 150; startEvents: mouseenter"
+                   animation__leave="property: color; to: #111122; dur: 150; startEvents: mouseleave"></a-plane>
+          <a-text id="fc-day-0" value="..." position="0 0 0.01" align="center" color="#ccc" width="3.5"></a-text>
+        </a-entity>
+        <a-entity class="clickable forecast-card" data-day="1" position="0 1.15 0.16">
+          <a-plane width="3.8" height="0.6" color="#111122" opacity="0.8"
+                   animation__hover="property: color; to: #1a1a3a; dur: 150; startEvents: mouseenter"
+                   animation__leave="property: color; to: #111122; dur: 150; startEvents: mouseleave"></a-plane>
+          <a-text id="fc-day-1" value="..." position="0 0 0.01" align="center" color="#ccc" width="3.5"></a-text>
+        </a-entity>
+        <a-entity class="clickable forecast-card" data-day="2" position="0 0.5 0.16">
+          <a-plane width="3.8" height="0.6" color="#111122" opacity="0.8"
+                   animation__hover="property: color; to: #1a1a3a; dur: 150; startEvents: mouseenter"
+                   animation__leave="property: color; to: #111122; dur: 150; startEvents: mouseleave"></a-plane>
+          <a-text id="fc-day-2" value="..." position="0 0 0.01" align="center" color="#ccc" width="3.5"></a-text>
+        </a-entity>
+        <a-entity class="clickable forecast-card" data-day="3" position="0 -0.15 0.16">
+          <a-plane width="3.8" height="0.6" color="#111122" opacity="0.8"
+                   animation__hover="property: color; to: #1a1a3a; dur: 150; startEvents: mouseenter"
+                   animation__leave="property: color; to: #111122; dur: 150; startEvents: mouseleave"></a-plane>
+          <a-text id="fc-day-3" value="..." position="0 0 0.01" align="center" color="#ccc" width="3.5"></a-text>
+        </a-entity>
+        <a-entity class="clickable forecast-card" data-day="4" position="0 -0.8 0.16">
+          <a-plane width="3.8" height="0.6" color="#111122" opacity="0.8"
+                   animation__hover="property: color; to: #1a1a3a; dur: 150; startEvents: mouseenter"
+                   animation__leave="property: color; to: #111122; dur: 150; startEvents: mouseleave"></a-plane>
+          <a-text id="fc-day-4" value="..." position="0 0 0.01" align="center" color="#ccc" width="3.5"></a-text>
+        </a-entity>
+        <a-entity class="clickable forecast-card" data-day="5" position="0 -1.45 0.16">
+          <a-plane width="3.8" height="0.6" color="#111122" opacity="0.8"
+                   animation__hover="property: color; to: #1a1a3a; dur: 150; startEvents: mouseenter"
+                   animation__leave="property: color; to: #111122; dur: 150; startEvents: mouseleave"></a-plane>
+          <a-text id="fc-day-5" value="..." position="0 0 0.01" align="center" color="#ccc" width="3.5"></a-text>
+        </a-entity>
+        <a-entity class="clickable forecast-card" data-day="6" position="0 -2.1 0.16">
+          <a-plane width="3.8" height="0.6" color="#111122" opacity="0.8"
+                   animation__hover="property: color; to: #1a1a3a; dur: 150; startEvents: mouseenter"
+                   animation__leave="property: color; to: #111122; dur: 150; startEvents: mouseleave"></a-plane>
+          <a-text id="fc-day-6" value="..." position="0 0 0.01" align="center" color="#ccc" width="3.5"></a-text>
+        </a-entity>
+      </a-entity>
+    </a-entity>
+
+    <!-- Forecast Day Detail Popup -->
+    <a-entity id="forecast-detail" visible="false" position="5 4.5 3" rotation="0 -30 0">
+      <a-plane width="3.5" height="2.5" color="#0a0a1a" opacity="0.95" material="shader: flat"></a-plane>
+      <a-plane width="3.5" height="2.5" color="#00d4ff" opacity="0.08" material="shader: flat; wireframe: true" position="0 0 0.003"></a-plane>
+      <a-text id="fd-title" value="" position="0 0.9 0.01" align="center" color="#00d4ff" width="4"></a-text>
+      <a-text id="fd-temp" value="" position="0 0.45 0.01" align="center" color="#fff" width="5"></a-text>
+      <a-text id="fd-precip" value="" position="0 0.05 0.01" align="center" color="#67e8f9" width="3.5"></a-text>
+      <a-text id="fd-uv" value="" position="0 -0.3 0.01" align="center" color="#f59e0b" width="3.5"></a-text>
+      <a-text id="fd-sun" value="" position="0 -0.65 0.01" align="center" color="#94a3b8" width="3"></a-text>
+      <a-entity class="clickable" id="fd-close" position="1.5 1.0 0.01">
+        <a-plane width="0.4" height="0.3" color="#ef4444" opacity="0.8"></a-plane>
+        <a-text value="X" align="center" color="#fff" width="2.5" position="0 0 0.01"></a-text>
+      </a-entity>
     </a-entity>
 
     <!-- Atmosphere/Comfort Panel -->
@@ -752,6 +812,24 @@
       }
       vr.forecast.setAttribute('value', forecastText || 'No forecast data');
 
+      // Populate interactive forecast cards + store daily data for detail popup
+      window._forecastDaily = daily;
+      if (daily && daily.time) {
+        var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        for (var ci = 0; ci < Math.min(daily.time.length, 7); ci++) {
+          var cd = new Date(daily.time[ci]);
+          var cdName = dayNames[cd.getDay()];
+          var cdHi = Math.round(daily.temperature_2m_max[ci]);
+          var cdLo = Math.round(daily.temperature_2m_min[ci]);
+          var cdInfo = weatherCodeToInfo(daily.weather_code[ci], true);
+          var cardEl = document.getElementById('fc-day-' + ci);
+          if (cardEl) {
+            cardEl.setAttribute('value', cdName + '  ' + cdInfo.emoji + '  ' + cdHi + '° / ' + cdLo + '°');
+            cardEl.setAttribute('color', cdHi > 25 ? '#f59e0b' : cdHi < 0 ? '#67e8f9' : '#ccc');
+          }
+        }
+      }
+
       // Set visual weather mode
       setWeatherMode(info.condition, c.cloud_cover, temp, c.is_day, c.relative_humidity_2m);
       
@@ -1116,6 +1194,54 @@
         case 'r': case 'R': if (typeof fetchWeatherData === 'function') fetchWeatherData(); break;
       }
     });
+
+    // ===== INTERACTIVE FORECAST CARDS =====
+    function showForecastDetail(dayIdx) {
+      var daily = window._forecastDaily;
+      if (!daily || !daily.time || !daily.time[dayIdx]) return;
+      var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      var d = new Date(daily.time[dayIdx]);
+      var hi = Math.round(daily.temperature_2m_max[dayIdx]);
+      var lo = Math.round(daily.temperature_2m_min[dayIdx]);
+      var fInfo = weatherCodeToInfo(daily.weather_code[dayIdx], true);
+      var pProb = daily.precipitation_probability_max[dayIdx] || 0;
+      var uv = daily.uv_index_max ? daily.uv_index_max[dayIdx] : null;
+      var sunrise = daily.sunrise ? daily.sunrise[dayIdx] : null;
+      var sunset = daily.sunset ? daily.sunset[dayIdx] : null;
+
+      document.getElementById('fd-title').setAttribute('value', dayNames[d.getDay()] + ' ' + fInfo.emoji);
+      document.getElementById('fd-temp').setAttribute('value', 'High: ' + hi + '°C  /  Low: ' + lo + '°C');
+      document.getElementById('fd-precip').setAttribute('value', 'Precip chance: ' + pProb + '%');
+      document.getElementById('fd-uv').setAttribute('value', uv !== null ? 'UV Index: ' + uv : '');
+      var sunText = '';
+      if (sunrise) sunText += 'Rise: ' + sunrise.split('T')[1];
+      if (sunset) sunText += '  Set: ' + sunset.split('T')[1];
+      document.getElementById('fd-sun').setAttribute('value', sunText);
+
+      var popup = document.getElementById('forecast-detail');
+      popup.setAttribute('visible', 'true');
+      popup.setAttribute('animation__show', 'property: scale; from: 0.5 0.5 0.5; to: 1 1 1; dur: 250; easing: easeOutBack');
+      if (window.VRAudio) window.VRAudio.click();
+    }
+
+    function closeForecastDetail() {
+      var popup = document.getElementById('forecast-detail');
+      if (popup) {
+        popup.setAttribute('animation__hide', 'property: scale; to: 0 0 0; dur: 200; easing: easeInQuad');
+        setTimeout(function () { popup.setAttribute('visible', 'false'); }, 200);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.forecast-card').forEach(function (card) {
+        card.addEventListener('click', function () {
+          var idx = parseInt(card.getAttribute('data-day'), 10);
+          if (!isNaN(idx)) showForecastDetail(idx);
+        });
+      });
+      var closeBtn = document.getElementById('fd-close');
+      if (closeBtn) closeBtn.addEventListener('click', closeForecastDetail);
+    });
   </script>
   <!-- Keyboard hints -->
   <script src="/vr/keyboard-hints.js"></script>
@@ -1158,6 +1284,7 @@
   <script src="/vr/advanced-ux.js"></script>
   <script src="/vr/comfort-intelligence.js"></script>
   <script src="/vr/content-depth.js"></script>
+  <script src="/vr/polish-productivity.js"></script>
 
   <!-- Comfort vignette + F1 help -->
   <script src="/vr/vr-comfort.js"></script>

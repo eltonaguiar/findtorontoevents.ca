@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0a0a1f">
+  <title>VR Hub Mobile - Toronto Events</title>
+  
+  <!-- A-Frame WebXR -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.4.0/dist/aframe-extras.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a1f;
+      color: white;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Mobile Loading Screen */
+    #mobile-loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0a0a1f 0%, #1a1a3e 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100000;
+      transition: opacity 0.5s;
+    }
+    
+    #mobile-loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(0,212,255,0.3);
+      border-top-color: #00d4ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      margin-top: 20px;
+      color: #00d4ff;
+      font-size: 16px;
+    }
+    
+    /* Mobile UI Overlay */
+    #mobile-ui {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 99999;
+    }
+    
+    /* Top Bar */
+    .mobile-top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(10,10,30,0.95) 0%, transparent 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      pointer-events: auto;
+    }
+    
+    .mobile-logo {
+      font-size: 18px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #00d4ff, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .mobile-menu-btn {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      color: white;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Bottom Controls */
+    .mobile-bottom-controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 180px;
+      background: linear-gradient(0deg, rgba(10,10,30,0.95) 0%, transparent 100%);
+      pointer-events: auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+    
+    /* Virtual Joystick */
+    .mobile-joystick {
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(0,212,255,0.5);
+      border-radius: 50%;
+      position: relative;
+      touch-action: none;
+    }
+    
+    .joystick-knob {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #00d4ff, #0ea5e9);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px rgba(0,212,255,0.5);
+    }
+    
+    /* Action Buttons */
+    .mobile-actions {
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+    }
+    
+    .mobile-action-btn {
+      width: 60px;
+      height: 60px;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      color: white;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+    
+    .mobile-action-btn.primary {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #00d4ff, #0ea5e9);
+      border-color: #00d4ff;
+      box-shadow: 0 0 30px rgba(0,212,255,0.4);
+    }
+    
+    .mobile-action-btn:active {
+      transform: scale(0.95);
+    }
+    
+    /* Look Controls Hint */
+    .mobile-look-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.7);
+      padding: 15px 25px;
+      border-radius: 25px;
+      font-size: 14px;
+      color: #888;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .mobile-look-hint.show {
+      opacity: 1;
+    }
+    
+    /* Zone Menu */
+    #mobile-zone-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10,10,30,0.98);
+      z-index: 100001;
+      display: none;
+      flex-direction: column;
+      padding: 20px;
+      padding-top: calc(20px + env(safe-area-inset-top));
+    }
+    
+    #mobile-zone-menu.active {
+      display: flex;
+    }
+    
+    .mobile-menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    
+    .mobile-menu-title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .mobile-close-btn {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 24px;
+    }
+    
+    .mobile-zone-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      overflow-y: auto;
+    }
+    
+    .mobile-zone-card {
+      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(168,85,247,0.2));
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      text-decoration: none;
+      color: white;
+    }
+    
+    .mobile-zone-card .icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+    
+    .mobile-zone-card .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    /* VR Enter Button */
+    .mobile-vr-btn {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 0 30px rgba(168,85,247,0.4);
+    }
+    
+    /* Orientation Warning */
+    #orientation-warning {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a0a1f;
+      z-index: 100002;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    #orientation-warning.show {
+      display: flex;
+    }
+    
+    .orientation-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: rotate 2s ease-in-out infinite;
+    }
+    
+    @keyframes rotate {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="mobile-loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading VR Experience...</div>
+  </div>
+  
+  <!-- Orientation Warning -->
+  <div id="orientation-warning">
+    <div class="orientation-icon">📱</div>
+    <h2>Rotate Your Device</h2>
+    <p style="color: #888; margin-top: 10px;">For the best VR experience, please use landscape mode</p>
+  </div>
+  
+  <!-- A-Frame Scene -->
+  <a-scene 
+    id="vr-scene"
+    embedded 
+    renderer="antialias: true; colorManagement: true; highRefreshRate: true"
+    vr-mode-ui="enabled: true; enterVRButton: #vr-enter-btn"
+    loading-screen="enabled: false">
+    
+    <!-- Assets -->
+    <a-assets>
+      <img id="sky-texture" src="/vr/assets/stars.jpg" crossorigin="anonymous">
+      <a-mixin id="hover-animation" animation="property: position; dir: alternate; dur: 2000; easing: easeInOutSine; loop: true; to: 0 0.2 0"></a-mixin>
+    </a-assets>
+    
+    <!-- Camera Rig -->
+    <a-entity id="rig" position="0 1.6 0">
+      <a-camera 
+        id="camera"
+        look-controls="enabled: true; touchEnabled: true; magicWindowTrackingEnabled: true"
+        wasd-controls="enabled: false">
+      </a-camera>
+    </a-entity>
+    
+    <!-- Environment -->
+    <a-sky color="#0a0a1f"></a-sky>
+    
+    <!-- Stars -->
+    <a-entity id="stars"></a-entity>
+    
+    <!-- Ground Platform -->
+    <a-cylinder 
+      position="0 0 0" 
+      radius="20" 
+      height="0.1" 
+      color="#1a1a3e"
+      material="metalness: 0.5; roughness: 0.5">
+    </a-cylinder>
+    
+    <!-- Grid Pattern -->
+    <a-grid helper geometry="primitive: plane; width: 40; height: 40" rotation="-90 0 0" material="src: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==); repeat: 40 40; transparent: true; opacity: 0.3">
+    </a-grid>
+    
+    <!-- Zone Portals -->
+    <a-entity id="portals">
+      <!-- Weather Portal -->
+      <a-entity position="-5 1.5 -8">
+        <a-torus color="#0ea5e9" radius="1.5" radius-tubular="0.1" rotation="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000"></a-torus>
+        <a-sphere color="#0ea5e9" radius="0.8" opacity="0.8" class="clickable" data-zone="weather">
+          <a-text value="Weather" align="center" position="0 0 0.9" width="4" color="white"></a-text>
+        </a-sphere>
+        <a-text value="🌤️" align="center" position="0 0 1" width="8"></a-text>
+      </a-entity>
+      
+      <!-- Movies Portal -->
+      <a-entity position="0 1.5 -8">
+        <a-torus color="#ec4899" radius="1.5" radius-tubular="0.1" rotation="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000"></a-torus>
+        <a-sphere color="#ec4899" radius="0.8" opacity="0.8" class="clickable" data-zone="movies">
+          <a-text value="Movies" align="center" position="0 0 0.9" width="4" color="white"></a-text>
+        </a-sphere>
+        <a-text value="🎬" align="center" position="0 0 1" width="8"></a-text>
+      </a-entity>
+      
+      <!-- Events Portal -->
+      <a-entity position="5 1.5 -8">
+        <a-torus color="#22c55e" radius="1.5" radius-tubular="0.1" rotation="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000"></a-torus>
+        <a-sphere color="#22c55e" radius="0.8" opacity="0.8" class="clickable" data-zone="events">
+          <a-text value="Events" align="center" position="0 0 0.9" width="4" color="white"></a-text>
+        </a-sphere>
+        <a-text value="📅" align="center" position="0 0 1" width="8"></a-text>
+      </a-entity>
+    </a-entity>
+    
+    <!-- Floating Particles -->
+    <a-entity id="particles"></a-entity>
+    
+    <!-- Ambient Light -->
+    <a-light type="ambient" color="#444"></a-light>
+    <a-light type="point" position="2 4 4" color="#00d4ff" intensity="0.5"></a-light>
+    <a-light type="point" position="-2 4 -4" color="#a855f7" intensity="0.5"></a-light>
+  </a-scene>
+  
+  <!-- Mobile UI Overlay -->
+  <div id="mobile-ui">
+    <!-- Top Bar -->
+    <div class="mobile-top-bar">
+      <div class="mobile-logo">🥽 VR Hub</div>
+      <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
+    
+    <!-- Look Hint -->
+    <div class="mobile-look-hint" id="look-hint">👆 Drag to look around</div>
+    
+    <!-- VR Button -->
+    <button class="mobile-vr-btn" id="vr-enter-btn" onclick="enterVR()">🥽</button>
+    
+    <!-- Bottom Controls -->
+    <div class="mobile-bottom-controls">
+      <!-- Virtual Joystick -->
+      <div class="mobile-joystick" id="joystick">
+        <div class="joystick-knob" id="joystick-knob"></div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="mobile-actions">
+        <button class="mobile-action-btn" onclick="jump()">⬆️</button>
+        <button class="mobile-action-btn primary" onclick="select()">👆</button>
+        <button class="mobile-action-btn" onclick="resetPosition()">🔄</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Zone Menu -->
+  <div id="mobile-zone-menu">
+    <div class="mobile-menu-header">
+      <div class="mobile-menu-title">🌐 Zones</div>
+      <button class="mobile-close-btn" onclick="toggleMenu()">×</button>
+    </div>
+    
+    <div class="mobile-zone-grid">
+      <a href="/vr/weather-zone.html" class="mobile-zone-card">
+        <div class="icon">🌤️</div>
+        <div class="name">Weather</div>
+      </a>
+      <a href="/vr/movies.html" class="mobile-zone-card">
+        <div class="icon">🎬</div>
+        <div class="name">Movies</div>
+      </a>
+      <a href="/vr/events/index.html" class="mobile-zone-card">
+        <div class="icon">📅</div>
+        <div class="name">Events</div>
+      </a>
+      <a href="/vr/creators.html" class="mobile-zone-card">
+        <div class="icon">⭐</div>
+        <div class="name">Creators</div>
+      </a>
+      <a href="/vr/stocks-zone.html" class="mobile-zone-card">
+        <div class="icon">📈</div>
+        <div class="name">Stocks</div>
+      </a>
+      <a href="/vr/wellness/index.html" class="mobile-zone-card">
+        <div class="icon">🧘</div>
+        <div class="name">Wellness</div>
+      </a>
+    </div>
+  </div>
+  
+  <script>
+    // Mobile VR Controller
+    const MobileVR = {
+      joystick: { active: false, x: 0, y: 0 },
+      rig: null,
+      camera: null,
+      
+      init() {
+        this.rig = document.getElementById('rig');
+        this.camera = document.getElementById('camera');
+        
+        this.setupJoystick();
+        this.setupTouchControls();
+        this.setupOrientation();
+        this.createStars();
+        this.createParticles();
+        
+        // Hide loading after scene loads
+        document.querySelector('a-scene').addEventListener('loaded', () => {
+          setTimeout(() => {
+            document.getElementById('mobile-loading').classList.add('hidden');
+            document.getElementById('look-hint').classList.add('show');
+            setTimeout(() => document.getElementById('look-hint').classList.remove('show'), 3000);
+          }, 1000);
+        });
+      },
+      
+      setupJoystick() {
+        const joystick = document.getElementById('joystick');
+        const knob = document.getElementById('joystick-knob');
+        let startX, startY;
+        
+        joystick.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          this.joystick.active = true;
+          const touch = e.touches[0];
+          const rect = joystick.getBoundingClientRect();
+          startX = rect.left + rect.width / 2;
+          startY = rect.top + rect.height / 2;
+        }, { passive: false });
+        
+        joystick.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          if (!this.joystick.active) return;
+          
+          const touch = e.touches[0];
+          const dx = touch.clientX - startX;
+          const dy = touch.clientY - startY;
+          const distance = Math.min(Math.sqrt(dx * dx + dy * dy), 35);
+          const angle = Math.atan2(dy, dx);
+          
+          const x = Math.cos(angle) * distance;
+          const y = Math.sin(angle) * distance;
+          
+          knob.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+          
+          this.joystick.x = x / 35;
+          this.joystick.y = y / 35;
+          
+          this.movePlayer();
+        }, { passive: false });
+        
+        joystick.addEventListener('touchend', () => {
+          this.joystick.active = false;
+          knob.style.transform = 'translate(-50%, -50%)';
+          this.joystick.x = 0;
+          this.joystick.y = 0;
+        });
+      },
+      
+      movePlayer() {
+        if (!this.rig) return;
+        
+        const speed = 0.05;
+        const pos = this.rig.getAttribute('position');
+        const rotation = this.camera.getAttribute('rotation');
+        
+        // Calculate movement based on camera rotation
+        const rad = (rotation.y - 90) * Math.PI / 180;
+        pos.x += Math.cos(rad) * this.joystick.x * speed;
+        pos.z += Math.sin(rad) * this.joystick.x * speed;
+        
+        this.rig.setAttribute('position', pos);
+      },
+      
+      setupTouchControls() {
+        // Double tap to select
+        let lastTap = 0;
+        document.querySelector('a-scene').addEventListener('click', (e) => {
+          const now = Date.now();
+          if (now - lastTap < 300) {
+            this.select();
+          }
+          lastTap = now;
+        });
+      },
+      
+      setupOrientation() {
+        // Check orientation
+        const checkOrientation = () => {
+          const warning = document.getElementById('orientation-warning');
+          if (window.innerWidth < window.innerHeight) {
+            warning.classList.add('show');
+          } else {
+            warning.classList.remove('show');
+          }
+        };
+        
+        window.addEventListener('resize', checkOrientation);
+        checkOrientation();
+      },
+      
+      createStars() {
+        const stars = document.getElementById('stars');
+        for (let i = 0; i < 200; i++) {
+          const star = document.createElement('a-sphere');
+          star.setAttribute('radius', Math.random() * 0.05 + 0.01);
+          star.setAttribute('color', '#ffffff');
+          star.setAttribute('position', {
+            x: (Math.random() - 0.5) * 100,
+            y: Math.random() * 50,
+            z: (Math.random() - 0.5) * 100
+          });
+          star.setAttribute('opacity', Math.random() * 0.5 + 0.3);
+          stars.appendChild(star);
+        }
+      },
+      
+      createParticles() {
+        const particles = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement('a-sphere');
+          particle.setAttribute('radius', 0.02);
+          particle.setAttribute('color', Math.random() > 0.5 ? '#00d4ff' : '#a855f7');
+          particle.setAttribute('position', {
+            x: (Math.random() - 0.5) * 20,
+            y: Math.random() * 5,
+            z: (Math.random() - 0.5) * 20
+          });
+          particle.setAttribute('animation', `property: position; to: ${(Math.random()-0.5)*20} ${Math.random()*5+2} ${(Math.random()-0.5)*20}; dur: ${5000+Math.random()*5000}; loop: true; dir: alternate; easing: easeInOutSine`);
+          particles.appendChild(particle);
+        }
+      },
+      
+      jump() {
+        if (!this.rig) return;
+        const pos = this.rig.getAttribute('position');
+        if (pos.y <= 1.6) {
+          pos.y += 0.5;
+          this.rig.setAttribute('position', pos);
+          setTimeout(() => {
+            pos.y = 1.6;
+            this.rig.setAttribute('position', pos);
+          }, 500);
+        }
+      },
+      
+      select() {
+        // Raycast selection
+        showToast('👆 Selection mode');
+      },
+      
+      resetPosition() {
+        if (this.rig) {
+          this.rig.setAttribute('position', '0 1.6 0');
+          this.rig.setAttribute('rotation', '0 0 0');
+        }
+        showToast('🔄 Position reset');
+      }
+    };
+    
+    // Global functions
+    function toggleMenu() {
+      document.getElementById('mobile-zone-menu').classList.toggle('active');
+    }
+    
+    function enterVR() {
+      const scene = document.querySelector('a-scene');
+      if (scene.enterVR) {
+        scene.enterVR();
+      }
+    }
+    
+    function jump() {
+      MobileVR.jump();
+    }
+    
+    function select() {
+      MobileVR.select();
+    }
+    
+    function resetPosition() {
+      MobileVR.resetPosition();
+    }
+    
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed; bottom: 200px; left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8); color: white;
+        padding: 12px 24px; border-radius: 25px;
+        font-size: 14px; z-index: 100003;
+        pointer-events: none;
+      `;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    }
+    
+    // Initialize when scene is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      MobileVR.init();
+    });
+  </script>
+</body>
+</html>

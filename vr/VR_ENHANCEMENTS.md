@@ -308,6 +308,8 @@ Based on real Meta Quest 3 user testing feedback. Prioritized by severity.
 | 18 | Hub Portal Loading Feedback (flash + spinner overlay) | 20 min | ✅ DONE |
 | 19 | Stocks Interactive Pedestals + Detail Popup | 1 hour | ✅ DONE |
 | 20 | Tutorial Zone Controller Support (laser + locomotion) | 20 min | ✅ DONE |
+| 21 | Movies Cinema Theme Selector (Classic/IMAX/Drive-In) | 30 min | ✅ DONE |
+| 22 | Weather Interactive Forecast Cards + Detail Popup | 30 min | ✅ DONE |
 
 ---
 
@@ -325,4 +327,4 @@ Each zone file just needs: `<script src="/vr/vr-controls.js"></script>`
 
 ---
 
-*Last updated: 2026-02-07 — Session 4: Zone tooltips, spatial audio, stock pedestals+popup, tutorial controllers, portal loading feedback*
+*Last updated: 2026-02-07 — Session 4: Zone tooltips, spatial audio, stock pedestals+popup, tutorial controllers, portal loading, cinema themes, weather forecast cards*

@@ -305,6 +305,8 @@
           '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRComfortIntel)VRComfortIntel.customHotkeys.openEditor()" title="Custom Hotkeys">&#x2328; Keys</button>' +
           '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRContentDepth)VRContentDepth.crossTimeline.open()" title="Timeline">&#x1F550; Timeline</button>' +
           '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRContentDepth)VRContentDepth.scratchpad.toggle()" title="Scratchpad (Ctrl+N)">&#x1F4DD; Notes</button>' +
+          '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRPolish)VRPolish.commandPalette.open()" title="Commands (Ctrl+Shift+P)">&#x1F50D; Cmds</button>' +
+          '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRPolish)VRPolish.qrSharing.show()" title="Share QR">&#x1F4F1; QR</button>' +
         '</div>' +
 
         // Zone navigation
