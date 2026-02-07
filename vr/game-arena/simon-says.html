@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simon Says VR - Game Arena | Toronto Events</title>
+  <script src="/vr/https-redirect.js"></script>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+
+  <script>
+    AFRAME.registerComponent('look-at-camera', {
+      tick: function () {
+        var cam = this.el.sceneEl.camera;
+        if (cam) this.el.object3D.lookAt(cam.getWorldPosition(new THREE.Vector3()));
+      }
+    });
+  </script>
+
+  <style>
+    body { margin: 0; overflow: hidden; font-family: 'Inter', -apple-system, sans-serif; }
+
+    #loading {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #0a0a1f 0%, #1f0a2e 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; color: white; transition: opacity 0.5s;
+    }
+    #loading h1 {
+      font-size: 2.5rem; margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #8b5cf6, #6366f1);
+      background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    #loading p { color: #888; font-size: 1.1rem; }
+    .spinner {
+      width: 60px; height: 60px; border: 4px solid rgba(139,92,246,0.3);
+      border-top-color: #8b5cf6; border-radius: 50%;
+      animation: spin 1s linear infinite; margin-bottom: 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+
+    /* HUD */
+    #hud {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 200; display: flex; gap: 14px; align-items: center;
+    }
+    .hud-card {
+      background: rgba(10,10,30,0.88); backdrop-filter: blur(10px);
+      border: 1px solid rgba(139,92,246,0.4); border-radius: 14px;
+      padding: 10px 18px; color: white; text-align: center; font-size: 14px; min-width: 75px;
+    }
+    .hud-card h3 { margin: 0 0 2px; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+    .hud-card .val { font-size: 24px; font-weight: 800; }
+    .hud-card .val.score { color: #8b5cf6; }
+    .hud-card .val.round { color: #22c55e; }
+    .hud-card .val.best { color: #f59e0b; }
+    .hud-card .val.streak { color: #ec4899; }
+
+    #hud-status {
+      position: fixed; top: 90px; left: 50%; transform: translateX(-50%);
+      z-index: 200; background: rgba(10,10,30,0.88); backdrop-filter: blur(10px);
+      border: 1px solid rgba(139,92,246,0.3); border-radius: 12px;
+      padding: 10px 28px; color: #8b5cf6; font-size: 16px; font-weight: 600;
+      text-align: center; transition: all 0.3s; min-width: 200px;
+    }
+
+    /* Start screen */
+    #start-screen {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: white;
+    }
+    #start-screen h1 {
+      font-size: 3rem; margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #8b5cf6, #6366f1);
+      background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    #start-screen p { color: #888; margin-bottom: 0.5rem; font-size: 1.1rem; max-width: 500px; text-align: center; }
+    .color-preview { display: flex; gap: 12px; margin: 1.5rem 0; }
+    .color-dot {
+      width: 40px; height: 40px; border-radius: 10px; opacity: 0.7;
+    }
+    .start-btn {
+      margin-top: 1rem; padding: 16px 48px; border-radius: 14px;
+      font-size: 18px; font-weight: 700; cursor: pointer; border: none;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white;
+      transition: all 0.3s;
+    }
+    .start-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(139,92,246,0.4); }
+    .hs-display { margin-top: 1.5rem; color: #888; font-size: 14px; }
+    .hs-display span { color: #8b5cf6; font-weight: 700; font-size: 20px; }
+
+    /* Buttons */
+    .btn-bar {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 200; display: flex; gap: 10px;
+    }
+    .btn {
+      padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s; color: white;
+    }
+    .btn-primary { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+    .btn-primary:hover { box-shadow: 0 4px 15px rgba(139,92,246,0.4); transform: translateY(-1px); }
+    .btn-secondary { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+    /* Game Over overlay */
+    #gameover-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: white; opacity: 0; pointer-events: none; transition: opacity 0.4s;
+    }
+    #gameover-overlay.active { opacity: 1; pointer-events: all; }
+    #gameover-overlay h1 { font-size: 3rem; margin-bottom: 0.3rem; }
+    #gameover-overlay .stats { display: flex; gap: 24px; margin: 1rem 0 1.5rem; }
+    #gameover-overlay .stat { text-align: center; }
+    #gameover-overlay .stat .sv { font-size: 2rem; font-weight: 800; }
+    #gameover-overlay .stat .sl { font-size: 12px; color: #888; text-transform: uppercase; }
+    #gameover-overlay .btn-bar { position: static; transform: none; }
+
+    /* Sequence display (dots showing current sequence) */
+    #sequence-dots {
+      position: fixed; top: 130px; left: 50%; transform: translateX(-50%);
+      z-index: 200; display: flex; gap: 6px; align-items: center;
+      padding: 8px 16px; background: rgba(10,10,30,0.85); border-radius: 10px;
+      border: 1px solid rgba(139,92,246,0.2); flex-wrap: wrap; justify-content: center;
+      max-width: 400px;
+    }
+    .seq-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); transition: all 0.3s;
+    }
+    .seq-dot.active { transform: scale(1.3); box-shadow: 0 0 8px; }
+    .seq-dot.correct { background: #22c55e; }
+    .seq-dot.wrong { background: #ef4444; }
+
+    /* Flash overlay */
+    #flash-msg {
+      position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 250; font-size: 2.5rem; font-weight: 900;
+      opacity: 0; pointer-events: none; transition: all 0.25s;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    #flash-msg.show { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  </style>
+</head>
+<body>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <h1>Simon Says</h1>
+    <p>Preparing the sequence...</p>
+  </div>
+
+  <!-- Start Screen -->
+  <div id="start-screen" class="hidden">
+    <h1>Simon Says</h1>
+    <p>Watch the color sequence, then repeat it! Each round adds one more color.</p>
+    <p style="color: #aaa; font-size: 14px;">How far can you go?</p>
+    <div class="color-preview">
+      <div class="color-dot" style="background: #ef4444;"></div>
+      <div class="color-dot" style="background: #3b82f6;"></div>
+      <div class="color-dot" style="background: #22c55e;"></div>
+      <div class="color-dot" style="background: #f59e0b;"></div>
+    </div>
+    <button class="start-btn" onclick="beginGame()">START GAME</button>
+    <div class="hs-display" id="hs-display"></div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-card"><h3>Score</h3><div class="val score" id="hud-score">0</div></div>
+    <div class="hud-card"><h3>Round</h3><div class="val round" id="hud-round">1</div></div>
+    <div class="hud-card"><h3>Best</h3><div class="val best" id="hud-best">0</div></div>
+    <div class="hud-card"><h3>Streak</h3><div class="val streak" id="hud-streak">0</div></div>
+  </div>
+  <div id="hud-status" class="hidden">Watch the sequence!</div>
+
+  <!-- Sequence dots -->
+  <div id="sequence-dots" class="hidden"></div>
+
+  <!-- Buttons -->
+  <div class="btn-bar">
+    <a class="btn btn-secondary" href="/vr/game-arena/">Back to Arena</a>
+  </div>
+
+  <!-- Flash message -->
+  <div id="flash-msg"></div>
+
+  <!-- Game Over overlay -->
+  <div id="gameover-overlay">
+    <h1 id="go-title" style="color: #ef4444;">Wrong Sequence!</h1>
+    <p id="go-subtitle" style="color: #aaa;">Great effort!</p>
+    <div class="stats">
+      <div class="stat"><div class="sv" id="go-score" style="color:#8b5cf6">0</div><div class="sl">Score</div></div>
+      <div class="stat"><div class="sv" id="go-round" style="color:#22c55e">0</div><div class="sl">Rounds</div></div>
+      <div class="stat"><div class="sv" id="go-length" style="color:#f59e0b">0</div><div class="sl">Max Sequence</div></div>
+      <div class="stat"><div class="sv" id="go-streak" style="color:#ec4899">0</div><div class="sl">Best Streak</div></div>
+    </div>
+    <p id="go-record" style="color: #8b5cf6; font-weight: 700; font-size: 18px;"></p>
+    <div class="btn-bar">
+      <button class="btn btn-primary" onclick="beginGame()">Play Again</button>
+      <a class="btn btn-secondary" href="/vr/game-arena/">Back to Arena</a>
+    </div>
+  </div>
+
+  <!-- A-FRAME SCENE -->
+  <a-scene
+    renderer="antialias: true; colorManagement: true; sortTransparentObjects: true"
+    vr-mode-ui="enabled: true"
+    loading-screen="enabled: false"
+    cursor="rayOrigin: mouse; fuse: false"
+    raycaster="objects: .clickable"
+  >
+    <a-assets></a-assets>
+
+    <a-entity environment="
+      preset: starry;
+      groundColor: #0a0a1f;
+      groundTexture: none;
+      dressing: none;
+      skyType: atmosphere;
+      skyColor: #050510;
+      horizonColor: #1a0a2e;
+      fog: 0.3"></a-entity>
+
+    <!-- Floor -->
+    <a-cylinder position="0 -0.05 0" radius="12" height="0.1" color="#0a0a1f" opacity="0.9"></a-cylinder>
+    <a-ring position="0 0.02 0" rotation="-90 0 0" radius-inner="4" radius-outer="4.08" color="#8b5cf6" opacity="0.4"
+            animation="property: rotation; to: -90 360 0; dur: 30000; loop: true; easing: linear"></a-ring>
+
+    <!-- Simon Says Board - 4 quadrants -->
+    <a-entity id="simon-board" position="0 2 -3.5">
+      <!-- Center circle -->
+      <a-cylinder position="0 0 0" radius="0.5" height="0.15" color="#1e1b4b" material="shader: flat"></a-cylinder>
+
+      <!-- RED - Top Left -->
+      <a-entity id="pad-0" class="clickable simon-pad" data-pad="0" position="-1.1 0.8 0">
+        <a-plane width="1.8" height="1.4" color="#7f1d1d" material="shader: flat" class="pad-bg"></a-plane>
+        <a-plane width="1.7" height="1.3" color="#991b1b" material="shader: flat" position="0 0 0.01" class="pad-inner"></a-plane>
+        <a-text value="RED" align="center" width="3" color="#fca5a5" position="0 0 0.02" opacity="0.6"></a-text>
+        <a-light type="point" color="#ef4444" intensity="0" distance="3" class="pad-glow"></a-light>
+      </a-entity>
+
+      <!-- BLUE - Top Right -->
+      <a-entity id="pad-1" class="clickable simon-pad" data-pad="1" position="1.1 0.8 0">
+        <a-plane width="1.8" height="1.4" color="#1e3a5f" material="shader: flat" class="pad-bg"></a-plane>
+        <a-plane width="1.7" height="1.3" color="#1e40af" material="shader: flat" position="0 0 0.01" class="pad-inner"></a-plane>
+        <a-text value="BLUE" align="center" width="3" color="#93c5fd" position="0 0 0.02" opacity="0.6"></a-text>
+        <a-light type="point" color="#3b82f6" intensity="0" distance="3" class="pad-glow"></a-light>
+      </a-entity>
+
+      <!-- GREEN - Bottom Left -->
+      <a-entity id="pad-2" class="clickable simon-pad" data-pad="2" position="-1.1 -0.8 0">
+        <a-plane width="1.8" height="1.4" color="#14532d" material="shader: flat" class="pad-bg"></a-plane>
+        <a-plane width="1.7" height="1.3" color="#166534" material="shader: flat" position="0 0 0.01" class="pad-inner"></a-plane>
+        <a-text value="GREEN" align="center" width="3" color="#86efac" position="0 0 0.02" opacity="0.6"></a-text>
+        <a-light type="point" color="#22c55e" intensity="0" distance="3" class="pad-glow"></a-light>
+      </a-entity>
+
+      <!-- YELLOW - Bottom Right -->
+      <a-entity id="pad-3" class="clickable simon-pad" data-pad="3" position="1.1 -0.8 0">
+        <a-plane width="1.8" height="1.4" color="#713f12" material="shader: flat" class="pad-bg"></a-plane>
+        <a-plane width="1.7" height="1.3" color="#854d0e" material="shader: flat" position="0 0 0.01" class="pad-inner"></a-plane>
+        <a-text value="YELLOW" align="center" width="2.5" color="#fde68a" position="0 0 0.02" opacity="0.6"></a-text>
+        <a-light type="point" color="#f59e0b" intensity="0" distance="3" class="pad-glow"></a-light>
+      </a-entity>
+
+      <!-- Outer frame -->
+      <a-plane width="4.8" height="3.6" color="#0f0e27" material="shader: flat" position="0 0 -0.05"></a-plane>
+      <a-plane width="5" height="3.8" color="#1e1b4b" material="shader: flat; opacity: 0.8" position="0 0 -0.06"></a-plane>
+    </a-entity>
+
+    <!-- Title -->
+    <a-entity position="0 5 -3.5" look-at-camera>
+      <a-text value="SIMON SAYS" align="center" width="8" color="#8b5cf6" font="mozillavr"></a-text>
+    </a-entity>
+
+    <!-- Score panel -->
+    <a-entity position="4 2 -2.5" rotation="0 -30 0">
+      <a-plane width="2.5" height="3" color="#0a0a1f" opacity="0.9" material="shader: flat">
+        <a-plane width="2.3" height="2.8" color="#111128" opacity="0.95" position="0 0 0.01" material="shader: flat"></a-plane>
+      </a-plane>
+      <a-text value="HIGH SCORES" align="center" width="3" color="#8b5cf6" position="0 1.1 0.05" font="mozillavr"></a-text>
+      <a-entity id="hs-board" position="0 0.4 0.05"></a-entity>
+    </a-entity>
+
+    <!-- Decorative -->
+    <a-sphere position="-7 3 -5" radius="0.1" color="#8b5cf6" opacity="0.5"
+              animation="property: position; to: -7 5 -5; dur: 4000; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+    <a-sphere position="7 4 -3" radius="0.08" color="#6366f1" opacity="0.4"
+              animation="property: position; to: 7 6 -3; dur: 3500; loop: true; dir: alternate; easing: easeInOutSine"></a-sphere>
+
+    <!-- Lighting -->
+    <a-light type="ambient" color="#303050" intensity="0.4"></a-light>
+    <a-light type="point" position="0 5 -1" color="#8b5cf6" intensity="0.6" distance="15"></a-light>
+    <a-light type="point" position="-3 3 -3" color="#6366f1" intensity="0.3" distance="8"></a-light>
+    <a-light type="point" position="3 3 -3" color="#a855f7" intensity="0.3" distance="8"></a-light>
+
+    <!-- Camera Rig -->
+    <a-entity id="rig" position="0 2 2.5">
+      <a-camera look-controls wasd-controls="acceleration: 30" fov="80">
+        <a-ring cursor="fuse: true; fuseTimeout: 1200"
+                raycaster="objects: .clickable; far: 20"
+                radius-inner="0.005" radius-outer="0.012"
+                color="#8b5cf6" shader="flat" position="0 0 -1"
+                animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 200"
+                animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.5 0.5 0.5; dur: 1200; easing: linear"
+                animation__mouseleave="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 200"></a-ring>
+      </a-camera>
+      <a-entity laser-controls="hand: left" raycaster="objects: .clickable; far: 20; lineColor: #8b5cf6; lineOpacity: 0.5" cursor="rayOrigin: entity; fuse: false"></a-entity>
+      <a-entity laser-controls="hand: right" raycaster="objects: .clickable; far: 20; lineColor: #6366f1; lineOpacity: 0.5" cursor="rayOrigin: entity; fuse: false"></a-entity>
+    </a-entity>
+  </a-scene>
+
+  <script>
+  (function() {
+    'use strict';
+
+    var STORAGE_KEY = 'gameArena';
+    var SIMON_KEY = 'simonSays';
+
+    // Pad configurations
+    var PADS = [
+      { id: 0, name: 'Red',    dimColor: '#991b1b', litColor: '#ef4444', bgDim: '#7f1d1d', freq: 329.63 },
+      { id: 1, name: 'Blue',   dimColor: '#1e40af', litColor: '#3b82f6', bgDim: '#1e3a5f', freq: 440.00 },
+      { id: 2, name: 'Green',  dimColor: '#166534', litColor: '#22c55e', bgDim: '#14532d', freq: 554.37 },
+      { id: 3, name: 'Yellow', dimColor: '#854d0e', litColor: '#f59e0b', bgDim: '#713f12', freq: 659.25 }
+    ];
+
+    // ===== STATE =====
+    var sequence = [];
+    var playerInput = [];
+    var round = 1;
+    var score = 0;
+    var bestStreak = 0;
+    var currentStreak = 0;
+    var phase = 'idle'; // idle, showing, input, gameover
+    var padElements = [];
+    var audioCtx = null;
+
+    // ===== AUDIO =====
+    function getAudioCtx() {
+      if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, duration) {
+      var ctx = getAudioCtx();
+      if (!ctx) return;
+      try {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.value = 0.15;
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playErrorTone() {
+      var ctx = getAudioCtx();
+      if (!ctx) return;
+      try {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.value = 100;
+        gain.gain.value = 0.12;
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.5);
+      } catch(e) {}
+    }
+
+    // ===== LOADING =====
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var el = document.getElementById('loading');
+        el.style.opacity = '0';
+        setTimeout(function () {
+          el.classList.add('hidden');
+          showStartScreen();
+        }, 500);
+      }, 1000);
+    });
+
+    // ===== SETUP PADS =====
+    function setupPads() {
+      padElements = [];
+      PADS.forEach(function(pad) {
+        var el = document.getElementById('pad-' + pad.id);
+        if (!el) return;
+
+        var inner = el.querySelector('.pad-inner');
+        var glow = el.querySelector('.pad-glow');
+
+        padElements.push({
+          id: pad.id,
+          entity: el,
+          inner: inner,
+          glow: glow,
+          config: pad
+        });
+
+        // Click handler
+        el.addEventListener('click', function() {
+          handlePadClick(pad.id);
+        });
+
+        // Hover
+        el.addEventListener('mouseenter', function() {
+          if (phase === 'input') {
+            inner.setAttribute('material', 'opacity', 0.8);
+          }
+        });
+        el.addEventListener('mouseleave', function() {
+          inner.setAttribute('material', 'opacity', 1);
+        });
+      });
+    }
+
+    // ===== START SCREEN =====
+    function showStartScreen() {
+      document.getElementById('gameover-overlay').classList.remove('active');
+      document.getElementById('hud').classList.add('hidden');
+      document.getElementById('hud-status').classList.add('hidden');
+      document.getElementById('sequence-dots').classList.add('hidden');
+      document.getElementById('start-screen').classList.remove('hidden');
+
+      var simonState = loadSimonState();
+      var hs = document.getElementById('hs-display');
+      if (simonState.highScore) {
+        hs.innerHTML = 'Best: Round <span>' + (simonState.bestRound || 0) + '</span> | Score: <span>' + simonState.highScore + '</span>';
+      } else {
+        hs.innerHTML = 'No records yet!';
+      }
+
+      setupPads();
+      renderHighScoreBoard();
+    }
+
+    // ===== BEGIN GAME =====
+    window.beginGame = function() {
+      sequence = [];
+      playerInput = [];
+      round = 1;
+      score = 0;
+      bestStreak = 0;
+      currentStreak = 0;
+      phase = 'idle';
+
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('gameover-overlay').classList.remove('active');
+      document.getElementById('hud').classList.remove('hidden');
+      document.getElementById('hud-status').classList.remove('hidden');
+      document.getElementById('sequence-dots').classList.remove('hidden');
+
+      setupPads();
+      updateHUD();
+      renderHighScoreBoard();
+
+      // Start first round
+      setTimeout(function() {
+        nextRound();
+      }, 800);
+    };
+
+    // ===== NEXT ROUND =====
+    function nextRound() {
+      playerInput = [];
+      phase = 'showing';
+
+      // Add new color to sequence
+      sequence.push(Math.floor(Math.random() * 4));
+
+      updateHUD();
+      renderSequenceDots();
+      setStatus('Watch the sequence! (' + sequence.length + ' colors)');
+
+      // Disable pad clicks during sequence display
+      // Show sequence with increasing speed
+      var delay = Math.max(300, 600 - (round - 1) * 20);
+      var pauseBetween = Math.max(150, 300 - (round - 1) * 10);
+
+      setTimeout(function() {
+        showSequence(0, delay, pauseBetween);
+      }, 500);
+    }
+
+    function showSequence(idx, delay, pauseBetween) {
+      if (idx >= sequence.length) {
+        // Done showing - player's turn
+        phase = 'input';
+        setStatus('Your turn! Repeat the sequence');
+        highlightCurrentDot(0);
+        return;
+      }
+
+      var padIdx = sequence[idx];
+      lightUpPad(padIdx, delay);
+      highlightSequenceDot(idx);
+
+      setTimeout(function() {
+        showSequence(idx + 1, delay, pauseBetween);
+      }, delay + pauseBetween);
+    }
+
+    // ===== LIGHT UP PAD =====
+    function lightUpPad(padIdx, duration) {
+      var pe = padElements[padIdx];
+      if (!pe) return;
+
+      var cfg = pe.config;
+      pe.inner.setAttribute('color', cfg.litColor);
+      pe.glow.setAttribute('intensity', '1.5');
+
+      playTone(cfg.freq, (duration || 400) / 1000);
+
+      // Scale animation
+      pe.entity.setAttribute('animation__light', {
+        property: 'scale',
+        from: '1 1 1',
+        to: '1.08 1.08 1.08',
+        dur: duration ? duration / 2 : 200,
+        easing: 'easeOutQuad',
+        dir: 'alternate',
+        loop: 1
+      });
+
+      setTimeout(function() {
+        pe.inner.setAttribute('color', cfg.dimColor);
+        pe.glow.setAttribute('intensity', '0');
+      }, duration || 400);
+    }
+
+    // ===== HANDLE PAD CLICK =====
+    function handlePadClick(padIdx) {
+      if (phase !== 'input') return;
+
+      var expectedIdx = playerInput.length;
+      var expected = sequence[expectedIdx];
+
+      // Light up the clicked pad
+      lightUpPad(padIdx, 250);
+
+      if (padIdx === expected) {
+        // Correct!
+        playerInput.push(padIdx);
+        markDotCorrect(expectedIdx);
+        highlightCurrentDot(expectedIdx + 1);
+
+        if (playerInput.length === sequence.length) {
+          // Completed the round!
+          phase = 'idle';
+          currentStreak++;
+          if (currentStreak > bestStreak) bestStreak = currentStreak;
+
+          // Score: more points for longer sequences
+          var roundPoints = sequence.length * 10 + (currentStreak > 1 ? currentStreak * 5 : 0);
+          score += roundPoints;
+          round++;
+
+          updateHUD();
+          showFlash('Round ' + (round - 1) + ' Complete! +' + roundPoints, '#22c55e');
+          setStatus('Excellent!');
+
+          setTimeout(function() {
+            nextRound();
+          }, 1500);
+        }
+      } else {
+        // Wrong!
+        phase = 'gameover';
+        markDotWrong(expectedIdx);
+        playErrorTone();
+
+        // Flash all pads red briefly
+        padElements.forEach(function(pe) {
+          pe.inner.setAttribute('color', '#ef4444');
+          pe.glow.setAttribute('intensity', '0.8');
+          pe.glow.setAttribute('color', '#ef4444');
+        });
+
+        setTimeout(function() {
+          padElements.forEach(function(pe) {
+            pe.inner.setAttribute('color', pe.config.dimColor);
+            pe.glow.setAttribute('intensity', '0');
+            pe.glow.setAttribute('color', pe.config.litColor || '#fff');
+          });
+        }, 500);
+
+        showFlash('Wrong!', '#ef4444');
+        setStatus('Game Over!');
+
+        setTimeout(function() {
+          endGame();
+        }, 1200);
+      }
+    }
+
+    // ===== END GAME =====
+    function endGame() {
+      var simonState = loadSimonState();
+      var isNewRecord = false;
+
+      if (!simonState.highScore || score > simonState.highScore) {
+        simonState.highScore = score;
+        isNewRecord = true;
+      }
+      if (!simonState.bestRound || round - 1 > simonState.bestRound) {
+        simonState.bestRound = round - 1;
+      }
+      if (!simonState.scores) simonState.scores = [];
+      simonState.scores.push({ score: score, round: round - 1, time: Date.now() });
+      simonState.scores.sort(function(a, b) { return b.score - a.score; });
+      simonState.scores = simonState.scores.slice(0, 10); // keep top 10
+
+      simonState.gamesPlayed = (simonState.gamesPlayed || 0) + 1;
+      saveSimonState(simonState);
+
+      // Record in arena
+      recordArenaMatch(round > 3 ? 'win' : 'loss');
+
+      document.getElementById('go-score').textContent = score;
+      document.getElementById('go-round').textContent = round - 1;
+      document.getElementById('go-length').textContent = sequence.length;
+      document.getElementById('go-streak').textContent = bestStreak;
+      document.getElementById('go-record').textContent = isNewRecord ? 'NEW HIGH SCORE!' : '';
+
+      var r = round - 1;
+      if (r >= 15) {
+        document.getElementById('go-title').textContent = 'Incredible!';
+        document.getElementById('go-title').style.color = '#fbbf24';
+      } else if (r >= 10) {
+        document.getElementById('go-title').textContent = 'Amazing!';
+        document.getElementById('go-title').style.color = '#22c55e';
+      } else if (r >= 5) {
+        document.getElementById('go-title').textContent = 'Good Run!';
+        document.getElementById('go-title').style.color = '#8b5cf6';
+      } else {
+        document.getElementById('go-title').textContent = 'Game Over';
+        document.getElementById('go-title').style.color = '#ef4444';
+      }
+      document.getElementById('go-subtitle').textContent = 'You reached round ' + r + ' with a sequence of ' + sequence.length + ' colors';
+
+      document.getElementById('gameover-overlay').classList.add('active');
+      renderHighScoreBoard();
+    }
+
+    // ===== SEQUENCE DOTS =====
+    function renderSequenceDots() {
+      var container = document.getElementById('sequence-dots');
+      container.innerHTML = '';
+      for (var i = 0; i < sequence.length; i++) {
+        var dot = document.createElement('div');
+        dot.className = 'seq-dot';
+        dot.id = 'seq-dot-' + i;
+        var color = PADS[sequence[i]].litColor;
+        dot.style.background = 'rgba(255,255,255,0.15)';
+        dot.setAttribute('data-color', color);
+        container.appendChild(dot);
+      }
+    }
+
+    function highlightSequenceDot(idx) {
+      // During sequence playback, show which one is playing
+      var dot = document.getElementById('seq-dot-' + idx);
+      if (dot) {
+        dot.style.background = dot.getAttribute('data-color');
+        dot.classList.add('active');
+        setTimeout(function() {
+          dot.style.background = 'rgba(255,255,255,0.15)';
+          dot.classList.remove('active');
+        }, 400);
+      }
+    }
+
+    function highlightCurrentDot(idx) {
+      // During input, show which one we're on
+      document.querySelectorAll('.seq-dot').forEach(function(d, i) {
+        d.classList.remove('active');
+      });
+      var dot = document.getElementById('seq-dot-' + idx);
+      if (dot) {
+        dot.classList.add('active');
+      }
+    }
+
+    function markDotCorrect(idx) {
+      var dot = document.getElementById('seq-dot-' + idx);
+      if (dot) {
+        dot.style.background = '#22c55e';
+        dot.classList.add('correct');
+        dot.classList.remove('active');
+      }
+    }
+
+    function markDotWrong(idx) {
+      var dot = document.getElementById('seq-dot-' + idx);
+      if (dot) {
+        dot.style.background = '#ef4444';
+        dot.classList.add('wrong');
+        dot.classList.remove('active');
+      }
+    }
+
+    // ===== HIGH SCORE BOARD (3D) =====
+    function renderHighScoreBoard() {
+      var container = document.getElementById('hs-board');
+      if (!container) return;
+      container.innerHTML = '';
+
+      var simonState = loadSimonState();
+      var scores = (simonState.scores || []).slice(0, 5);
+
+      if (scores.length === 0) {
+        var t = document.createElement('a-text');
+        t.setAttribute('value', 'No scores yet');
+        t.setAttribute('align', 'center');
+        t.setAttribute('width', '2.5');
+        t.setAttribute('color', '#666');
+        container.appendChild(t);
+        return;
+      }
+
+      scores.forEach(function(s, i) {
+        var y = -i * 0.4;
+        var color = i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#d97706' : '#888';
+
+        var rank = document.createElement('a-text');
+        rank.setAttribute('value', '#' + (i + 1));
+        rank.setAttribute('align', 'left');
+        rank.setAttribute('width', '2.5');
+        rank.setAttribute('color', color);
+        rank.setAttribute('position', '-0.9 ' + y + ' 0');
+        container.appendChild(rank);
+
+        var info = document.createElement('a-text');
+        info.setAttribute('value', 'R' + s.round + ' - ' + s.score + 'pts');
+        info.setAttribute('align', 'right');
+        info.setAttribute('width', '2.5');
+        info.setAttribute('color', color);
+        info.setAttribute('position', '0.9 ' + y + ' 0');
+        container.appendChild(info);
+      });
+    }
+
+    // ===== HUD HELPERS =====
+    function updateHUD() {
+      document.getElementById('hud-score').textContent = score;
+      document.getElementById('hud-round').textContent = round;
+      document.getElementById('hud-streak').textContent = currentStreak;
+
+      var simonState = loadSimonState();
+      document.getElementById('hud-best').textContent = simonState.bestRound || 0;
+    }
+
+    function setStatus(text) {
+      document.getElementById('hud-status').textContent = text;
+    }
+
+    function showFlash(text, color) {
+      var flash = document.getElementById('flash-msg');
+      flash.textContent = text;
+      flash.style.color = color;
+      flash.classList.add('show');
+      setTimeout(function() { flash.classList.remove('show'); }, 800);
+    }
+
+    // ===== PERSISTENCE =====
+    function loadSimonState() {
+      try { return JSON.parse(localStorage.getItem(SIMON_KEY) || '{}'); } catch(e) { return {}; }
+    }
+    function saveSimonState(s) {
+      try { localStorage.setItem(SIMON_KEY, JSON.stringify(s)); } catch(e) {}
+    }
+
+    function recordArenaMatch(result) {
+      try {
+        var s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        s.wins = (s.wins || 0) + (result === 'win' ? 1 : 0);
+        s.losses = (s.losses || 0) + (result === 'loss' ? 1 : 0);
+        if (!s.matches) s.matches = [];
+        s.matches.push({ game: 'Simon Says', opponent: 'Round ' + round, result: result, time: Date.now() });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+      } catch(e) {}
+    }
+
+  })();
+  </script>
+</body>
+</html>
