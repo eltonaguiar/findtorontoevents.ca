@@ -35,6 +35,7 @@ export default defineConfig({
     /(?:^|\/)tests\/live-offline-removal\.spec\.ts$/,
     /(?:^|\/)tests\/streamer-last-seen-api\.spec\.ts$/,
     /(?:^|\/)tests\/mental-health-resources\.spec\.ts$/,
+    /(?:^|\/)tests\/vr_quick_wins\.spec\.ts$/,
   ],
   timeout: isRemoteVerify ? 90000 : 30000,
   retries: isRemoteVerify ? 1 : 0,
