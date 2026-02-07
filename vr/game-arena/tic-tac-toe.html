@@ -599,13 +599,21 @@
       var delay = 25000 + Math.random() * 40000;
       setTimeout(function() {
         var challenger = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
+        var games = [
+          { name: 'Tic-Tac-Toe', url: '/vr/game-arena/tic-tac-toe.html' },
+          { name: 'Soccer Shootout', url: '/vr/game-arena/soccer-shootout.html' },
+          { name: 'Memory Match', url: '/vr/game-arena/memory-match.html' },
+          { name: 'Whack-a-Mole', url: '/vr/game-arena/whack-a-mole.html' },
+          { name: 'Simon Says', url: '/vr/game-arena/simon-says.html' }
+        ];
+        var game = games[Math.floor(Math.random() * games.length)];
         var c = document.getElementById('toast-container');
         var t = document.createElement('div');
         t.className = 'toast';
         t.innerHTML = '<div class="toast-title">' + challenger + ' wants to play!</div>'
-          + '<div class="toast-msg">Tic-Tac-Toe challenge</div>'
+          + '<div class="toast-msg">' + game.name + ' challenge</div>'
           + '<div class="toast-actions">'
-          + '<button class="toast-btn accept" onclick="window.location.href=\'/vr/game-arena/tic-tac-toe.html?opponent=' + encodeURIComponent(challenger) + '\'">Accept</button>'
+          + '<button class="toast-btn accept" onclick="window.location.href=\'' + game.url + '?opponent=' + encodeURIComponent(challenger) + '\'">Accept</button>'
           + '<button class="toast-btn decline" onclick="this.closest(\'.toast\').remove()">Decline</button>'
           + '</div>';
         c.appendChild(t);
