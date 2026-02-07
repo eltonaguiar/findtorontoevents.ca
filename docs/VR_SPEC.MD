@@ -105,6 +105,7 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | `interaction.js` | Set 10: Immersive Interaction — events sort/save, creators follow, theater mode, movie ratings, 3D stock charts, watchlist, meditation timer, stats dashboard, achievements, sound cues |
 | `personalization.js` | Set 11: Personalization & Social — theme customizer, named playlists, event sharing, event notes, multi-city weather, creator history, notification center, stock portfolio, cross-zone pinboard, hub quick-launch |
 | `advanced-ux.js` | Set 12: Advanced UX & Immersion — data export/import, mini-map radar, dynamic weather FX, photo mode, events countdown, movie autoplay queue, creator spotlight, voice commands, usage analytics, spatial ambient audio |
+| `comfort-intelligence.js` | Set 13: Comfort & Intelligence — multi-language i18n, zen mode, smart recommendations, custom hotkeys, zone transitions, daily challenges, comfort settings v2, content bookmarks, session replay, particle density control |
 
 ## Testing & Deployment
 
@@ -183,3 +184,13 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | ENH-065 | Voice Commands (speech recognition, 11 commands, V key shortcut) | Done |
 | ENH-066 | Usage Analytics Dashboard (session tracking, zone breakdown, day graph) | Done |
 | ENH-067 | Spatial Ambient Audio (zone-specific drone soundscapes, toggleable) | Done |
+| ENH-068 | Multi-Language i18n (EN/FR/ES selector, 22 translated UI labels) | Done |
+| ENH-069 | Focus/Zen Mode (hide all overlays, Z key toggle, minimal badge) | Done |
+| ENH-070 | Smart Recommendations (usage-based "You might like", 3 suggestions) | Done |
+| ENH-071 | Custom Hotkeys (user-rebindable shortcuts, visual editor, reset) | Done |
+| ENH-072 | Zone Transition Effects (fade/wipe/zoom animations between zones) | Done |
+| ENH-073 | Daily Challenge System (deterministic daily tasks, auto-progress tracking) | Done |
+| ENH-074 | Comfort Settings V2 (FOV vignette, reduce motion, UI scale slider) | Done |
+| ENH-075 | Content Bookmarks (add with tags, search, panel with filter) | Done |
+| ENH-076 | Session Replay (action timeline, auto-log clicks/keys, visual timeline) | Done |
+| ENH-077 | Particle Density Control (0-200% slider for all particle systems) | Done |

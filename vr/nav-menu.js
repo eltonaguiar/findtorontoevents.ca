@@ -300,6 +300,9 @@
           '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRPersonalization)VRPersonalization.pinboard.toggle()" title="Pinboard">&#x1F4CC; Pins</button>' +
           '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRAdvancedUX)VRAdvancedUX.analytics.open()" title="Analytics">&#x1F4CA; Stats</button>' +
           '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRAdvancedUX)VRAdvancedUX.dataExport.export()" title="Export Data">&#x1F4BE; Export</button>' +
+          '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRComfortIntel)VRComfortIntel.zenMode.toggle()" title="Zen Mode (Z)">&#x1F9D8; Zen</button>' +
+          '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRComfortIntel)VRComfortIntel.comfortV2.open()" title="Comfort Settings">&#x1F6CB; Comfort</button>' +
+          '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRComfortIntel)VRComfortIntel.customHotkeys.openEditor()" title="Custom Hotkeys">&#x2328; Keys</button>' +
         '</div>' +
 
         // Zone navigation
