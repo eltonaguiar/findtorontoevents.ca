@@ -67,6 +67,10 @@
       
       console.log('[MobileDetect] Redirecting to:', mobileUrl);
       
+      if (window.VRLogger) {
+        VRLogger.logRedirect(currentPath, mobileUrl, 'Manual mobile redirect');
+      }
+      
       // Redirect
       window.location.href = mobileUrl;
     },
@@ -136,11 +140,21 @@
     init() {
       // Log detection results
       const info = this.getDeviceInfo();
+      const isMobile = this.isMobile();
+      
+      // Use VRLogger if available
+      if (window.VRLogger) {
+        VRLogger.logMobileDetection(isMobile, info);
+      }
+      
       console.log('[MobileDetect] User Agent:', info.userAgent);
-      console.log('[MobileDetect] Is Mobile:', this.isMobile());
+      console.log('[MobileDetect] Is Mobile:', isMobile);
       
       // NEVER auto-redirect - only show prompt if user wants to switch
-      if (this.isMobile() && !window.location.pathname.includes('mobile')) {
+      if (isMobile && !window.location.pathname.includes('mobile')) {
+        if (window.VRLogger) {
+          VRLogger.log('MOBILE', 'Showing mobile prompt');
+        }
         // Wait for page to load, then show gentle prompt
         setTimeout(() => {
           this.showPrompt();
