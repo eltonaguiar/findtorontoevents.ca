@@ -295,6 +295,9 @@
           '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRQuickWins7)VRQuickWins7.shareSnapshot()" title="Share this zone">&#x1F517; Share</button>' +
           '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRCompleteness)VRCompleteness.openA11y()" title="Accessibility (Alt+A)">&#x267F; A11y</button>' +
           '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRCompleteness)VRCompleteness.showChangelog()" title="What\'s New">&#x1F389; New</button>' +
+          '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRPersonalization)VRPersonalization.themeCustomizer.openPanel()" title="Theme (Ctrl+,)">&#x1F3A8; Theme</button>' +
+          '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRPersonalization)VRPersonalization.notifications.toggle()" title="Notifications">&#x1F514; Notifs</button>' +
+          '<button class="vr-nav-util-btn" onclick="closeNavMenu();if(window.VRPersonalization)VRPersonalization.pinboard.toggle()" title="Pinboard">&#x1F4CC; Pins</button>' +
         '</div>' +
 
         // Zone navigation

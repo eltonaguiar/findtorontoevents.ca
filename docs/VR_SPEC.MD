@@ -103,6 +103,7 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | `scene-enhancements.js` | Set 8: 3D scene polish — portal particles, hover pulse, energy waves, screen glow, dust motes, price sparks, fireflies, sky tint, ambient motes, data badges |
 | `completeness.js` | Set 9: Production readiness — session continuity, error recovery, accessibility, onboarding, performance LOD, calendar minimap, watch history, forecast timeline, device adaptive, changelog |
 | `interaction.js` | Set 10: Immersive Interaction — events sort/save, creators follow, theater mode, movie ratings, 3D stock charts, watchlist, meditation timer, stats dashboard, achievements, sound cues |
+| `personalization.js` | Set 11: Personalization & Social — theme customizer, named playlists, event sharing, event notes, multi-city weather, creator history, notification center, stock portfolio, cross-zone pinboard, hub quick-launch |
 
 ## Testing & Deployment
 
@@ -161,3 +162,13 @@ Seven-step interactive lesson: look around → point & click → move → telepo
 | ENH-045 | Hub Stats Dashboard (visits, time per zone, bar visualization) | Done |
 | ENH-046 | Achievement System (10 unlockable badges, toast notifications) | Done |
 | ENH-047 | Ambient Sound Cues (zone entry chimes via Web Audio API, toggleable) | Done |
+| ENH-048 | Theme Customizer (5 themes: Neon/Ocean/Forest/Sunset/Midnight, Ctrl+,) | Done |
+| ENH-049 | Movies Named Playlists (create/manage/switch, localStorage) | Done |
+| ENH-050 | Events Social Share (Twitter, copy link, Web Share API) | Done |
+| ENH-051 | Events Personal Notes (per-event notes, badge count, panel) | Done |
+| ENH-052 | Weather Multi-City (Toronto/Vancouver/Montreal/Calgary selector) | Done |
+| ENH-053 | Creator View History (track views, recently watched panel) | Done |
+| ENH-054 | Notification Center (persistent bell, read/unread, clear all) | Done |
+| ENH-055 | Stocks Portfolio (simulated buy/sell, P&L tracking, auto-refresh) | Done |
+| ENH-056 | Cross-Zone Pinboard (pin items from any zone, global panel) | Done |
+| ENH-057 | Hub Quick-Launch Favorites (pinned zone shortcuts on hub) | Done |
