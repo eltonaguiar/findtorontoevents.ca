@@ -53,7 +53,7 @@ From the root directory:
 Using the provided FTP credentials:
 - Server: ftps2.50webs.com
 - User: ejaguiar1
-- Password: $a^FzN7BqKapSQMsZxD&^FeTJ
+- Password: <FTP_PASS env var>
 
 You can use the `tools/ftp_backup_and_upload.py` script or upload manually via FTP client.
 

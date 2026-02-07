@@ -848,12 +848,14 @@
   <!-- Keyboard hints + search (QW-006) -->
   <script src="/vr/keyboard-hints.js"></script>
   <script>
-    VRKeyboardHints.register([
-      { key: '/ or F', desc: 'Search events' },
-      { key: '←/→', desc: 'Previous / Next page' },
-      { key: 'G', desc: 'Area Guide' },
-      { key: 'Esc', desc: 'Close detail / preview' }
-    ]);
+    if (typeof VRKeyboardHints !== 'undefined') {
+      VRKeyboardHints.register([
+        { key: '/ or F', desc: 'Search events' },
+        { key: '←/→', desc: 'Previous / Next page' },
+        { key: 'G', desc: 'Area Guide' },
+        { key: 'Esc', desc: 'Close detail / preview' }
+      ]);
+    }
     // Search filter
     window._vrSearchEvents = function (query) {
       if (!query || query.trim() === '') {
@@ -1027,5 +1029,8 @@
     else window.addEventListener('load', init);
   })();
   </script>
+  <!-- VR AI Agent -->
+  <link rel="stylesheet" href="/vr/vr-ai-agent.css">
+  <script src="/vr/vr-ai-agent.js"></script>
 </body>
 </html>

@@ -472,9 +472,29 @@
       if (!query || query.length < 2) return [];
       var q = query.toLowerCase();
       var results = [];
-      Object.keys(content).forEach(function (zone) {
-        content[zone].forEach(function (item) {
-          if (item.title.toLowerCase().indexOf(q) !== -1 || item.category.toLowerCase().indexOf(q) !== -1) {
+
+      // Merge live movie data if available
+      var liveMovies = (window.allMovies || window.filteredMovies || []);
+      var movieItems = liveMovies.length > 0
+        ? liveMovies.map(function(m) { return { title: m.title, category: m.genre || m.type || '', zone: 'movies' }; })
+        : content.movies;
+
+      // Build searchable map with live overrides
+      var searchContent = { events: content.events, movies: movieItems, creators: content.creators, stocks: content.stocks };
+
+      // Also pull live events/creators if available
+      var liveEvents = window.filteredEvents || window._allEvents || window.allEvents || [];
+      if (liveEvents.length > 0) {
+        searchContent.events = liveEvents.slice(0, 50).map(function(e) { return { title: e.title || '', category: e.category || '', zone: 'events' }; });
+      }
+      var liveCreators = window.allCreators || [];
+      if (liveCreators.length > 0) {
+        searchContent.creators = liveCreators.map(function(c) { return { title: c.name || '', category: c.platform || '', zone: 'creators' }; });
+      }
+
+      Object.keys(searchContent).forEach(function (zone) {
+        searchContent[zone].forEach(function (item) {
+          if (item.title.toLowerCase().indexOf(q) !== -1 || (item.category && item.category.toLowerCase().indexOf(q) !== -1)) {
             results.push(item);
           }
         });
@@ -497,8 +517,19 @@
           if (!container) return;
           if (results.length === 0) { container.innerHTML = '<div style="color:#475569;padding:8px">No results</div>'; return; }
           var html = '';
+          var isOnMovies = window.location.pathname.indexOf('movies') !== -1;
           results.slice(0, 10).forEach(function (r) {
-            html += '<div class="vr17-result"><span>' + r.title + '</span><div class="vr17-result-zone">' + r.zone + ' · ' + r.category + '</div></div>';
+            var clickAction = '';
+            if (r.zone === 'movies' && isOnMovies && window.selectMovieByTitle) {
+              clickAction = ' onclick="window.selectMovieByTitle(\'' + r.title.replace(/'/g, "\\'") + '\');document.getElementById(\'vr17-search\').remove();"';
+            } else if (r.zone === 'movies') {
+              clickAction = ' onclick="window.location.href=\'/vr/movies.html\';"';
+            } else if (r.zone === 'events') {
+              clickAction = ' onclick="window.location.href=\'/vr/events/\';"';
+            } else if (r.zone === 'creators') {
+              clickAction = ' onclick="window.location.href=\'/vr/creators.html\';"';
+            }
+            html += '<div class="vr17-result"' + clickAction + '><span>' + r.title + '</span><div class="vr17-result-zone">' + r.zone + ' · ' + r.category + '</div></div>';
           });
           container.innerHTML = html;
         });

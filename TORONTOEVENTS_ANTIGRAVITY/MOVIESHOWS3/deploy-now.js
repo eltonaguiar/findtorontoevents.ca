@@ -6,10 +6,10 @@ const path = require('path');
 const sftp = new SftpClient();
 
 const config = {
-    host: 'ftps2.50webs.com',
+    host: process.env.FTP_SERVER || 'ftps2.50webs.com',
     port: 22,
-    username: 'ejaguiar1',
-    password: '$a^FzN7BqKapSQMsZxD&^FeTJ',
+    username: process.env.FTP_USER || 'ejaguiar1',
+    password: process.env.FTP_PASS || '',
     readyTimeout: 30000,
     retries: 3
 };

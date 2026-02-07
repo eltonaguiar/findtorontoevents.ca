@@ -54,7 +54,7 @@ $events_username = _events_db_env('EVENTS_MYSQL_USER');
 if (!$events_username) $events_username = 'ejaguiar1_events';
 
 $events_password = _events_db_env('EVENTS_MYSQL_PASSWORD');
-if (!$events_password) $events_password = 'event123';
+if (!$events_password) $events_password = '0nOj4g4RA%FD9P4c7iq)';
 
 $events_dbname = _events_db_env('EVENTS_MYSQL_DATABASE');
 if (!$events_dbname) $events_dbname = 'ejaguiar1_events';

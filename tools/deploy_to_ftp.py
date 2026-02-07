@@ -126,6 +126,10 @@ def deploy_main_site(ftp: ftplib.FTP, remote_base: str) -> bool:
         _upload_file(ftp, ev, f"{remote_base}/next/events.json")
     elif (WORKSPACE / "next" / "events.json").is_file():
         _upload_file(ftp, WORKSPACE / "next" / "events.json", f"{remote_base}/next/events.json")
+    # ai-assistant.js (AI chat + voice assistant, no API keys needed)
+    ai = WORKSPACE / "ai-assistant.js"
+    if ai.is_file():
+        _upload_file(ftp, ai, f"{remote_base}/ai-assistant.js")
     # last_update.json (stats page: last updated time + source)
     lu = WORKSPACE / "last_update.json"
     if lu.is_file():

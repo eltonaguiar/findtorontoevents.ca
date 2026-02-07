@@ -1,9 +1,9 @@
 # PowerShell script to verify .htaccess file exists on FTP server
 # This will prove the file is really there even if FileZilla doesn't show it
 
-$FTP_HOST = "ftps2.50webs.com"
-$FTP_USER = "ejaguiar1"
-$FTP_PASS = '$a^FzN7BqKapSQMsZxD&^FeTJ'
+$FTP_HOST = if ($env:FTP_SERVER) { $env:FTP_SERVER } else { "ftps2.50webs.com" }
+$FTP_USER = if ($env:FTP_USER) { $env:FTP_USER } else { "ejaguiar1" }
+$FTP_PASS = $env:FTP_PASS
 $REMOTE_DIR = "next/_next"
 
 Write-Host "Connecting to FTP server: $FTP_HOST" -ForegroundColor Cyan

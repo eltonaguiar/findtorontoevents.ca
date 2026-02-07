@@ -32,7 +32,7 @@ $TMDB_READ_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiODRmZjdiZmUzNWZmYWQ4Nzc5Yjc
 $host = 'localhost';
 $dbname = 'ejaguiar1_tvmoviestrailers';
 $dbuser = 'ejaguiar1_tvmoviestrailers';
-$dbpass = 'virus2016';
+$dbpass = 'D41$4Jci6T9W2PsJdagLEr*KMo96nrCD';
 
 $type = isset($_GET['type']) ? $_GET['type'] : 'both';
 $pages = isset($_GET['pages']) ? min((int)$_GET['pages'], 10) : 3;

@@ -1,10 +1,15 @@
 # Dependencies
 node_modules/
 
-# Secrets and env
+# Secrets and env — NEVER commit credentials
 .env
 .env.local
 .env.*.local
+.env.events
+**/.env.events
+**/test-credentials*
+temp_kick_response.json
+important.txt
 
 # IDE / OS
 .vs/

@@ -2,6 +2,11 @@
   "name": "puppeteer-test",
   "version": "1.0.0",
   "type": "commonjs",
+  "scripts": {
+    "test:full-page": "npx playwright test tests/full_page_test.spec.ts --project=\"Desktop Chrome\"",
+    "test:full-page:remote": "cross-env VERIFY_REMOTE=1 npx playwright test tests/full_page_test.spec.ts --project=\"Desktop Chrome\"",
+    "test:full-page:standalone": "node .cursor/skills/full-page-test/scripts/run-full-page-test.js"
+  },
   "devDependencies": {
     "@playwright/test": "^1.58.1",
     "puppeteer": "^24.36.1"

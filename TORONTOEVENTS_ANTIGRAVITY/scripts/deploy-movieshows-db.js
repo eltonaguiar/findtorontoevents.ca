@@ -9,7 +9,7 @@ const fs = require('fs');
 require('dotenv').config();
 
 const FTP_CONFIG = {
-    host: process.env.FTP_SERVER || 'ftps2.50webs.com',
+    host: process.env.FTP_SERVER || (process.env.FTP_SERVER || 'ftps2.50webs.com'),
     port: 22,
     username: process.env.FTP_USERNAME,
     password: process.env.FTP_PASSWORD,

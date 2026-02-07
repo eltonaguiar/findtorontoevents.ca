@@ -62,8 +62,8 @@ def upload_directory(local_dir, remote_dir, host, username, password):
 if __name__ == "__main__":
     local_directory = "docs"
     remote_directory = "/findtorontoevents.ca/fc"
-    host = "ftps2.50webs.com"
-    username = "ejaguiar1"
-    password = r"$a^FzN7BqKapSQMsZxD&^FeTJ"
+    host = os.environ.get('FTP_SERVER', 'ftps2.50webs.com')
+    username = os.environ.get('FTP_USER', 'ejaguiar1')
+    password = os.environ.get('FTP_PASS', '')
     
     upload_directory(local_directory, remote_directory, host, username, password)

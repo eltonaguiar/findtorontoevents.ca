@@ -9,9 +9,9 @@ async function cleanup() {
         console.log('🧹 Cleaning up duplicate folders...\n');
 
         await client.access({
-            host: 'ftps2.50webs.com',
-            user: 'ejaguiar1',
-            password: '$a^FzN7BqKapSQMsZxD&^FeTJ',
+            host: process.env.FTP_SERVER || 'ftps2.50webs.com',
+            user: process.env.FTP_USER || 'ejaguiar1',
+            password: process.env.FTP_PASS || '',
             secure: false
         });
 

@@ -6,6 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#0ea5e9">
   <title>Weather VR - Mobile</title>
+  <!-- HTTPS redirect notice (must load before A-Frame) -->
+  <script src="/vr/https-redirect.js"></script>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -47,5 +49,8 @@
       <button class="mobile-action-btn">📊</button>
     </div>
   </div>
+  <!-- VR AI Agent -->
+  <link rel="stylesheet" href="/vr/vr-ai-agent.css">
+  <script src="/vr/vr-ai-agent.js"></script>
 </body>
 </html>

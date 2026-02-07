@@ -29,8 +29,8 @@ function _auth_db_get($keys, $default) {
 }
 
 // Reads env / api/.env first; defaults below used when PHP doesn't see server env (e.g. cPanel).
-// FavCreators DB: ejaguiar1_favcreators / Solid-Kitten-92-Brave-Vessel
+// FavCreators DB: ejaguiar1_favcreators / 3ADDzY*stB6Qd#$!l1%IIKYuHVRCCupl
 $servername = _auth_db_get(array('FC_MYSQL_HOST', 'MYSQL_HOST'), 'localhost');
 $username   = _auth_db_get(array('FC_MYSQL_USER', 'MYSQL_USER'), 'ejaguiar1_favcreators');
-$password   = _auth_db_get(array('DB_PASS_SERVER_FAVCREATORS', 'FC_MYSQL_PASSWORD', 'MYSQL_PASSWORD'), 'Solid-Kitten-92-Brave-Vessel');
+$password   = _auth_db_get(array('DB_PASS_SERVER_FAVCREATORS', 'FC_MYSQL_PASSWORD', 'MYSQL_PASSWORD'), '3ADDzY*stB6Qd#$!l1%IIKYuHVRCCupl');
 $dbname     = _auth_db_get(array('DB_NAME_SERVER_FAVCREATORS', 'FC_MYSQL_DATABASE', 'MYSQL_DATABASE'), 'ejaguiar1_favcreators');

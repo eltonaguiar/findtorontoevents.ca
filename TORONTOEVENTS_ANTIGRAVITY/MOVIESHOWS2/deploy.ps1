@@ -4,9 +4,9 @@
 Write-Host "🚀 Deploying MOVIESHOWS2 to findtorontoevents.ca..." -ForegroundColor Cyan
 
 # Configuration
-$ftpHost = "ftps2.50webs.com"
+$ftpHost = if ($env:FTP_SERVER) { $env:FTP_SERVER } else { "ftps2.50webs.com" }
 $ftpPort = 22
-$ftpUser = "ejaguiar1"
+$ftpUser = if ($env:FTP_USER) { $env:FTP_USER } else { "ejaguiar1" }
 $remotePath = "/findtorontoevents.ca/MOVIESHOWS2"
 $localPath = "E:\findtorontoevents_antigravity.ca\TORONTOEVENTS_ANTIGRAVITY\MOVIESHOWS2"
 

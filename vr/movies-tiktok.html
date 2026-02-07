@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>VR Movies - TikTok Style</title>
+  <!-- HTTPS redirect notice (must load before A-Frame) -->
+  <script src="/vr/https-redirect.js"></script>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1341,5 +1343,8 @@
     // Initialize
     init();
   </script>
+  <!-- VR AI Agent -->
+  <link rel="stylesheet" href="/vr/vr-ai-agent.css">
+  <script src="/vr/vr-ai-agent.js"></script>
 </body>
 </html>

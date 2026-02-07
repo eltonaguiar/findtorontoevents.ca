@@ -2,7 +2,7 @@
 $host = 'mysql.50webs.com';
 $db = 'ejaguiar1_tvmoviestrailers';
 $user = 'ejaguiar1_tvmoviestrailers';
-$pass = 'virus2016';
+$pass = 'D41$4Jci6T9W2PsJdagLEr*KMo96nrCD';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);

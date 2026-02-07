@@ -25,7 +25,7 @@ if ($query === '') {
 $host = 'localhost';
 $dbname = 'ejaguiar1_tvmoviestrailers';
 $dbuser = 'ejaguiar1_tvmoviestrailers';
-$dbpass = 'virus2016';
+$dbpass = 'D41$4Jci6T9W2PsJdagLEr*KMo96nrCD';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $dbuser, $dbpass);

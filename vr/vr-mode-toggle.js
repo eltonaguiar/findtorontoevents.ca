@@ -73,8 +73,11 @@
       
       // First-time user: show mode selector
       if (!localStorage.getItem('vr-mode-seen')) {
-        this.showModeSelector();
-        localStorage.setItem('vr-mode-seen', 'true');
+        // Small delay to ensure page is fully rendered
+        setTimeout(() => {
+          this.showModeSelector();
+          localStorage.setItem('vr-mode-seen', 'true');
+        }, 500);
       }
     },
     
@@ -87,33 +90,43 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(10,10,30,0.95);
+        background: rgba(10,10,30,0.98);
         backdrop-filter: blur(10px);
-        z-index: 100000;
+        z-index: 999999;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         padding: 20px;
+        pointer-events: auto;
       `;
+      
+      // Determine current mode to highlight the active button
+      const currentMode = this.mode;
+      const simpleActive = currentMode === 'simple';
+      const advancedActive = currentMode === 'advanced';
       
       selector.innerHTML = `
         <h2 style="color: #00d4ff; font-size: 28px; margin-bottom: 10px;">Choose Your Experience</h2>
-        <p style="color: #888; margin-bottom: 40px; text-align: center;">Select a mode that suits your preference</p>
+        <p style="color: #888; margin-bottom: 40px; text-align: center;">${simpleActive ? 'Simple Mode is active' : advancedActive ? 'Advanced Mode is active' : 'Select a mode that suits your preference'}</p>
         
         <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
           <button id="vr-mode-simple-btn" style="
             width: 200px;
             padding: 30px;
             background: linear-gradient(135deg, #22c55e, #16a34a);
-            border: none;
+            border: ${simpleActive ? '4px solid #fff' : '3px solid transparent'};
             border-radius: 20px;
             color: white;
             cursor: pointer;
-            transition: transform 0.2s;
-          ">
+            transition: all 0.2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: ${simpleActive ? '0 0 30px rgba(34,197,94,0.6)' : 'none'};
+            opacity: ${simpleActive ? '1' : '0.7'};
+          " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             <div style="font-size: 48px; margin-bottom: 15px;">🎯</div>
-            <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Simple Mode</div>
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">${simpleActive ? '✓ Simple Mode' : 'Simple Mode'}</div>
             <div style="font-size: 12px; opacity: 0.9;">Clean, minimal UI<br>Essential features only</div>
           </button>
           
@@ -121,35 +134,89 @@
             width: 200px;
             padding: 30px;
             background: linear-gradient(135deg, #6b7280, #4b5563);
-            border: none;
+            border: ${advancedActive ? '4px solid #fff' : '3px solid transparent'};
             border-radius: 20px;
             color: white;
             cursor: pointer;
-            transition: transform 0.2s;
-          ">
+            transition: all 0.2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: ${advancedActive ? '0 0 30px rgba(107,114,128,0.6)' : 'none'};
+            opacity: ${advancedActive ? '1' : '0.7'};
+          " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             <div style="font-size: 48px; margin-bottom: 15px;">🎛️</div>
-            <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Advanced Mode</div>
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">${advancedActive ? '✓ Advanced Mode' : 'Advanced Mode'}</div>
             <div style="font-size: 12px; opacity: 0.9;">Full feature set<br>160+ VR features</div>
           </button>
         </div>
         
-        <p style="color: #666; margin-top: 30px; font-size: 12px;">You can change this anytime using the mode button</p>
+        <p style="color: #666; margin-top: 30px; font-size: 12px;">You can change this anytime using the mode button at the bottom</p>
       `;
       
       document.body.appendChild(selector);
       
-      selector.querySelector('#vr-mode-simple-btn').onclick = () => {
-        this.setMode('simple');
-        selector.remove();
+      const simpleBtn = selector.querySelector('#vr-mode-simple-btn');
+      const advancedBtn = selector.querySelector('#vr-mode-advanced-btn');
+      
+      const handleSimpleMode = (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        console.log('[VR Mode] Simple mode selected');
+        
+        // Visual feedback
+        simpleBtn.style.transform = 'scale(0.95)';
+        simpleBtn.style.boxShadow = '0 0 30px rgba(34,197,94,0.8)';
+        
+        setTimeout(() => {
+          this.setMode('simple');
+          selector.remove();
+          this.showToast('🎯 Simple Mode activated!');
+        }, 200);
       };
       
-      selector.querySelector('#vr-mode-advanced-btn').onclick = () => {
-        this.setMode('advanced');
-        selector.remove();
+      const handleAdvancedMode = (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        console.log('[VR Mode] Advanced mode selected');
+        
+        // Visual feedback
+        advancedBtn.style.transform = 'scale(0.95)';
+        advancedBtn.style.boxShadow = '0 0 30px rgba(107,114,128,0.8)';
+        
+        setTimeout(() => {
+          this.setMode('advanced');
+          selector.remove();
+          this.showToast('🎛️ Advanced Mode activated!');
+        }, 200);
       };
+      
+      simpleBtn.addEventListener('click', handleSimpleMode);
+      advancedBtn.addEventListener('click', handleAdvancedMode);
+      
+      // Also add touch handlers for mobile
+      simpleBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handleSimpleMode();
+      });
+      
+      advancedBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handleAdvancedMode();
+      });
     },
     
     categorizeButtons() {
+      // Clear previous categorization
+      this.simpleButtons = [];
+      this.advancedButtons = [];
+      
+      // Check if we're on mobile
+      const isMobilePage = window.location.pathname.includes('mobile');
+      
       // Get all buttons and categorize them
       const allButtons = Array.from(document.querySelectorAll('button, [role="button"]'));
       
@@ -157,46 +224,92 @@
         const id = btn.id || '';
         const classes = btn.className || '';
         
-        // Simple mode buttons (always visible)
-        if (
-          id.includes('hub') ||
-          id.includes('back') ||
-          id.includes('menu') ||
-          id.includes('reset') ||
-          classes.includes('primary') ||
-          btn.textContent.includes('ENTER') ||
-          id === 'vr-mode-toggle'
-        ) {
-          this.simpleButtons.push(btn);
-          btn.dataset.vrMode = 'simple';
+        // Skip already categorized
+        if (btn.dataset.vrMode) {
+          if (btn.dataset.vrMode === 'simple') this.simpleButtons.push(btn);
+          else this.advancedButtons.push(btn);
+          return;
         }
-        // Advanced mode buttons (hidden in simple mode)
-        else if (
-          id.includes('set') ||
-          id.includes('quick') ||
-          id.includes('clipboard') ||
-          id.includes('gesture') ||
-          id.includes('haptic') ||
-          id.includes('profiler') ||
-          id.includes('bookmark') ||
-          id.includes('note') ||
-          id.includes('pet') ||
-          id.includes('weather-widget') ||
-          id.includes('notifications') ||
-          id.includes('shortcuts') ||
-          id.includes('ambient') ||
-          id.includes('fireworks') ||
-          id.includes('celebration') ||
-          classes.includes('advanced') ||
-          btn.style.position === 'fixed' && !btn.dataset.vrMode
-        ) {
-          this.advancedButtons.push(btn);
-          btn.dataset.vrMode = 'advanced';
+        
+        // MOBILE: Keep most UI elements visible - only hide true power-user features
+        if (isMobilePage) {
+          // Essential mobile UI (always visible)
+          if (
+            id.includes('hub') ||
+            id.includes('back') ||
+            id.includes('menu') ||
+            id.includes('reset') ||
+            id.includes('jump') ||
+            id.includes('select') ||
+            id.includes('vr-enter') ||
+            id === 'vr-mode-toggle' ||
+            classes.includes('mobile-action-btn') ||
+            classes.includes('mobile-menu-btn') ||
+            classes.includes('mobile-close-btn') ||
+            classes.includes('primary')
+          ) {
+            this.simpleButtons.push(btn);
+            btn.dataset.vrMode = 'simple';
+          }
+          // Only truly advanced features on mobile (AI, profiler, etc)
+          else if (
+            id.includes('profiler') ||
+            id.includes('ai-full') ||
+            id.includes('developer') ||
+            id.includes('debug') ||
+            classes.includes('advanced-only')
+          ) {
+            this.advancedButtons.push(btn);
+            btn.dataset.vrMode = 'advanced';
+          }
+          // Everything else is simple on mobile
+          else {
+            this.simpleButtons.push(btn);
+            btn.dataset.vrMode = 'simple';
+          }
+        }
+        // DESKTOP: Full simple/advanced separation
+        else {
+          // Simple mode buttons (always visible)
+          if (
+            id.includes('hub') ||
+            id.includes('back') ||
+            id.includes('menu') ||
+            id.includes('reset') ||
+            classes.includes('primary') ||
+            btn.textContent.includes('ENTER') ||
+            id === 'vr-mode-toggle'
+          ) {
+            this.simpleButtons.push(btn);
+            btn.dataset.vrMode = 'simple';
+          }
+          // Advanced mode buttons (hidden in simple mode)
+          else if (
+            id.includes('set') ||
+            id.includes('quick') ||
+            id.includes('clipboard') ||
+            id.includes('gesture') ||
+            id.includes('haptic') ||
+            id.includes('profiler') ||
+            id.includes('bookmark') ||
+            id.includes('note') ||
+            id.includes('pet') ||
+            id.includes('weather-widget') ||
+            id.includes('notifications') ||
+            id.includes('shortcuts') ||
+            id.includes('ambient') ||
+            id.includes('fireworks') ||
+            id.includes('celebration') ||
+            classes.includes('advanced') ||
+            (btn.style.position === 'fixed' && !btn.dataset.vrMode)
+          ) {
+            this.advancedButtons.push(btn);
+            btn.dataset.vrMode = 'advanced';
+          }
         }
       });
       
-      console.log('[VR Mode] Simple buttons:', this.simpleButtons.length);
-      console.log('[VR Mode] Advanced buttons:', this.advancedButtons.length);
+      console.log('[VR Mode] Simple buttons:', this.simpleButtons.length, '| Advanced:', this.advancedButtons.length);
     },
     
     toggleMode() {
@@ -205,15 +318,23 @@
     },
     
     setMode(mode) {
+      console.log('[VR Mode] Setting mode to:', mode);
       this.mode = mode;
       localStorage.setItem('vr-ui-mode', mode);
-      this.applyMode();
-      this.updateToggleAppearance();
+      localStorage.setItem('vr-mode-seen', 'true');
       
-      // Show toast
-      this.showToast(mode === 'simple' ? '🎯 Simple Mode: Clean UI' : '🎛️ Advanced Mode: All Features');
+      // Re-categorize buttons before applying (DOM may have changed)
+      this.simpleButtons = [];
+      this.advancedButtons = [];
+      this.categorizeButtons();
       
-      console.log('[VR Mode] Switched to:', mode);
+      // Apply with slight delay to ensure DOM ready
+      setTimeout(() => {
+        this.applyMode();
+        this.updateToggleAppearance();
+        this.showToast(mode === 'simple' ? '🎯 Simple Mode: Clean UI' : '🎛️ Advanced Mode: All Features');
+        console.log('[VR Mode] Mode applied:', mode);
+      }, 100);
     },
     
     applyMode() {

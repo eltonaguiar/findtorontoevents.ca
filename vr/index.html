@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Toronto Events VR Hub - Meta Quest Experience</title>
 
+  <!-- HTTPS redirect notice (must load before A-Frame) -->
+  <script src="/vr/https-redirect.js"></script>
+
   <!-- A-Frame WebXR Framework -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
@@ -175,7 +178,8 @@
   <script src="/vr/quick-wins-substantial-set14.js"></script>
   <script src="/vr/quick-wins-substantial-set15.js"></script>
   <script src="/vr/quick-wins-substantial-set16.js"></script>
-  <script src="/vr/vr-logger.js"></script>`n  <script src="/vr/mobile-detect.js"></script>
+  <script src="/vr/vr-logger.js"></script>
+  <script src="/vr/mobile-detect.js"></script>
 </head>
 <body>
 
@@ -485,7 +489,9 @@
 
   <script>
     // ===== LOADING =====
+    var loadingDone = false;
     window.addEventListener('load', function () {
+      loadingDone = true;
       setTimeout(function () {
         var el = document.getElementById('loading');
         el.style.opacity = '0';
@@ -500,6 +506,23 @@
       }, 1500);
     });
 
+    // Loading timeout fallback: if page doesn't load within 20s, show error + skip option
+    setTimeout(function () {
+      if (loadingDone) return;
+      var el = document.getElementById('loading');
+      if (!el || el.classList.contains('hidden')) return;
+      var msg = document.createElement('div');
+      msg.style.cssText = 'text-align:center;margin-top:1.5rem;';
+      msg.innerHTML =
+        '<p style="color:#f59e0b;font-size:1rem;margin-bottom:1rem;">Loading is taking longer than expected.<br>A 3D asset may have failed to download.</p>' +
+        '<button onclick="document.getElementById(\'loading\').classList.add(\'hidden\');document.getElementById(\'instructions\').classList.remove(\'hidden\');" style="' +
+          'padding:10px 28px;border-radius:2rem;border:1px solid rgba(255,255,255,0.3);' +
+          'background:rgba(255,255,255,0.1);color:#fff;font-size:0.95rem;cursor:pointer;">' +
+          'Continue Anyway</button>' +
+        '<p style="color:#64748b;font-size:0.8rem;margin-top:0.75rem;">Some features may be limited.</p>';
+      el.appendChild(msg);
+    }, 20000);
+
     // ===== NAVIGATE TO ZONE =====
     function goToZone(url) {
       // Brief flash effect
@@ -512,8 +535,6 @@
 
     // ===== KEYBOARD CONTROLS =====
     document.addEventListener('keydown', function (e) {
-      var cam = document.querySelector('a-camera');
-
       if (e.key === 'F1') {
         e.preventDefault();
         document.getElementById('help-overlay').classList.toggle('hidden');
@@ -524,16 +545,119 @@
         return;
       }
 
-      switch (e.key) {
-        case '1': cam.setAttribute('position', '-6 1.6 -5'); break; // Events
-        case '2': cam.setAttribute('position', '0 1.6 -5'); break;  // Movies
-        case '3': cam.setAttribute('position', '6 1.6 -5'); break;  // Creators
-        case '4': cam.setAttribute('position', '-6 1.6 5'); break;  // Stocks
-        case '5': cam.setAttribute('position', '0 1.6 5'); break;   // Wellness
-        case '6': cam.setAttribute('position', '6 1.6 5'); break;   // Weather
-        case '0': cam.setAttribute('position', '0 1.6 0'); break;   // Center
+      // Guard: camera may not exist yet if scene hasn't finished loading
+      var cam = document.querySelector('a-camera');
+      if (!cam) return;
+
+      try {
+        switch (e.key) {
+          case '1': cam.setAttribute('position', '-6 1.6 -5'); break; // Events
+          case '2': cam.setAttribute('position', '0 1.6 -5'); break;  // Movies
+          case '3': cam.setAttribute('position', '6 1.6 -5'); break;  // Creators
+          case '4': cam.setAttribute('position', '-6 1.6 5'); break;  // Stocks
+          case '5': cam.setAttribute('position', '0 1.6 5'); break;   // Wellness
+          case '6': cam.setAttribute('position', '6 1.6 5'); break;   // Weather
+          case '0': cam.setAttribute('position', '0 1.6 0'); break;   // Center
+        }
+      } catch (err) {
+        console.warn('[VR Hub] Zone jump failed:', err.message);
       }
     });
+
+    // ===== TOUCH ZONE-JUMP BUTTONS (for touch-screen users on desktop view) =====
+    (function () {
+      var hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (!hasTouch) return;
+
+      // Replace keyboard instruction text with touch-friendly version
+      var instrP = document.querySelector('#instructions p');
+      if (instrP) {
+        instrP.textContent = 'Tap a zone to enter | Drag to look | Use panel below to jump';
+      }
+
+      // Also add touch instructions to the help overlay
+      var helpColumns = document.querySelector('#help-card .columns');
+      if (helpColumns) {
+        var touchCol = document.createElement('div');
+        touchCol.innerHTML =
+          '<strong>Touch</strong>' +
+          '<ul>' +
+            '<li>Drag to look around</li>' +
+            '<li>Tap a zone portal to enter</li>' +
+            '<li>Use jump panel (bottom-right)</li>' +
+          '</ul>';
+        helpColumns.appendChild(touchCol);
+      }
+
+      // Create floating zone-jump panel
+      var panel = document.createElement('div');
+      panel.id = 'touch-zone-panel';
+      panel.style.cssText = [
+        'position:fixed', 'bottom:80px', 'right:16px', 'z-index:9998',
+        'display:flex', 'flex-direction:column', 'gap:8px',
+        'background:rgba(10,10,30,0.85)', 'backdrop-filter:blur(8px)',
+        'border:1px solid rgba(0,212,255,0.25)', 'border-radius:16px',
+        'padding:10px', 'pointer-events:auto', 'max-width:70px',
+        'box-shadow:0 8px 32px rgba(0,0,0,0.4)'
+      ].join(';');
+
+      var zones = [
+        { key: '1', label: 'Events',   color: '#ff6b6b', pos: '-6 1.6 -5' },
+        { key: '2', label: 'Movies',   color: '#4ecdc4', pos: '0 1.6 -5' },
+        { key: '3', label: 'Creators', color: '#a855f7', pos: '6 1.6 -5' },
+        { key: '4', label: 'Stocks',   color: '#22c55e', pos: '-6 1.6 5' },
+        { key: '5', label: 'Wellness', color: '#10b981', pos: '0 1.6 5' },
+        { key: '6', label: 'Weather',  color: '#06b6d4', pos: '6 1.6 5' },
+        { key: '0', label: 'Center',   color: '#ffffff', pos: '0 1.6 0' }
+      ];
+
+      zones.forEach(function (z) {
+        var btn = document.createElement('button');
+        btn.textContent = z.label.charAt(0);
+        btn.title = z.label;
+        btn.style.cssText = [
+          'width:50px', 'height:50px', 'border-radius:12px',
+          'border:2px solid ' + z.color,
+          'background:rgba(0,0,0,0.5)', 'color:' + z.color,
+          'font-size:16px', 'font-weight:700', 'cursor:pointer',
+          'transition:transform 0.15s,background 0.15s'
+        ].join(';');
+        btn.dataset.vrMode = 'simple';
+        btn.addEventListener('click', function () {
+          var cam = document.querySelector('a-camera');
+          if (cam) cam.setAttribute('position', z.pos);
+          btn.style.transform = 'scale(0.9)';
+          setTimeout(function () { btn.style.transform = ''; }, 150);
+        });
+        panel.appendChild(btn);
+      });
+
+      // Toggle button to show/hide the panel
+      var toggle = document.createElement('button');
+      toggle.id = 'touch-panel-toggle';
+      toggle.innerHTML = '&#x1F4CD;'; // pin emoji
+      toggle.title = 'Zone Jump Panel';
+      toggle.style.cssText = [
+        'position:fixed', 'bottom:30px', 'right:16px', 'z-index:9999',
+        'width:44px', 'height:44px', 'border-radius:50%',
+        'background:linear-gradient(135deg,#00d4ff,#a855f7)',
+        'border:none', 'color:#fff', 'font-size:18px',
+        'cursor:pointer', 'box-shadow:0 4px 20px rgba(0,212,255,0.3)',
+        'pointer-events:auto'
+      ].join(';');
+      toggle.dataset.vrMode = 'simple';
+
+      var panelVisible = false;
+      panel.style.display = 'none';
+      toggle.addEventListener('click', function () {
+        panelVisible = !panelVisible;
+        panel.style.display = panelVisible ? 'flex' : 'none';
+        toggle.style.opacity = panelVisible ? '0.6' : '1';
+      });
+
+      document.body.appendChild(panel);
+      document.body.appendChild(toggle);
+    })();
 
     // ===== QUEST CONTROLLER LOCOMOTION =====
     (function () {
@@ -802,5 +926,8 @@
   <!-- Mobile-friendly touch controls -->
   <script src="/vr/vr-mobile.js"></script>
   <script src="/vr/vr-mode-toggle.js"></script>
+  <!-- VR AI Agent -->
+  <link rel="stylesheet" href="/vr/vr-ai-agent.css">
+  <script src="/vr/vr-ai-agent.js"></script>
 </body>
 </html>

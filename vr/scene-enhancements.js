@@ -72,11 +72,9 @@
         var sphere = el('a-sphere', {
           position: (bx + ox) + ' 0.2 ' + (bz + oz),
           radius: (0.03 + Math.random() * 0.04).toFixed(3),
-          color: p.color,
-          opacity: '0.6',
-          shader: 'flat',
+          material: 'shader: flat; color: ' + p.color + '; opacity: 0.6',
           animation: 'property: position; to: ' + (bx + ox * 0.5) + ' ' + yEnd + ' ' + (bz + oz * 0.5) + '; dur: ' + Math.round(dur) + '; loop: true; dir: alternate; easing: easeInOutSine',
-          'animation__fade': 'property: opacity; from: 0.6; to: 0.1; dur: ' + Math.round(dur) + '; loop: true; dir: alternate; easing: easeInOutSine'
+          'animation__fade': 'property: material.opacity; from: 0.6; to: 0.1; dur: ' + Math.round(dur) + '; loop: true; dir: alternate; easing: easeInOutSine'
         });
         scene.appendChild(sphere);
       }
@@ -113,12 +111,10 @@
         rotation: '-90 0 0',
         'radius-inner': '0.3',
         'radius-outer': '0.4',
-        color: '#00d4ff',
-        opacity: '0.5',
-        shader: 'flat',
+        material: 'shader: flat; color: #00d4ff; opacity: 0.5',
         animation: 'property: radius-outer; from: 0.5; to: 5; dur: 4000; loop: true; delay: ' + delay + '; easing: linear',
         'animation__ri': 'property: radius-inner; from: 0.3; to: 4.8; dur: 4000; loop: true; delay: ' + delay + '; easing: linear',
-        'animation__fade': 'property: opacity; from: 0.5; to: 0; dur: 4000; loop: true; delay: ' + delay + '; easing: linear'
+        'animation__fade': 'property: material.opacity; from: 0.5; to: 0; dur: 4000; loop: true; delay: ' + delay + '; easing: linear'
       });
       scene.appendChild(ring);
     }
@@ -145,10 +141,8 @@
       position: '0 3.5 -16.3',
       width: '13',
       height: '8',
-      color: '#4ecdc4',
-      opacity: '0.05',
-      shader: 'flat',
-      animation: 'property: opacity; from: 0.03; to: 0.08; dur: 3000; loop: true; dir: alternate; easing: easeInOutSine'
+      material: 'shader: flat; color: #4ecdc4; opacity: 0.05',
+      animation: 'property: material.opacity; from: 0.03; to: 0.08; dur: 3000; loop: true; dir: alternate; easing: easeInOutSine'
     });
     scene.appendChild(glowPlane);
   }
@@ -163,12 +157,11 @@
       var y = (Math.random() - 0.5) * 4;
       var z = (Math.random() - 0.5) * 12;
       var dur = 5000 + Math.random() * 8000;
+      var moteOpacity = (0.15 + Math.random() * 0.2).toFixed(2);
       var mote = el('a-sphere', {
         position: x + ' ' + y + ' ' + z,
         radius: (0.01 + Math.random() * 0.02).toFixed(3),
-        color: '#ffffff',
-        opacity: (0.15 + Math.random() * 0.2).toFixed(2),
-        shader: 'flat',
+        material: 'shader: flat; color: #ffffff; opacity: ' + moteOpacity,
         animation: 'property: position; to: ' + (x + (Math.random() - 0.5) * 2) + ' ' + (y + (Math.random() - 0.5) * 2) + ' ' + (z + (Math.random() - 0.5) * 2) + '; dur: ' + Math.round(dur) + '; loop: true; dir: alternate; easing: easeInOutSine'
       });
       moteContainer.appendChild(mote);
@@ -193,11 +186,9 @@
         var spark = el('a-sphere', {
           position: panelX + ' ' + (2 + Math.random() * 2) + ' -5',
           radius: '0.04',
-          color: color,
-          opacity: '0.8',
-          shader: 'flat',
+          material: 'shader: flat; color: ' + color + '; opacity: 0.8',
           animation: 'property: position; to: ' + (panelX + (Math.random() - 0.5) * 3) + ' ' + (3 + Math.random() * 2) + ' ' + (-5 + (Math.random() - 0.5) * 2) + '; dur: 1200; easing: easeOutQuad',
-          'animation__fade': 'property: opacity; from: 0.8; to: 0; dur: 1200; easing: easeInQuad'
+          'animation__fade': 'property: material.opacity; from: 0.8; to: 0; dur: 1200; easing: easeInQuad'
         });
         sparkContainer.appendChild(spark);
         // Clean up after animation
@@ -215,15 +206,14 @@
       var pos = box.getAttribute('position');
       if (!pos) return;
       // Add a subtle edge glow ring
+      var edgeColor = box.getAttribute('color') || '#00d4ff';
       var edgeGlow = el('a-ring', {
         position: pos.x + ' ' + (pos.y - 1.5) + ' ' + pos.z,
         rotation: '-90 0 0',
         'radius-inner': '1.3',
         'radius-outer': '1.4',
-        color: box.getAttribute('color') || '#00d4ff',
-        opacity: '0.2',
-        shader: 'flat',
-        animation: 'property: opacity; from: 0.1; to: 0.35; dur: 2000; loop: true; dir: alternate; easing: easeInOutSine'
+        material: 'shader: flat; color: ' + edgeColor + '; opacity: 0.2',
+        animation: 'property: material.opacity; from: 0.1; to: 0.35; dur: 2000; loop: true; dir: alternate; easing: easeInOutSine'
       });
       panel.appendChild(edgeGlow);
     });
@@ -244,11 +234,9 @@
       var fly = el('a-sphere', {
         position: x + ' ' + y + ' ' + z,
         radius: (0.02 + Math.random() * 0.03).toFixed(3),
-        color: color,
-        opacity: '0.7',
-        shader: 'flat',
+        material: 'shader: flat; color: ' + color + '; opacity: 0.7',
         animation: 'property: position; to: ' + (x + (Math.random() - 0.5) * 4) + ' ' + (y + (Math.random() - 0.5) * 2) + ' ' + (z + (Math.random() - 0.5) * 4) + '; dur: ' + Math.round(dur) + '; loop: true; dir: alternate; easing: easeInOutSine',
-        'animation__blink': 'property: opacity; from: 0.7; to: 0.1; dur: ' + (1500 + Math.random() * 2000).toFixed(0) + '; loop: true; dir: alternate; easing: easeInOutSine'
+        'animation__blink': 'property: material.opacity; from: 0.7; to: 0.1; dur: ' + (1500 + Math.random() * 2000).toFixed(0) + '; loop: true; dir: alternate; easing: easeInOutSine'
       });
       container.appendChild(fly);
     }
@@ -261,16 +249,15 @@
       var pz = -8 + Math.random() * 10;
       var pDur = 6000 + Math.random() * 5000;
       var petalColors = ['#fda4af', '#f9a8d4', '#c4b5fd', '#fef08a'];
+      var petalColor = petalColors[Math.floor(Math.random() * petalColors.length)];
       var petal = el('a-plane', {
         position: px + ' ' + (4 + Math.random() * 2) + ' ' + pz,
         width: '0.08',
         height: '0.06',
-        color: petalColors[Math.floor(Math.random() * petalColors.length)],
-        opacity: '0.7',
-        shader: 'flat',
+        material: 'shader: flat; color: ' + petalColor + '; opacity: 0.7; side: double',
         animation: 'property: position; to: ' + (px + (Math.random() - 0.5) * 3) + ' 0.1 ' + (pz + (Math.random() - 0.5) * 3) + '; dur: ' + Math.round(pDur) + '; loop: true; easing: linear',
         'animation__spin': 'property: rotation; from: 0 0 0; to: 360 180 90; dur: ' + Math.round(pDur) + '; loop: true; easing: linear',
-        'animation__fade': 'property: opacity; from: 0.7; to: 0; dur: ' + Math.round(pDur) + '; loop: true; easing: easeInQuad'
+        'animation__fade': 'property: material.opacity; from: 0.7; to: 0; dur: ' + Math.round(pDur) + '; loop: true; easing: easeInQuad'
       });
       petalContainer.appendChild(petal);
     }
@@ -324,12 +311,11 @@
       var y = 1 + Math.random() * 5;
       var z = (Math.random() - 0.5) * 16;
       var dur = 8000 + Math.random() * 10000;
+      var ambientOpacity = (0.2 + Math.random() * 0.25).toFixed(2);
       var mote = el('a-sphere', {
         position: x + ' ' + y + ' ' + z,
         radius: (0.015 + Math.random() * 0.025).toFixed(3),
-        color: color,
-        opacity: (0.2 + Math.random() * 0.25).toFixed(2),
-        shader: 'flat',
+        material: 'shader: flat; color: ' + color + '; opacity: ' + ambientOpacity,
         animation: 'property: position; to: ' + (x + (Math.random() - 0.5) * 6) + ' ' + (y + (Math.random() - 0.5) * 3) + ' ' + (z + (Math.random() - 0.5) * 6) + '; dur: ' + Math.round(dur) + '; loop: true; dir: alternate; easing: easeInOutSine'
       });
       container.appendChild(mote);
@@ -355,9 +341,7 @@
       var bg = el('a-plane', {
         width: '2',
         height: '0.4',
-        color: b.color,
-        opacity: '0.15',
-        shader: 'flat'
+        material: 'shader: flat; color: ' + b.color + '; opacity: 0.15'
       });
       var txt = el('a-text', {
         value: b.text,

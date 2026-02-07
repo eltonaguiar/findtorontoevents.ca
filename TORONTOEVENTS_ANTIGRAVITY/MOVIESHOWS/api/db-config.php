@@ -8,7 +8,7 @@
 define('DB_HOST', 'localhost'); // Update if different
 define('DB_NAME', 'ejaguiar1_tvmoviestrailers');
 define('DB_USER', 'ejaguiar1_tvmoviestrailers');
-define('DB_PASS', 'virus2016');
+define('DB_PASS', 'D41$4Jci6T9W2PsJdagLEr*KMo96nrCD');
 define('DB_CHARSET', 'utf8mb4');
 
 // CORS headers for API access

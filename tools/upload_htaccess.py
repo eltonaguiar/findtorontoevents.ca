@@ -6,9 +6,9 @@ from ftplib import FTP_TLS
 from pathlib import Path
 
 def main():
-    FTP_HOST = "ftps2.50webs.com"
-    FTP_USER = "ejaguiar1"
-    FTP_PASS = "$a^FzN7BqKapSQMsZxD&^FeTJ"
+    FTP_HOST = os.environ.get('FTP_SERVER', 'ftps2.50webs.com')
+    FTP_USER = os.environ.get('FTP_USER', 'ejaguiar1')
+    FTP_PASS = os.environ.get('FTP_PASS', '')
     
     workspace_root = Path(__file__).parent.parent
     htaccess = workspace_root / ".htaccess"

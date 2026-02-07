@@ -1,9 +1,9 @@
 # Simple script to verify .htaccess exists by trying to read it
 # Run this anytime to prove the file is there
 
-$FTP_HOST = "ftps2.50webs.com"
-$FTP_USER = "ejaguiar1"
-$FTP_PASS = '$a^FzN7BqKapSQMsZxD&^FeTJ'
+$FTP_HOST = if ($env:FTP_SERVER) { $env:FTP_SERVER } else { "ftps2.50webs.com" }
+$FTP_USER = if ($env:FTP_USER) { $env:FTP_USER } else { "ejaguiar1" }
+$FTP_PASS = $env:FTP_PASS
 
 Write-Host "Checking if .htaccess exists..." -ForegroundColor Cyan
 Write-Host ""

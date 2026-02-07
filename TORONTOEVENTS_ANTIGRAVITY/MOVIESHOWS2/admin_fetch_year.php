@@ -25,7 +25,7 @@ $TMDB_READ_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiODRmZjdiZmUzNWZmYWQ4Nzc5Yjc
 $host = 'localhost';
 $dbname = 'ejaguiar1_tvmoviestrailers';
 $dbuser = 'ejaguiar1_tvmoviestrailers';
-$dbpass = 'virus2016';
+$dbpass = 'D41$4Jci6T9W2PsJdagLEr*KMo96nrCD';
 
 $year = isset($_GET['year']) ? (int)$_GET['year'] : 0;
 $type = isset($_GET['type']) ? $_GET['type'] : 'both';

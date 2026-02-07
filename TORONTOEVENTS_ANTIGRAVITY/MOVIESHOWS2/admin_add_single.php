@@ -24,7 +24,7 @@ $TMDB_READ_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiODRmZjdiZmUzNWZmYWQ4Nzc5Yjc
 $host = 'localhost';
 $dbname = 'ejaguiar1_tvmoviestrailers';
 $dbuser = 'ejaguiar1_tvmoviestrailers';
-$dbpass = 'virus2016';
+$dbpass = 'D41$4Jci6T9W2PsJdagLEr*KMo96nrCD';
 
 $tmdbId = isset($_GET['tmdb_id']) ? (int)$_GET['tmdb_id'] : 0;
 $contentType = isset($_GET['type']) ? $_GET['type'] : '';

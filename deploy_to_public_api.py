@@ -3,9 +3,9 @@
 import ftplib
 import os
 
-host = 'ftps2.50webs.com'
-user = 'ejaguiar1'
-passwd = r'$a^FzN7BqKapSQMsZxD&^FeTJ'
+host = os.environ.get('FTP_SERVER', 'ftps2.50webs.com')
+user = os.environ.get('FTP_USER', 'ejaguiar1')
+passwd = os.environ.get('FTP_PASS', '')
 remote_base = '/findtorontoevents.ca/fc'
 
 files_to_upload = [

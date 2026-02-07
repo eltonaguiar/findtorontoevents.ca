@@ -50,6 +50,14 @@ export default defineConfig({
     /(?:^|\/)tests\/vr_polish\.spec\.ts$/,
     /(?:^|\/)tests\/vr_social_rich\.spec\.ts$/,
     /(?:^|\/)tests\/vr_intel_engage\.spec\.ts$/,
+    /(?:^|\/)tests\/vr_full_comprehensive\.spec\.ts$/,
+    /(?:^|\/)tests\/vr_full_site_test\.spec\.ts$/,
+    /(?:^|\/)tests\/vr_cross_platform_comprehensive\.spec\.ts$/,
+    /(?:^|\/)tests\/vr_mode_toggle_cross_platform\.spec\.ts$/,
+    /(?:^|\/)tests\/vr_mode_toggle_focused\.spec\.ts$/,
+    /(?:^|\/)tests\/full_page_test\.spec\.ts$/,
+    /(?:^|\/)tests\/weather_page\.spec\.ts$/,
+    /(?:^|\/)tests\/otherstuff_popup\.spec\.ts$/,
   ],
   timeout: isRemoteVerify ? 90000 : 30000,
   retries: isRemoteVerify ? 1 : 0,
@@ -71,4 +79,35 @@ export default defineConfig({
     video: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
+  projects: [
+    {
+      name: 'Desktop Chrome',
+      use: {
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        viewport: { width: 1920, height: 1080 },
+      },
+    },
+    {
+      name: 'Desktop Edge',
+      use: {
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
+        viewport: { width: 1920, height: 1080 },
+      },
+    },
+    {
+      name: 'Samsung Galaxy S21',
+      use: {
+        userAgent: 'Mozilla/5.0 (Linux; Android 13; SM-G991B) AppleWebKit/537.0.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+        viewport: { width: 384, height: 854 },
+        hasTouch: true,
+      },
+    },
+    {
+      name: 'Meta Quest 3',
+      use: {
+        userAgent: 'Mozilla/5.0 (X11; Linux x86_64; Quest 3) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/31.0.0.0.0 SamsungBrowser/4.0 Chrome/120.0.0.0 VR Safari/537.36',
+        viewport: { width: 1832, height: 1920 },
+      },
+    },
+  ],
 });

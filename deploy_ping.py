@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 """Deploy ping file to the server"""
 import ftplib
+import os
 
-host = 'ftps2.50webs.com'
-user = 'ejaguiar1'
-passwd = r'$a^FzN7BqKapSQMsZxD&^FeTJ'
+host = os.environ.get('FTP_SERVER', 'ftps2.50webs.com')
+user = os.environ.get('FTP_USER', 'ejaguiar1')
+passwd = os.environ.get('FTP_PASS', '')
 remote_dir = '/findtorontoevents.ca/fc/api'
 
 ftp = ftplib.FTP_TLS()

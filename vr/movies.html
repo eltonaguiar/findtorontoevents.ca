@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VR Movie Theater - Toronto Events</title>
+  <!-- HTTPS redirect notice (must load before A-Frame) -->
+  <script src="/vr/https-redirect.js"></script>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <style>
     body { margin: 0; overflow: hidden; background: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
@@ -121,6 +123,52 @@
       border-radius: 22px; border: 1px solid rgba(78,205,196,0.3);
       color: #fff; font-size: 13px; white-space: nowrap;
     }
+
+    /* ===== Search Bar ===== */
+    #search-bar {
+      position: fixed; top: 120px; left: 50%; transform: translateX(-50%); z-index: 95;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px);
+      border-radius: 24px; border: 1px solid rgba(78,205,196,0.3);
+      transition: all 0.3s ease;
+    }
+    #search-bar:focus-within {
+      border-color: #4ecdc4;
+      box-shadow: 0 0 20px rgba(78,205,196,0.3);
+    }
+    #search-input {
+      background: transparent; border: none; outline: none;
+      color: #fff; font-size: 14px; width: 200px;
+      font-family: inherit;
+    }
+    #search-input::placeholder { color: #64748b; }
+    #search-btn {
+      background: rgba(78,205,196,0.2); border: none;
+      color: #4ecdc4; border-radius: 50%; width: 32px; height: 32px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    #search-btn:hover { background: rgba(78,205,196,0.3); }
+    #search-results {
+      position: fixed; top: 170px; left: 50%; transform: translateX(-50%); z-index: 94;
+      max-height: 300px; overflow-y: auto;
+      background: rgba(10,10,20,0.95); backdrop-filter: blur(16px);
+      border: 1px solid rgba(78,205,196,0.2); border-radius: 12px;
+      padding: 12px; min-width: 280px; display: none;
+    }
+    #search-results.visible { display: block; }
+    .search-result-item {
+      padding: 10px 14px; cursor: pointer; border-radius: 8px;
+      color: #e2e8f0; font-size: 14px; display: flex; align-items: center; gap: 10px;
+      transition: all 0.2s;
+    }
+    .search-result-item:hover { background: rgba(78,205,196,0.15); }
+    .search-result-item img { width: 50px; height: 28px; object-fit: cover; border-radius: 4px; }
+    .search-result-item .info { flex: 1; }
+    .search-result-item .title { font-weight: 600; }
+    .search-result-item .meta { font-size: 12px; color: #64748b; }
+    .no-results { color: #64748b; text-align: center; padding: 20px; }
+    .highlight-match { color: #4ecdc4; font-weight: 600; }
     #now-playing-bar.active { display: flex; }
     .np-label {
       font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #4ecdc4;
@@ -362,6 +410,13 @@
     <button data-filter="movie">Movies</button>
     <button data-filter="tv">TV Shows</button>
   </div>
+
+  <!-- Search Bar -->
+  <div id="search-bar">
+    <input type="text" id="search-input" placeholder="Search movies..." autocomplete="off">
+    <button id="search-btn" onclick="performSearch()">&#128269;</button>
+  </div>
+  <div id="search-results"></div>
 
   <!-- TikTok Mode Toggle -->
   <a href="movies-tiktok.html" id="tiktok-toggle" style="
@@ -726,6 +781,8 @@
     function buildGallery(movies) {
       clearGallery();
       filteredMovies = movies;
+      // Keep global references in sync for search modules
+      window.filteredMovies = filteredMovies;
 
       var moviesList = movies.filter(function(m) { return m.type === 'movie'; });
       var tvList = movies.filter(function(m) { return m.type === 'tv'; });
@@ -1000,6 +1057,17 @@
         var next = playQueue.shift();
         playTrailer(next);
         showToast('Now playing: ' + next.title);
+      } else if (nowPlayingMovie && autoQueueEnabled) {
+        // Auto-fill queue with similar movies when empty
+        autoFillQueue(nowPlayingMovie);
+        if (playQueue.length > 0) {
+          var next = playQueue.shift();
+          playTrailer(next);
+          showToast('Now playing: ' + next.title);
+        } else {
+          closeYouTubePlayer();
+          showToast('Queue finished');
+        }
       } else {
         closeYouTubePlayer();
         showToast('Queue finished');
@@ -1288,6 +1356,147 @@
       return str.length > len ? str.substring(0, len - 1) + '...' : str;
     }
 
+    // ===== SEARCH FUNCTIONALITY =====
+    var autoQueueEnabled = true; // Auto-queue when video ends
+    
+    function performSearch() {
+      var query = document.getElementById('search-input').value.toLowerCase().trim();
+      var resultsContainer = document.getElementById('search-results');
+      
+      if (!query) {
+        resultsContainer.classList.remove('visible');
+        return;
+      }
+      
+      // Get all movies (respect current filter)
+      var moviesToSearch = currentFilter === 'all' ? allMovies : allMovies.filter(function(m) { 
+        return m.type === currentFilter; 
+      });
+      
+      // Search in title, genre, and description
+      var results = moviesToSearch.filter(function(movie) {
+        return (movie.title && movie.title.toLowerCase().includes(query)) ||
+               (movie.genre && movie.genre.toLowerCase().includes(query)) ||
+               (movie.description && movie.description.toLowerCase().includes(query));
+      }).slice(0, 10); // Limit to 10 results
+      
+      // Build results HTML
+      if (results.length === 0) {
+        resultsContainer.innerHTML = '<div class="no-results">No movies found</div>';
+      } else {
+        resultsContainer.innerHTML = results.map(function(movie) {
+          var thumb = movie.trailer_id ? ytThumb(movie.trailer_id) : '';
+          var titleHtml = highlightMatch(movie.title, query);
+          var meta = (movie.release_year || '') + (movie.imdb_rating ? ' ★' + movie.imdb_rating : '');
+          return '<div class="search-result-item" onclick="playSearchResult(' + movie.id + ')">' +
+            (thumb ? '<img src="' + thumb + '" alt="">' : '') +
+            '<div class="info">' +
+              '<div class="title">' + titleHtml + '</div>' +
+              '<div class="meta">' + meta + ' • ' + movie.type + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+      
+      resultsContainer.classList.add('visible');
+    }
+    
+    function highlightMatch(text, query) {
+      if (!text) return '';
+      var regex = new RegExp('(' + escapeRegex(query) + ')', 'gi');
+      return escapeHtml(text).replace(regex, '<span class="highlight-match">$1</span>');
+    }
+    
+    function escapeRegex(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    function playSearchResult(movieId) {
+      var movie = allMovies.find(function(m) { return m.id === movieId; });
+      if (movie) {
+        document.getElementById('search-results').classList.remove('visible');
+        document.getElementById('search-input').value = '';
+        // Auto-enable auto-queue when playing from search
+        if (playQueue.length === 0) {
+          autoFillQueue(movie);
+        }
+        playTrailer(movie);
+      }
+    }
+    
+    // Auto-fill queue with similar movies when queue is empty
+    function autoFillQueue(currentMovie) {
+      if (!autoQueueEnabled) return;
+      
+      // Find movies of same type/genre
+      var similarMovies = allMovies.filter(function(m) {
+        return m.id !== currentMovie.id && 
+               m.type === currentMovie.type &&
+               m.trailer_id;
+      });
+      
+      // If not enough similar, add any movies
+      if (similarMovies.length < 3) {
+        var otherMovies = allMovies.filter(function(m) {
+          return m.id !== currentMovie.id && 
+                 m.id !== similarMovies.map(function(sm) { return sm.id; }) &&
+                 m.trailer_id;
+        });
+        similarMovies = similarMovies.concat(otherMovies);
+      }
+      
+      // Add up to 5 movies to queue
+      var toQueue = similarMovies.slice(0, 5);
+      toQueue.forEach(function(movie) {
+        playQueue.push(movie);
+      });
+      
+      if (toQueue.length > 0) {
+        showToast('Auto-queued ' + toQueue.length + ' similar ' + currentMovie.type + 's');
+        updateQueueUI();
+      }
+    }
+
+    // Search input event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      var searchInput = document.getElementById('search-input');
+      var searchResults = document.getElementById('search-results');
+      
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          performSearch();
+        });
+        
+        searchInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            searchResults.classList.remove('visible');
+            searchInput.blur();
+          }
+        });
+        
+        searchInput.addEventListener('focus', function() {
+          if (searchInput.value.trim()) {
+            performSearch();
+          }
+        });
+      }
+      
+      // Close search results when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('#search-bar') && !e.target.closest('#search-results')) {
+          searchResults.classList.remove('visible');
+        }
+      });
+      
+      // Keyboard shortcut: / to focus search
+      document.addEventListener('keydown', function(e) {
+        if (e.key === '/' && document.activeElement !== searchInput) {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+    });
+
     // --- VR Video Player Functions (ENH-004) ---
     // Uses WebXR DOM Overlay so YouTube plays INSIDE the headset without exiting VR.
     var isVRMode = false;
@@ -1392,6 +1601,19 @@
         allMovies = generateDemoMovies();
         buildGallery(allMovies);
       }
+
+      // Expose movie data and functions globally so search modules can find and interact with them
+      window.allMovies = allMovies;
+      window.filteredMovies = filteredMovies;
+      window.playTrailer = playTrailer;
+      window.selectMovieByTitle = function(title) {
+        var movie = allMovies.find(function(m) { return m.title === title; });
+        if (movie) {
+          selectedMovie = movie;
+          if (movie.trailer_id) { playTrailer(movie); }
+          else { selectMovie(allMovies.indexOf(movie)); }
+        }
+      };
 
       // Hide loading
       setTimeout(function() {
@@ -1529,12 +1751,14 @@
   <!-- Keyboard hints (QW-009) -->
   <script src="/vr/keyboard-hints.js"></script>
   <script>
-    VRKeyboardHints.register([
-      { key: '←/→', desc: 'Browse movies' },
-      { key: 'Enter', desc: 'Play trailer' },
-      { key: 'G', desc: 'Area Guide' },
-      { key: 'Esc', desc: 'Close trailer' }
-    ]);
+    if (typeof VRKeyboardHints !== 'undefined') {
+      VRKeyboardHints.register([
+        { key: '←/→', desc: 'Browse movies' },
+        { key: 'Enter', desc: 'Play trailer' },
+        { key: 'G', desc: 'Area Guide' },
+        { key: 'Esc', desc: 'Close trailer' }
+      ]);
+    }
   </script>
   <!-- Shared presence tracker + keyboard shortcuts -->
   <script src="/vr/presence.js"></script>
@@ -1618,5 +1842,8 @@
     else window.addEventListener('load', init);
   })();
   </script>
+  <!-- VR AI Agent -->
+  <link rel="stylesheet" href="/vr/vr-ai-agent.css">
+  <script src="/vr/vr-ai-agent.js"></script>
 </body>
 </html>

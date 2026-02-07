@@ -138,6 +138,7 @@
         </div>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="vr-ai-input" placeholder="Type a message..." style="flex: 1; padding: 8px; border-radius: 5px; background: rgba(255,255,255,0.1); border: 1px solid #8b5cf6; color: white; font-size: 12px;">
+          <button id="vr-ai-mic-btn" onmousedown="VRQuickWinsSet7.AI.startListening()" onmouseup="VRQuickWinsSet7.AI.stopListening()" ontouchstart="VRQuickWinsSet7.AI.startListening()" ontouchend="VRQuickWinsSet7.AI.stopListening()" style="padding: 8px 12px; background: #ef4444; border: none; border-radius: 5px; color: white; cursor: pointer; font-size: 16px;">🎤</button>
           <button onclick="VRQuickWinsSet7.AI.sendMessage()" style="padding: 8px 12px; background: #8b5cf6; border: none; border-radius: 5px; color: white; cursor: pointer;">➤</button>
         </div>
       `;
@@ -158,15 +159,59 @@
     },
 
     setupVoiceRecognition() {
-      if (!('webkitSpeechRecognition' in window)) return;
+      if (!('webkitSpeechRecognition' in window)) {
+        console.log('[VR AI] Speech recognition not supported');
+        return;
+      }
       
       this.recognition = new webkitSpeechRecognition();
       this.recognition.continuous = false;
       this.recognition.interimResults = false;
+      this.recognition.lang = 'en-US';
       
       this.recognition.onresult = (e) => {
         const transcript = e.results[0][0].transcript.toLowerCase();
+        console.log('[VR AI] Heard:', transcript);
         this.processInput(transcript);
+      };
+      
+      this.recognition.onerror = (e) => {
+        console.error('[VR AI] Speech recognition error:', e.error);
+        state.aiListening = false;
+        const status = document.getElementById('vr-ai-status');
+        const micBtn = document.getElementById('vr-ai-mic-btn');
+        if (status) {
+          status.textContent = 'Idle';
+          status.style.color = '#888';
+        }
+        if (micBtn) {
+          micBtn.style.background = '#ef4444';
+          micBtn.textContent = '🎤';
+        }
+        if (e.error === 'not-allowed') {
+          this.respond('Microphone access denied. Please allow microphone access and try again.');
+        } else if (e.error === 'no-speech') {
+          this.respond('I didn\'t hear anything. Please try again.');
+        } else {
+          this.respond('Sorry, there was an error. Please try again.');
+        }
+      };
+      
+      this.recognition.onend = () => {
+        if (state.aiListening) {
+          // Recognition ended but we didn't get a result
+          state.aiListening = false;
+          const status = document.getElementById('vr-ai-status');
+          const micBtn = document.getElementById('vr-ai-mic-btn');
+          if (status) {
+            status.textContent = 'Idle';
+            status.style.color = '#888';
+          }
+          if (micBtn) {
+            micBtn.style.background = '#ef4444';
+            micBtn.textContent = '🎤';
+          }
+        }
       };
     },
 
@@ -178,28 +223,52 @@
     },
 
     startListening() {
+      if (state.aiListening) return; // Already listening
+      
       state.aiListening = true;
       const status = document.getElementById('vr-ai-status');
+      const micBtn = document.getElementById('vr-ai-mic-btn');
       if (status) {
         status.textContent = 'Listening...';
         status.style.color = '#22c55e';
       }
+      if (micBtn) {
+        micBtn.style.background = '#22c55e';
+        micBtn.textContent = '🔴';
+      }
       
       if (this.recognition) {
-        this.recognition.start();
+        try {
+          this.recognition.start();
+        } catch (e) {
+          console.log('[VR AI] Recognition already started or error:', e);
+        }
+      } else {
+        this.respond('Sorry, speech recognition is not supported in your browser.');
       }
     },
 
     stopListening() {
+      if (!state.aiListening) return; // Not listening
+      
       state.aiListening = false;
       const status = document.getElementById('vr-ai-status');
+      const micBtn = document.getElementById('vr-ai-mic-btn');
       if (status) {
         status.textContent = 'Processing...';
         status.style.color = '#f59e0b';
       }
+      if (micBtn) {
+        micBtn.style.background = '#ef4444';
+        micBtn.textContent = '🎤';
+      }
       
       if (this.recognition) {
-        this.recognition.stop();
+        try {
+          this.recognition.stop();
+        } catch (e) {
+          console.log('[VR AI] Recognition already stopped or error:', e);
+        }
       }
     },
 

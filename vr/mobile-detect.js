@@ -7,18 +7,35 @@
   'use strict';
 
   const MobileDetect = {
-    // Check if device is mobile - CONSERVATIVE detection
+    // Check if device is mobile - STRICT detection
     isMobile() {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       
-      // Primary check: mobile user agents ONLY
-      const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      // Primary check: mobile user agents ONLY (no tablets)
+      const mobileRegex = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i;
       
-      // Must match user agent AND have touch support
+      // Exclude tablets and iPads - they should use desktop VR
+      const isTablet = /iPad|Tablet|Kindle|Silk/i.test(userAgent);
+      
+      // Must match mobile user agent AND have touch support
       const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
       
-      // Desktop browsers sometimes report touch support, so we need BOTH conditions
-      return mobileRegex.test(userAgent) && hasTouch;
+      // Desktop Chrome sometimes reports touch on convertible laptops
+      // Require maxTouchPoints > 1 (most phones have 5+)
+      const hasMultiTouch = navigator.maxTouchPoints > 1;
+      
+      // Screen size check - mobile screens are typically < 1024px
+      const isSmallScreen = window.innerWidth < 1024;
+      
+      // Must be mobile UA + touch + multi-touch + small screen
+      const result = mobileRegex.test(userAgent) && hasTouch && hasMultiTouch && isSmallScreen && !isTablet;
+      
+      console.log('[MobileDetect] Checks - UA:', mobileRegex.test(userAgent), 
+                  'Touch:', hasTouch, 'MultiTouch:', hasMultiTouch, 
+                  'SmallScreen:', isSmallScreen, 'NotTablet:', !isTablet,
+                  'RESULT:', result);
+      
+      return result;
     },
 
     // Check if device supports VR
@@ -136,7 +153,7 @@
       localStorage.setItem('vr-mobile-prompt-dismissed', Date.now().toString());
     },
 
-    // Initialize - NO AUTO REDIRECT, only manual
+    // Initialize - auto-redirect phones, prompt tablets
     init() {
       // Log detection results
       const info = this.getDeviceInfo();
@@ -150,15 +167,19 @@
       console.log('[MobileDetect] User Agent:', info.userAgent);
       console.log('[MobileDetect] Is Mobile:', isMobile);
       
-      // NEVER auto-redirect - only show prompt if user wants to switch
       if (isMobile && !window.location.pathname.includes('mobile')) {
-        if (window.VRLogger) {
-          VRLogger.log('MOBILE', 'Showing mobile prompt');
+        // Don't redirect if user explicitly chose desktop mode
+        if (localStorage.getItem('vr-desktop-mode') === 'true') {
+          console.log('[MobileDetect] User prefers desktop, showing prompt instead');
+          setTimeout(() => this.showPrompt(), 3000);
+          return;
         }
-        // Wait for page to load, then show gentle prompt
-        setTimeout(() => {
-          this.showPrompt();
-        }, 3000);
+        
+        if (window.VRLogger) {
+          VRLogger.log('MOBILE', 'Auto-redirecting phone to mobile version');
+        }
+        console.log('[MobileDetect] Auto-redirecting to mobile version');
+        this.redirect();
       }
     }
   };

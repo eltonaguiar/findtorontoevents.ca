@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weather Observatory VR - Toronto</title>
+
+  <!-- HTTPS redirect notice (must load before A-Frame) -->
+  <script src="/vr/https-redirect.js"></script>
   
   <!-- A-Frame Core -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
@@ -1246,15 +1249,17 @@
   <!-- Keyboard hints -->
   <script src="/vr/keyboard-hints.js"></script>
   <script>
-    VRKeyboardHints.register([
-      { key: '1', desc: 'Clear weather' },
-      { key: '2', desc: 'Rain mode' },
-      { key: '3', desc: 'Snow mode' },
-      { key: '4', desc: 'Thunderstorm' },
-      { key: 'P', desc: 'Passthrough AR' },
-      { key: 'R', desc: 'Refresh weather' },
-      { key: 'G', desc: 'Area Guide' }
-    ]);
+    if (typeof VRKeyboardHints !== 'undefined') {
+      VRKeyboardHints.register([
+        { key: '1', desc: 'Clear weather' },
+        { key: '2', desc: 'Rain mode' },
+        { key: '3', desc: 'Snow mode' },
+        { key: '4', desc: 'Thunderstorm' },
+        { key: 'P', desc: 'Passthrough AR' },
+        { key: 'R', desc: 'Refresh weather' },
+        { key: 'G', desc: 'Area Guide' }
+      ]);
+    }
   </script>
   <script src="/vr/presence.js"></script>
   <!-- VR Controller Support -->
@@ -1337,5 +1342,8 @@
     else window.addEventListener('load', init);
   })();
   </script>
+  <!-- VR AI Agent -->
+  <link rel="stylesheet" href="/vr/vr-ai-agent.css">
+  <script src="/vr/vr-ai-agent.js"></script>
 </body>
 </html>

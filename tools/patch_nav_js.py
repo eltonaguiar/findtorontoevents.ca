@@ -138,6 +138,29 @@ def patch_js():
                 content = content.replace(bad, good)
                 break
 
+    # 10. Replace 2XKO Frame Data with VR Experience (desktop + mobile) and Accountability Dashboard
+    vr_desktop_link = '(0,t.jsxs)("a",{href:"/vr/",className:"w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-fuchsia-500/20 text-fuchsia-200 hover:text-white transition-all border border-transparent hover:border-fuchsia-500/30 overflow-hidden",onClick:()=>r(!1),children:[(0,t.jsx)("span",{className:"text-lg",children:"\uD83E\uDD7D"})," VR Experience"]})'
+    vr_mobile_link = '(0,t.jsxs)("a",{href:"/vr/mobile-index.html",className:"w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-violet-500/20 text-violet-200 hover:text-white transition-all border border-transparent hover:border-violet-500/30 overflow-hidden",onClick:()=>r(!1),children:[(0,t.jsx)("span",{className:"text-lg",children:"\uD83D\uDCF1"})," VR Mobile"]})'
+    acct_link = '(0,t.jsxs)("a",{href:"/fc/#/accountability",className:"w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-amber-500/20 text-amber-200 hover:text-white transition-all border border-transparent hover:border-amber-500/30 overflow-hidden",onClick:()=>r(!1),children:[(0,t.jsx)("span",{className:"text-lg",children:"\uD83C\uDFAF"})," Accountability Dashboard"]})'
+    new_nav_links = vr_desktop_link + ',' + vr_mobile_link + ',' + acct_link
+    # Fix double comma before 2XKO (left by previous patches)
+    content = re.sub(r'(Mental Health Resources"\]\}\)),{2,}', r'\1,', content)
+    # Remove 2XKO link and replace with VR + Accountability (regex: emoji-agnostic)
+    two_xko_re = re.compile(
+        r'\(0,t\.jsxs\)\("a",\{href:"/2xko",className:"[^"]*",onClick:\(\)=>r\(!1\),children:\[\(0,t\.jsx\)\("span",\{className:"text-lg",children:"[^"]*"\}\)," 2XKO Frame Data"\]\}\)'
+    )
+    if two_xko_re.search(content):
+        content = two_xko_re.sub(new_nav_links, content, count=1)
+        print(" Replaced 2XKO with VR Experience, VR Mobile, Accountability Dashboard")
+    # Also add these links if 2XKO was already removed but new links are missing
+    elif '" VR Experience"]' not in content and '" Mental Health Resources"]' in content:
+        # Insert after Mental Health Resources
+        content = content.replace(
+            '" Mental Health Resources"]}),',
+            '" Mental Health Resources"]}),'+new_nav_links+','
+        )
+        print(" Added VR Experience, VR Mobile, Accountability Dashboard after Mental Health")
+
     # 9. Mirror to other chunk locations (so menu FavCreators link is /fc/#/guest everywhere)
     targets = [
         'e:/findtorontoevents_antigravity.ca/_next/static/chunks/a2ac3a6616d60872.js',

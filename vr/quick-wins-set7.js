@@ -175,6 +175,24 @@
       }
     });
 
+    // Search movies
+    var movieData = window.allMovies || window.filteredMovies || [];
+    movieData.forEach(function (m) {
+      if ((m.title && m.title.toLowerCase().indexOf(q) !== -1) ||
+          (m.genre && m.genre.toLowerCase().indexOf(q) !== -1) ||
+          (m.description && m.description.toLowerCase().indexOf(q) !== -1)) {
+        results.push({
+          type: m.type === 'tv' ? 'tv show' : 'movie',
+          title: m.title,
+          sub: (m.genre || '') + (m.release_year ? ' (' + m.release_year + ')' : '') + (m.imdb_rating ? ' ★' + m.imdb_rating : ''),
+          url: '/vr/movies.html',
+          color: m.type === 'tv' ? '#a855f7' : '#00d4ff',
+          icon: m.type === 'tv' ? '📺' : '🎬',
+          movieTitle: m.title
+        });
+      }
+    });
+
     // Limit results
     results = results.slice(0, 12);
 
@@ -184,6 +202,15 @@
     }
 
     resultsEl.innerHTML = results.map(function (r) {
+      // If we're already on the movies page and this is a movie result, play it directly
+      var isOnMovies = window.location.pathname.indexOf('movies') !== -1;
+      if (isOnMovies && r.movieTitle && window.selectMovieByTitle) {
+        return '<a href="#" onclick="event.preventDefault();window.selectMovieByTitle(\'' + r.movieTitle.replace(/'/g, "\\'") + '\');var o=document.getElementById(\'vr-qw7-search\');if(o)o.classList.remove(\'open\');" class="qw7-search-item" style="--item-color:' + r.color + '">' +
+          '<span class="qw7-si-icon">' + r.icon + '</span>' +
+          '<div class="qw7-si-text"><span class="qw7-si-title">' + r.title + '</span><span class="qw7-si-sub">' + r.sub + '</span></div>' +
+          '<span class="qw7-si-type">' + r.type + '</span>' +
+        '</a>';
+      }
       return '<a href="' + r.url + '" class="qw7-search-item" style="--item-color:' + r.color + '">' +
         '<span class="qw7-si-icon">' + r.icon + '</span>' +
         '<div class="qw7-si-text"><span class="qw7-si-title">' + r.title + '</span><span class="qw7-si-sub">' + r.sub + '</span></div>' +

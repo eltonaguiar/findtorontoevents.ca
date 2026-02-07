@@ -8,7 +8,7 @@ function getDbConnection()
     $host = 'localhost';
     $dbname = 'ejaguiar1_tvmoviestrailers';
     $username = 'ejaguiar1_tvmoviestrailers';
-    $password = 'virus2016';
+    $password = 'D41$4Jci6T9W2PsJdagLEr*KMo96nrCD';
 
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);

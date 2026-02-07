@@ -502,13 +502,15 @@
   <!-- Keyboard hints (QW-009) -->
   <script src="/vr/keyboard-hints.js"></script>
   <script>
-    VRKeyboardHints.register([
-      { key: 'S', desc: 'Skip current step' },
-      { key: 'B', desc: 'Go back one step' },
-      { key: 'R', desc: 'Reset tutorial' },
-      { key: 'G', desc: 'Area Guide' },
-      { key: 'Q/E', desc: 'Snap turn left/right' }
-    ]);
+    if (typeof VRKeyboardHints !== 'undefined') {
+      VRKeyboardHints.register([
+        { key: 'S', desc: 'Skip current step' },
+        { key: 'B', desc: 'Go back one step' },
+        { key: 'R', desc: 'Reset tutorial' },
+        { key: 'G', desc: 'Area Guide' },
+        { key: 'Q/E', desc: 'Snap turn left/right' }
+      ]);
+    }
   </script>
 
   <!-- Comfort vignette + F1 help -->
@@ -575,5 +577,8 @@
   <script src="/vr/comfort-intelligence.js"></script>
   <script src="/vr/content-depth.js"></script>
   <script src="/vr/polish-productivity.js"></script>
+  <!-- VR AI Agent -->
+  <link rel="stylesheet" href="/vr/vr-ai-agent.css">
+  <script src="/vr/vr-ai-agent.js"></script>
 </body>
 </html>

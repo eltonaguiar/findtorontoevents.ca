@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Check FTP server files and their modification times"""
 import ssl
+import os
 from ftplib import FTP_TLS
 from datetime import datetime
 
 def main():
-    FTP_HOST = "ftps2.50webs.com"
-    FTP_USER = "ejaguiar1"
-    FTP_PASS = "$a^FzN7BqKapSQMsZxD&^FeTJ"
+    FTP_HOST = os.environ.get('FTP_SERVER', 'ftps2.50webs.com')
+    FTP_USER = os.environ.get('FTP_USER', 'ejaguiar1')
+    FTP_PASS = os.environ.get('FTP_PASS', '')
     
     print("Connecting to FTP server...")
     context = ssl.create_default_context()

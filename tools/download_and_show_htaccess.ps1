@@ -1,9 +1,9 @@
 # PowerShell script to download and display .htaccess file contents
 # This proves the file exists by actually downloading it
 
-$FTP_HOST = "ftps2.50webs.com"
-$FTP_USER = "ejaguiar1"
-$FTP_PASS = '$a^FzN7BqKapSQMsZxD&^FeTJ'
+$FTP_HOST = if ($env:FTP_SERVER) { $env:FTP_SERVER } else { "ftps2.50webs.com" }
+$FTP_USER = if ($env:FTP_USER) { $env:FTP_USER } else { "ejaguiar1" }
+$FTP_PASS = $env:FTP_PASS
 $REMOTE_FILE = "next/_next/.htaccess"
 $LOCAL_TEMP = "$env:TEMP\htaccess_verify.txt"
 

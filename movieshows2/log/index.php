@@ -2,7 +2,7 @@
 $host = 'mysql.50webs.com';
 $db = 'ejaguiar1_tvmoviestrailers';
 $user = 'ejaguiar1_tvmoviestrailers';
-$pass = getenv('EJAGUIAR1_TVMOVIESTRAILERS') ?: 'virus2016';
+$pass = getenv('EJAGUIAR1_TVMOVIESTRAILERS') ?: 'D41$4Jci6T9W2PsJdagLEr*KMo96nrCD';
 
 header('Content-Type: text/html; charset=utf-8');
 ?>

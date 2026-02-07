@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toronto Weather | findtorontoevents.ca</title>
+  <meta name="description" content="Real-time Toronto weather with wind chill, humidex, clothing advice, 7-day forecast and weather alerts.">
+  <style>
+    :root {
+      --bg-primary: #0a0a1a;
+      --bg-secondary: #111827;
+      --bg-card: #1a1a2e;
+      --bg-card-hover: #222244;
+      --text-primary: #f0f0f0;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent-blue: #00d4ff;
+      --accent-blue-dim: rgba(0, 212, 255, 0.15);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --gradient-cold: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-cool: linear-gradient(135deg, #14b8a6 0%, #0ea5e9 100%);
+      --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      --gradient-hot: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background gradient */
+    .bg-anim {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(ellipse at 20% 50%, rgba(0,212,255,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 20%, rgba(99,102,241,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 80%, rgba(168,85,247,0.04) 0%, transparent 50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto; padding: 20px 16px 80px;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      text-align: center; padding: 30px 0 20px;
+    }
+    .header h1 {
+      font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, #00d4ff, #a855f7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header .subtitle {
+      color: var(--text-secondary); font-size: 0.95rem; margin-top: 4px;
+    }
+    .season-badge {
+      display: inline-block; margin-top: 10px;
+      padding: 6px 16px; border-radius: 20px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border-color);
+      font-size: 0.85rem; color: var(--text-secondary);
+    }
+
+    /* ===== NAV BAR ===== */
+    .nav-bar {
+      display: flex; justify-content: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .nav-btn {
+      padding: 8px 18px; border-radius: 24px; border: 1px solid var(--border-color);
+      background: rgba(255,255,255,0.04); color: var(--text-secondary);
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: none;
+      transition: all 0.25s;
+    }
+    .nav-btn:hover { background: rgba(0,212,255,0.12); color: var(--accent-blue); border-color: rgba(0,212,255,0.3); }
+    .nav-btn.active { background: rgba(0,212,255,0.15); color: var(--accent-blue); border-color: var(--accent-blue); }
+
+    /* ===== LOADING ===== */
+    .loading-state {
+      text-align: center; padding: 80px 20px;
+    }
+    .loading-spinner {
+      width: 48px; height: 48px; border: 3px solid rgba(0,212,255,0.2);
+      border-top-color: var(--accent-blue); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-state p { color: var(--text-secondary); font-size: 0.95rem; }
+
+    /* ===== MAIN GRID ===== */
+    .weather-grid {
+      display: grid; gap: 16px;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 700px) {
+      .weather-grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 16px; padding: 24px; transition: border-color 0.3s;
+    }
+    .card:hover { border-color: rgba(0,212,255,0.2); }
+    .card.span-2 { grid-column: 1 / -1; }
+
+    .card-label {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px;
+    }
+
+    /* ===== HERO CARD (current weather) ===== */
+    .hero-card { grid-column: 1 / -1; text-align: center; padding: 36px 24px; position: relative; overflow: hidden; }
+    .hero-card::before {
+      content: ''; position: absolute; top: -40%; left: -20%; width: 140%; height: 180%;
+      background: radial-gradient(ellipse, rgba(0,212,255,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-temp { font-size: 5rem; font-weight: 900; line-height: 1; }
+    .hero-condition { font-size: 1.3rem; color: var(--text-secondary); margin: 8px 0 0; }
+    .hero-updated { font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; }
+
+    /* ===== FEELS LIKE BOX ===== */
+    .feels-card { position: relative; }
+    .feels-value { font-size: 2.8rem; font-weight: 800; line-height: 1.1; }
+    .feels-desc { color: var(--text-secondary); font-size: 0.9rem; margin-top: 6px; }
+    .feels-badge {
+      display: inline-block; margin-top: 10px; padding: 4px 12px;
+      border-radius: 12px; font-size: 0.75rem; font-weight: 700;
+    }
+    .feels-badge.cold { background: rgba(99,102,241,0.2); color: #818cf8; }
+    .feels-badge.cool { background: rgba(20,184,166,0.2); color: #5eead4; }
+    .feels-badge.warm { background: rgba(245,158,11,0.2); color: #fbbf24; }
+    .feels-badge.hot { background: rgba(239,68,68,0.2); color: #f87171; }
+
+    /* ===== DETAIL STATS ===== */
+    .stat-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border-color);
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--text-secondary); font-size: 0.9rem; }
+    .stat-value { font-weight: 700; font-size: 1rem; }
+
+    /* ===== CLOTHING ADVICE ===== */
+    .advice-card {
+      border-radius: 14px; padding: 20px 24px;
+      font-weight: 600; font-size: 1rem; line-height: 1.5;
+      color: #fff;
+    }
+
+    /* ===== ALERTS ===== */
+    .alert-banner {
+      padding: 14px 20px; border-radius: 12px; margin-bottom: 10px;
+      border-left: 4px solid; animation: alert-glow 2s ease-in-out infinite alternate;
+    }
+    .alert-banner.high { background: rgba(239,68,68,0.15); border-color: #ef4444; }
+    .alert-banner.medium { background: rgba(245,158,11,0.15); border-color: #f59e0b; }
+    .alert-title { font-weight: 700; font-size: 0.95rem; }
+    .alert-desc { font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px; }
+    @keyframes alert-glow {
+      from { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+      to { box-shadow: 0 0 20px 0 rgba(239,68,68,0.15); }
+    }
+
+    /* ===== FORECAST ===== */
+    .forecast-strip {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
+    }
+    @media (max-width: 700px) {
+      .forecast-strip { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 420px) {
+      .forecast-strip { grid-template-columns: repeat(3, 1fr); }
+    }
+    .forecast-day {
+      text-align: center; padding: 14px 6px; border-radius: 14px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+      cursor: pointer; transition: all 0.25s;
+    }
+    .forecast-day:hover { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.25); transform: translateY(-2px); }
+    .forecast-day .day-name { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+    .forecast-day .day-emoji { font-size: 1.6rem; margin: 6px 0; }
+    .forecast-day .day-temps { font-size: 0.85rem; }
+    .forecast-day .day-hi { font-weight: 700; color: var(--text-primary); }
+    .forecast-day .day-lo { color: var(--text-muted); }
+    .forecast-day .day-precip { font-size: 0.7rem; color: #60a5fa; margin-top: 4px; }
+
+    /* ===== FORECAST DETAIL MODAL ===== */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 9000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-box {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 20px; padding: 32px; max-width: 420px; width: 90%;
+      transform: translateY(20px) scale(0.96); transition: transform 0.25s;
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+    .modal-close {
+      float: right; background: none; border: none; color: var(--text-muted);
+      font-size: 1.5rem; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: var(--text-primary); }
+
+    /* ===== COMFORT BAR ===== */
+    .comfort-track {
+      width: 100%; height: 10px; border-radius: 5px;
+      background: rgba(255,255,255,0.06); margin-top: 12px; overflow: hidden;
+    }
+    .comfort-fill {
+      height: 100%; border-radius: 5px; transition: width 1s ease, background 1s ease;
+    }
+
+    /* ===== BACK LINK ===== */
+    .back-link {
+      position: fixed; bottom: 20px; left: 20px; z-index: 100;
+      padding: 10px 20px; border-radius: 24px;
+      background: rgba(0,0,0,0.7); border: 1px solid var(--border-color);
+      color: var(--accent-blue); text-decoration: none; font-weight: 600;
+      font-size: 0.9rem; backdrop-filter: blur(10px); transition: all 0.25s;
+    }
+    .back-link:hover { background: rgba(0,212,255,0.12); border-color: var(--accent-blue); }
+
+    /* ===== VR LINK ===== */
+    .vr-link {
+      position: fixed; bottom: 20px; right: 20px; z-index: 100;
+      padding: 10px 20px; border-radius: 24px;
+      background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3);
+      color: #a855f7; text-decoration: none; font-weight: 600;
+      font-size: 0.9rem; backdrop-filter: blur(10px); transition: all 0.25s;
+    }
+    .vr-link:hover { background: rgba(168,85,247,0.25); border-color: #a855f7; }
+
+    /* ===== HOURLY CHART ===== */
+    .hourly-scroll {
+      display: flex; gap: 10px; overflow-x: auto; padding: 8px 0;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+    }
+    .hourly-scroll::-webkit-scrollbar { height: 4px; }
+    .hourly-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .hour-item {
+      flex-shrink: 0; text-align: center; padding: 10px 12px;
+      border-radius: 12px; background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-color); min-width: 70px;
+    }
+    .hour-item .h-time { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+    .hour-item .h-emoji { font-size: 1.2rem; margin: 4px 0; }
+    .hour-item .h-temp { font-weight: 700; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="bg-anim"></div>
+
+  <!-- Back to main site -->
+  <a href="/" class="back-link">← Back to Events</a>
+  <!-- VR weather link -->
+  <a href="/vr/weather-zone.html" class="vr-link">🥽 VR Weather</a>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🌤️ Toronto Weather</h1>
+      <p class="subtitle">Real-time conditions with wind chill, humidex & what to wear</p>
+      <div class="season-badge" id="season-badge">Loading season...</div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loading-state" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Fetching Toronto weather...</p>
+    </div>
+
+    <!-- Weather content (hidden until loaded) -->
+    <div id="weather-content" style="display:none;">
+
+      <!-- Alerts -->
+      <div id="alerts-container"></div>
+
+      <!-- Main Grid -->
+      <div class="weather-grid">
+
+        <!-- Hero: Current Temp -->
+        <div class="card hero-card">
+          <div class="hero-temp" id="hero-temp">--°</div>
+          <div class="hero-condition" id="hero-condition">Loading...</div>
+          <div class="hero-updated" id="hero-updated">--</div>
+        </div>
+
+        <!-- Feels Like -->
+        <div class="card feels-card">
+          <div class="card-label">🌡️ What it REALLY feels like</div>
+          <div class="feels-value" id="feels-value">--°</div>
+          <div class="feels-desc" id="feels-desc">Calculating...</div>
+          <span class="feels-badge" id="feels-badge"></span>
+          <div class="comfort-track">
+            <div class="comfort-fill" id="comfort-fill" style="width:0%;"></div>
+          </div>
+        </div>
+
+        <!-- Clothing Advice -->
+        <div class="card advice-card" id="advice-card" style="background: var(--bg-card);">
+          <div class="card-label" style="color:rgba(255,255,255,0.5);">👕 What to Wear</div>
+          <div id="advice-text">Loading advice...</div>
+        </div>
+
+        <!-- Details -->
+        <div class="card">
+          <div class="card-label">📊 Current Details</div>
+          <div class="stat-row"><span class="stat-label">💨 Wind</span><span class="stat-value" id="s-wind">--</span></div>
+          <div class="stat-row"><span class="stat-label">💨 Gusts</span><span class="stat-value" id="s-gust">--</span></div>
+          <div class="stat-row"><span class="stat-label">💧 Humidity</span><span class="stat-value" id="s-humidity">--</span></div>
+          <div class="stat-row"><span class="stat-label">🥶 Wind Chill</span><span class="stat-value" id="s-windchill">--</span></div>
+          <div class="stat-row"><span class="stat-label">🔥 Humidex</span><span class="stat-value" id="s-humidex">--</span></div>
+        </div>
+
+        <!-- Sun/UV -->
+        <div class="card">
+          <div class="card-label">☀️ Sun & UV</div>
+          <div class="stat-row"><span class="stat-label">🌅 Sunrise</span><span class="stat-value" id="s-sunrise">--</span></div>
+          <div class="stat-row"><span class="stat-label">🌇 Sunset</span><span class="stat-value" id="s-sunset">--</span></div>
+          <div class="stat-row"><span class="stat-label">☀️ UV Index</span><span class="stat-value" id="s-uv">--</span></div>
+          <div class="stat-row"><span class="stat-label">🌡️ Pressure</span><span class="stat-value" id="s-pressure">--</span></div>
+        </div>
+
+        <!-- Hourly -->
+        <div class="card span-2">
+          <div class="card-label">🕐 Next 24 Hours</div>
+          <div class="hourly-scroll" id="hourly-scroll"></div>
+        </div>
+
+        <!-- 7-Day Forecast -->
+        <div class="card span-2">
+          <div class="card-label">📅 7-Day Forecast</div>
+          <div class="forecast-strip" id="forecast-strip"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Forecast detail modal -->
+  <div class="modal-overlay" id="forecast-modal">
+    <div class="modal-box">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <h3 id="modal-title" style="font-size:1.3rem; margin-bottom:12px;"></h3>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    const LAT = 43.6532, LON = -79.3832;
+
+    // ===== WEATHER CODES =====
+    function weatherCodeToInfo(code, isDay) {
+      const map = {
+        0:  { desc: 'Clear sky',       condition: 'clear',   emoji: isDay ? '☀️' : '🌙' },
+        1:  { desc: 'Mainly clear',    condition: 'clear',   emoji: isDay ? '🌤️' : '🌙' },
+        2:  { desc: 'Partly cloudy',   condition: 'clouds',  emoji: '⛅' },
+        3:  { desc: 'Overcast',        condition: 'clouds',  emoji: '☁️' },
+        45: { desc: 'Foggy',           condition: 'fog',     emoji: '🌫️' },
+        48: { desc: 'Icy fog',         condition: 'fog',     emoji: '🌫️' },
+        51: { desc: 'Light drizzle',   condition: 'drizzle', emoji: '🌦️' },
+        53: { desc: 'Drizzle',         condition: 'drizzle', emoji: '🌦️' },
+        55: { desc: 'Dense drizzle',   condition: 'rain',    emoji: '🌧️' },
+        61: { desc: 'Light rain',      condition: 'rain',    emoji: '🌧️' },
+        63: { desc: 'Moderate rain',   condition: 'rain',    emoji: '🌧️' },
+        65: { desc: 'Heavy rain',      condition: 'rain',    emoji: '🌧️' },
+        66: { desc: 'Freezing rain',   condition: 'rain',    emoji: '🌧️' },
+        67: { desc: 'Heavy freezing rain', condition: 'rain', emoji: '🌧️' },
+        71: { desc: 'Light snow',      condition: 'snow',    emoji: '🌨️' },
+        73: { desc: 'Moderate snow',   condition: 'snow',    emoji: '🌨️' },
+        75: { desc: 'Heavy snow',      condition: 'snow',    emoji: '❄️' },
+        77: { desc: 'Snow grains',     condition: 'snow',    emoji: '🌨️' },
+        80: { desc: 'Light showers',   condition: 'rain',    emoji: '🌦️' },
+        81: { desc: 'Moderate showers', condition: 'rain',   emoji: '🌧️' },
+        82: { desc: 'Violent showers', condition: 'rain',    emoji: '🌧️' },
+        85: { desc: 'Snow showers',    condition: 'snow',    emoji: '🌨️' },
+        86: { desc: 'Heavy snow showers', condition: 'snow', emoji: '❄️' },
+        95: { desc: 'Thunderstorm',    condition: 'thunder', emoji: '⛈️' },
+        96: { desc: 'Thunderstorm w/ hail', condition: 'thunder', emoji: '⛈️' },
+        99: { desc: 'Severe thunderstorm', condition: 'thunder', emoji: '⛈️' }
+      };
+      return map[code] || { desc: 'Unknown', condition: 'clouds', emoji: '🌥️' };
+    }
+
+    // ===== CALCULATIONS =====
+    function calcHumidex(tempC, humidity) {
+      if (tempC < 20 || humidity < 20) return null;
+      const dewpoint = tempC - ((100 - humidity) / 5);
+      return Math.round(tempC + 0.5555 * (6.11 * Math.exp(5417.7530 * ((1/273.16) - (1/(273.16 + dewpoint)))) - 10));
+    }
+
+    function calcWindChill(tempC, windKmh) {
+      if (tempC > 10 || windKmh < 4.8) return null;
+      return 13.12 + 0.6215 * tempC - 11.37 * Math.pow(windKmh, 0.16) + 0.3965 * tempC * Math.pow(windKmh, 0.16);
+    }
+
+    function getRealFeel(tempC, windKmh, humidity) {
+      const windChill = calcWindChill(tempC, windKmh);
+      const humidex = calcHumidex(tempC, humidity);
+      let realFeel = tempC, description = '', type = 'neutral';
+
+      if (windChill !== null && windChill < tempC) {
+        realFeel = windChill; type = 'cold';
+        if (windChill <= -20) description = 'Dangerous cold! Frostbite risk within minutes.';
+        else if (windChill <= -10) description = 'Bitter cold. Bundle up heavily.';
+        else if (windChill <= 0) description = 'Freezing cold. Winter coat essential.';
+        else if (windChill <= 10) description = 'Quite chilly. Dress warmly.';
+        else description = 'Cool with wind. Layer up.';
+      } else if (humidex !== null && humidex > tempC) {
+        realFeel = humidex; type = 'hot';
+        if (humidex >= 45) description = 'Dangerous heat! Stay indoors if possible.';
+        else if (humidex >= 40) description = 'Extremely uncomfortable. Limit outdoor activity.';
+        else if (humidex >= 35) description = 'Very humid and uncomfortable. Stay hydrated.';
+        else if (humidex >= 30) description = 'Noticeably humid. Take breaks in shade.';
+        else description = 'Slightly muggy.';
+      } else {
+        if (tempC <= 0) { type = 'cold'; description = 'Cold but calm. Dress for the temperature.'; }
+        else if (tempC <= 10) { type = 'cool'; description = 'Cool and comfortable.'; }
+        else if (tempC <= 25) { type = 'warm'; description = 'Pleasant temperature!'; }
+        else { type = 'hot'; description = 'Hot but dry heat.'; }
+      }
+      return { value: Math.round(realFeel), description, type, windChill, humidex };
+    }
+
+    function getComfortLevel(realFeel) {
+      if (realFeel <= -20) return { level: 'DANGEROUS COLD', color: '#7c3aed', pct: 5 };
+      if (realFeel <= -10) return { level: 'EXTREME COLD', color: '#6366f1', pct: 15 };
+      if (realFeel <= 0)   return { level: 'FREEZING', color: '#3b82f6', pct: 25 };
+      if (realFeel <= 10)  return { level: 'COLD', color: '#0ea5e9', pct: 35 };
+      if (realFeel <= 18)  return { level: 'COOL', color: '#14b8a6', pct: 50 };
+      if (realFeel <= 25)  return { level: 'COMFORTABLE', color: '#22c55e', pct: 70 };
+      if (realFeel <= 30)  return { level: 'WARM', color: '#eab308', pct: 80 };
+      if (realFeel <= 35)  return { level: 'HOT', color: '#f97316', pct: 90 };
+      return { level: 'EXTREME HEAT', color: '#ef4444', pct: 100 };
+    }
+
+    function getClothingAdvice(realFeel, weatherCode, windKmh) {
+      let text = '', bg = '';
+      if (realFeel <= -20) { text = '🥶 EXTREME COLD — Stay indoors if possible. Heavy winter coat, thermal layers, face cover required.'; bg = '#7c3aed'; }
+      else if (realFeel <= -10) { text = '❄️ Very cold — Heavy winter jacket, thermal layers, hat, gloves, and scarf essential.'; bg = '#6366f1'; }
+      else if (realFeel <= 0) { text = '🧥 Cold — Winter jacket needed. Wear layers, hat, and gloves.'; bg = '#3b82f6'; }
+      else if (realFeel <= 5) { text = '🧤 Chilly — Warm jacket or heavy sweater. Gloves recommended.'; bg = '#0ea5e9'; }
+      else if (realFeel <= 10) { text = '🧣 Cool — Light jacket or layered sweater. You might want a scarf.'; bg = '#14b8a6'; }
+      else if (realFeel <= 18) { text = '👕 Mild — Light layers. A hoodie or light jacket is enough.'; bg = '#22c55e'; }
+      else if (realFeel <= 25) { text = '☀️ Nice out! T-shirt weather. Sunscreen if sunny.'; bg = '#f59e0b'; }
+      else if (realFeel <= 30) { text = '🌡️ Warm — Light clothing, stay hydrated, sunscreen recommended.'; bg = '#f97316'; }
+      else { text = '🔥 Hot — Stay hydrated! Light clothing, sunscreen, hat. Limit outdoor activity.'; bg = '#ef4444'; }
+
+      const info = weatherCodeToInfo(weatherCode, true);
+      if (info.condition.includes('rain')) text += ' ☔ Bring an umbrella!';
+      if (info.condition.includes('snow')) text += ' ❄️ Watch for ice!';
+      if (windKmh > 40) text += ' 💨 Very windy — hold onto your hat!';
+      return { text, bg };
+    }
+
+    // ===== SEASON =====
+    function detectSeason() {
+      const month = new Date().getMonth();
+      let season, emoji, name;
+      if (month >= 2 && month <= 4) { season = 'spring'; emoji = '🌸'; name = 'Spring'; }
+      else if (month >= 5 && month <= 7) { season = 'summer'; emoji = '☀️'; name = 'Summer'; }
+      else if (month >= 8 && month <= 10) { season = 'autumn'; emoji = '🍂'; name = 'Autumn'; }
+      else { season = 'winter'; emoji = '❄️'; name = 'Winter'; }
+      document.getElementById('season-badge').textContent = emoji + ' ' + name + ' in Toronto';
+      return season;
+    }
+
+    // ===== ALERTS =====
+    function checkAlerts(data) {
+      const c = data.current;
+      const alerts = [];
+      const windChill = calcWindChill(c.temperature_2m, c.wind_speed_10m);
+      const humidex = calcHumidex(c.temperature_2m, c.relative_humidity_2m);
+
+      if (windChill && windChill <= -30)
+        alerts.push({ title: '🔴 EXTREME COLD WARNING', desc: 'Wind chill of ' + Math.round(windChill) + '°C. Frostbite in minutes.', severity: 'high' });
+      else if (windChill && windChill <= -15)
+        alerts.push({ title: '🟡 Cold Alert', desc: 'Wind chill of ' + Math.round(windChill) + '°C. Dress very warmly.', severity: 'medium' });
+
+      if (humidex && humidex >= 40)
+        alerts.push({ title: '🔴 HEAT WARNING', desc: 'Humidex of ' + humidex + '. Dangerous heat levels.', severity: 'high' });
+      else if (humidex && humidex >= 35)
+        alerts.push({ title: '🟡 Heat Alert', desc: 'Humidex of ' + humidex + '. Stay hydrated.', severity: 'medium' });
+
+      if (c.wind_gusts_10m > 70)
+        alerts.push({ title: '🔴 WIND WARNING', desc: 'Gusts up to ' + Math.round(c.wind_gusts_10m) + ' km/h. Secure loose objects.', severity: 'high' });
+      else if (c.wind_gusts_10m > 50)
+        alerts.push({ title: '🟡 Wind Advisory', desc: 'Gusts up to ' + Math.round(c.wind_gusts_10m) + ' km/h.', severity: 'medium' });
+
+      if (data.daily && data.daily.uv_index_max && data.daily.uv_index_max[0] >= 8)
+        alerts.push({ title: '☀️ HIGH UV', desc: 'UV index ' + data.daily.uv_index_max[0] + '. Sunscreen essential.', severity: 'medium' });
+
+      const container = document.getElementById('alerts-container');
+      container.innerHTML = '';
+      alerts.forEach(function(a) {
+        const div = document.createElement('div');
+        div.className = 'alert-banner ' + a.severity;
+        div.innerHTML = '<div class="alert-title">' + a.title + '</div><div class="alert-desc">' + a.desc + '</div>';
+        container.appendChild(div);
+      });
+    }
+
+    // ===== RENDER =====
+    function render(data) {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('weather-content').style.display = 'block';
+
+      const c = data.current;
+      const daily = data.daily;
+      const hourly = data.hourly;
+      const temp = Math.round(c.temperature_2m);
+      const windKmh = Math.round(c.wind_speed_10m);
+      const humidity = c.relative_humidity_2m;
+      const realFeel = getRealFeel(c.temperature_2m, c.wind_speed_10m, humidity);
+      const info = weatherCodeToInfo(c.weather_code, c.is_day);
+      const comfort = getComfortLevel(realFeel.value);
+      const advice = getClothingAdvice(realFeel.value, c.weather_code, windKmh);
+
+      // Hero
+      document.getElementById('hero-temp').textContent = temp + '°C';
+      document.getElementById('hero-condition').textContent = info.emoji + ' ' + info.desc;
+      document.getElementById('hero-updated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+
+      // Feels like
+      document.getElementById('feels-value').textContent = realFeel.value + '°C';
+      document.getElementById('feels-desc').textContent = realFeel.description;
+      const badge = document.getElementById('feels-badge');
+      badge.textContent = comfort.level;
+      badge.className = 'feels-badge ' + realFeel.type;
+
+      // Comfort bar
+      const fill = document.getElementById('comfort-fill');
+      fill.style.width = comfort.pct + '%';
+      fill.style.background = comfort.color;
+
+      // Advice
+      const advCard = document.getElementById('advice-card');
+      advCard.style.background = advice.bg;
+      document.getElementById('advice-text').textContent = advice.text;
+
+      // Stats
+      document.getElementById('s-wind').textContent = windKmh + ' km/h';
+      document.getElementById('s-gust').textContent = Math.round(c.wind_gusts_10m) + ' km/h';
+      document.getElementById('s-humidity').textContent = humidity + '%';
+      document.getElementById('s-windchill').textContent = realFeel.windChill !== null ? Math.round(realFeel.windChill) + '°C' : 'N/A';
+      document.getElementById('s-humidex').textContent = realFeel.humidex !== null ? realFeel.humidex + '' : 'N/A';
+
+      // Sun/UV
+      if (daily && daily.sunrise && daily.sunset) {
+        document.getElementById('s-sunrise').textContent = new Date(daily.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('s-sunset').textContent = new Date(daily.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      document.getElementById('s-uv').textContent = daily && daily.uv_index_max ? daily.uv_index_max[0].toFixed(1) : '--';
+      document.getElementById('s-pressure').textContent = Math.round(c.pressure_msl) + ' hPa';
+
+      // Hourly
+      renderHourly(hourly);
+
+      // Forecast
+      renderForecast(daily);
+
+      // Alerts
+      checkAlerts(data);
+    }
+
+    function renderHourly(hourly) {
+      const container = document.getElementById('hourly-scroll');
+      container.innerHTML = '';
+      if (!hourly || !hourly.time) return;
+      const now = new Date();
+      const currentHour = now.getHours();
+      // Find the index of the current hour
+      let startIdx = 0;
+      for (let i = 0; i < hourly.time.length; i++) {
+        const h = new Date(hourly.time[i]);
+        if (h.getDate() === now.getDate() && h.getHours() >= currentHour) { startIdx = i; break; }
+      }
+      for (let i = startIdx; i < Math.min(startIdx + 24, hourly.time.length); i++) {
+        const h = new Date(hourly.time[i]);
+        const hInfo = weatherCodeToInfo(hourly.weather_code[i], h.getHours() >= 6 && h.getHours() < 20);
+        const div = document.createElement('div');
+        div.className = 'hour-item';
+        div.innerHTML =
+          '<div class="h-time">' + h.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</div>' +
+          '<div class="h-emoji">' + hInfo.emoji + '</div>' +
+          '<div class="h-temp">' + Math.round(hourly.temperature_2m[i]) + '°</div>';
+        container.appendChild(div);
+      }
+    }
+
+    function renderForecast(daily) {
+      const strip = document.getElementById('forecast-strip');
+      strip.innerHTML = '';
+      if (!daily || !daily.time) return;
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+      for (let i = 0; i < Math.min(daily.time.length, 7); i++) {
+        const d = new Date(daily.time[i]);
+        const fInfo = weatherCodeToInfo(daily.weather_code[i], true);
+        const hi = Math.round(daily.temperature_2m_max[i]);
+        const lo = Math.round(daily.temperature_2m_min[i]);
+        const pProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[i] : 0;
+
+        const div = document.createElement('div');
+        div.className = 'forecast-day';
+        div.setAttribute('data-idx', i);
+        div.innerHTML =
+          '<div class="day-name">' + (i === 0 ? 'Today' : dayNames[d.getDay()]) + '</div>' +
+          '<div class="day-emoji">' + fInfo.emoji + '</div>' +
+          '<div class="day-temps"><span class="day-hi">' + hi + '°</span> / <span class="day-lo">' + lo + '°</span></div>' +
+          (pProb > 20 ? '<div class="day-precip">💧 ' + pProb + '%</div>' : '');
+
+        div.addEventListener('click', function() { openForecastModal(i, daily); });
+        strip.appendChild(div);
+      }
+    }
+
+    // ===== MODAL =====
+    function openForecastModal(idx, daily) {
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const d = new Date(daily.time[idx]);
+      const fInfo = weatherCodeToInfo(daily.weather_code[idx], true);
+      const hi = Math.round(daily.temperature_2m_max[idx]);
+      const lo = Math.round(daily.temperature_2m_min[idx]);
+      const pProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[idx] : 0;
+      const uv = daily.uv_index_max ? daily.uv_index_max[idx] : null;
+
+      document.getElementById('modal-title').textContent = (idx === 0 ? 'Today' : dayNames[d.getDay()]) + ' ' + fInfo.emoji;
+
+      let html = '<div style="font-size:2rem; font-weight:800; margin-bottom:8px;">' + hi + '° / ' + lo + '°</div>';
+      html += '<p style="color:var(--text-secondary); margin-bottom:16px;">' + fInfo.desc + '</p>';
+      html += '<div style="display:grid; gap:8px;">';
+      html += '<div class="stat-row"><span class="stat-label">🌧️ Precipitation</span><span class="stat-value">' + pProb + '%</span></div>';
+      if (uv !== null) html += '<div class="stat-row"><span class="stat-label">☀️ UV Index</span><span class="stat-value">' + uv.toFixed(1) + '</span></div>';
+      if (daily.sunrise && daily.sunrise[idx]) {
+        html += '<div class="stat-row"><span class="stat-label">🌅 Sunrise</span><span class="stat-value">' + daily.sunrise[idx].split('T')[1] + '</span></div>';
+        html += '<div class="stat-row"><span class="stat-label">🌇 Sunset</span><span class="stat-value">' + daily.sunset[idx].split('T')[1] + '</span></div>';
+      }
+      html += '</div>';
+
+      document.getElementById('modal-body').innerHTML = html;
+      document.getElementById('forecast-modal').classList.add('open');
+    }
+
+    document.getElementById('modal-close').addEventListener('click', function() {
+      document.getElementById('forecast-modal').classList.remove('open');
+    });
+    document.getElementById('forecast-modal').addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('open');
+    });
+
+    // ===== FETCH =====
+    async function loadWeather() {
+      try {
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + LAT + '&longitude=' + LON
+          + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_gusts_10m,cloud_cover,is_day,pressure_msl'
+          + '&hourly=temperature_2m,weather_code'
+          + '&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,uv_index_max,sunrise,sunset'
+          + '&timezone=America/Toronto&temperature_unit=celsius&wind_speed_unit=kmh&forecast_days=7';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('API ' + res.status);
+        const data = await res.json();
+        render(data);
+      } catch (err) {
+        console.warn('Weather fetch failed:', err);
+        document.getElementById('loading-state').innerHTML =
+          '<p style="color:#f87171;">Could not load weather data. Please try again later.</p>';
+      }
+    }
+
+    // ===== INIT =====
+    detectSeason();
+    loadWeather();
+    // Refresh every 10 minutes
+    setInterval(loadWeather, 600000);
+  })();
+  </script>
+
+  <!-- AI Assistant: context-aware chat + voice assistant (free, no API keys) -->
+  <script src="/ai-assistant.js"></script>
+</body>
+</html>

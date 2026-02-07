@@ -549,6 +549,9 @@
     init() {
       this.createUI();
       this.buildIndex();
+      // Rebuild index once movie data loads (may arrive after init)
+      const self = this;
+      setTimeout(() => { self.buildIndex(); }, 3000);
       console.log('[VR Smart Search] Initialized');
     },
 
@@ -588,6 +591,15 @@
         { name: 'Help', action: () => window.VRQuickWinsSet12?.Shortcuts?.showOverlay(), icon: '❓' },
         { name: 'Reset Position', action: () => window.resetPosition && window.resetPosition(), icon: '🔄' },
       ];
+      // Inject live movies into search index if available
+      const liveMovies = window.allMovies || window.filteredMovies || [];
+      liveMovies.forEach(m => {
+        this.searchIndex.push({
+          name: m.title + (m.release_year ? ' (' + m.release_year + ')' : ''),
+          icon: m.type === 'tv' ? '📺' : '🎬',
+          action: () => { if (window.selectMovieByTitle) window.selectMovieByTitle(m.title); else window.location.href = '/vr/movies.html'; }
+        });
+      });
     },
 
     showSearch() {

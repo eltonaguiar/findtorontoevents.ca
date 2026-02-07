@@ -8,6 +8,9 @@ RewriteRule ^api/ - [L]
 # Redirect exposed internal server path to canonical root (info disclosure fix)
 RewriteRule ^services/users/ / [R=301,L]
 
+# VR: redirect uppercase /VR to lowercase /vr/ (case-sensitive servers)
+RewriteRule ^VR/?$ /vr/ [R=301,L]
+
 # Stats page at /stats (root): serve stats/index.html
 RewriteRule ^stats/?$ stats/index.html [L]
 

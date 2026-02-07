@@ -12,7 +12,7 @@ require('dotenv').config();
 const sftp = new SftpClient();
 
 const config = {
-    host: process.env.FTP_SERVER || 'ftps2.50webs.com',
+    host: process.env.FTP_SERVER || (process.env.FTP_SERVER || 'ftps2.50webs.com'),
     port: 22,
     username: process.env.FTP_USERNAME || 'ejaguiar1',
     password: process.env.FTP_PASSWORD?.replace(/"/g, '') || '',

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Create a visible test file in next/_next/ to verify directory"""
 import ssl
+import os
 from ftplib import FTP_TLS
 from io import BytesIO
 
 def main():
-    FTP_HOST = "ftps2.50webs.com"
-    FTP_USER = "ejaguiar1"
-    FTP_PASS = "$a^FzN7BqKapSQMsZxD&^FeTJ"
+    FTP_HOST = os.environ.get('FTP_SERVER', 'ftps2.50webs.com')
+    FTP_USER = os.environ.get('FTP_USER', 'ejaguiar1')
+    FTP_PASS = os.environ.get('FTP_PASS', '')
     
     print("Connecting to FTP server...")
     context = ssl.create_default_context()

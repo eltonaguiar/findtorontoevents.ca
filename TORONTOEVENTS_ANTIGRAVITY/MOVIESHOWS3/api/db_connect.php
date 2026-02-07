@@ -5,7 +5,7 @@
 $host = 'mysql.50webs.com';
 $dbname = 'ejaguiar1_favcreators';
 $username = 'ejaguiar1';
-$password = 'Solid-Kitten-92-Brave-Vessel';
+$password = '3ADDzY*stB6Qd#$!l1%IIKYuHVRCCupl';
 
 $conn = new mysqli($host, $username, $password, $dbname);
 

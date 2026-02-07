@@ -4,8 +4,8 @@
 
 const fetch = require('node-fetch');
 
-const CLIENT_ID = 'vowdmej43crbuq3o6bu7edrv9wmyd5';
-const CLIENT_SECRET = 'ixckc8kqhk51h0bqgj2fko90bjrnrf';
+const CLIENT_ID = process.env.TWITCH_CLIENT_ID || '';
+const CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET || '';
 
 async function getOAuthToken() {
   const resp = await fetch('https://id.twitch.tv/oauth2/token', {

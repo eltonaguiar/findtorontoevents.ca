@@ -53,9 +53,9 @@ def upload_directory(ftp: FTP_TLS, local_dir: str, remote_base: str) -> None:
 
 def main():
     # FTP credentials
-    FTP_HOST = "ftps2.50webs.com"
-    FTP_USER = "ejaguiar1"
-    FTP_PASS = "$a^FzN7BqKapSQMsZxD&^FeTJ"
+    FTP_HOST = os.environ.get('FTP_SERVER', 'ftps2.50webs.com')
+    FTP_USER = os.environ.get('FTP_USER', 'ejaguiar1')
+    FTP_PASS = os.environ.get('FTP_PASS', '')
     FTP_ROOT = "/"  # Root directory on server
     
     # Local paths (relative to workspace root)

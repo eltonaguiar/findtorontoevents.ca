@@ -14,7 +14,7 @@ The automated SFTP script is experiencing connection timeouts. Here's the quicke
    Port: 22
    Protocol: SFTP
    Username: ejaguiar1
-   Password: CxH1Uh*#0QkIVg@KxgMZXn7Hp
+   Password: <FTP_PASS env var>
    ```
 
 3. **Navigate on remote server to:**

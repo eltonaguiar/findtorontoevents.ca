@@ -53,7 +53,7 @@ jobs:
 
       - name: Trigger TMDB fetch via HTTP
         env:
-          SYNC_KEY: ms2_sync_2024_findto
+          SYNC_KEY: ${{ secrets.MS2_SYNC_KEY }}
         run: |
           TYPE="${{ github.event.inputs.type || 'both' }}"
           PAGES="${{ github.event.inputs.pages || '3' }}"

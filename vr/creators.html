@@ -6,6 +6,9 @@
   <title>FavCreators Live Lounge — VR Zone</title>
   <meta name="description" content="See your favorite creators' live status in immersive VR. Works on Meta Quest 3 and desktop browsers." />
 
+  <!-- HTTPS redirect notice (must load before A-Frame) -->
+  <script src="/vr/https-redirect.js"></script>
+
   <!-- A-Frame 1.6.0 -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
@@ -2322,13 +2325,15 @@
   <!-- Keyboard hints -->
   <script src="/vr/keyboard-hints.js"></script>
   <script>
-    VRKeyboardHints.register([
-      { key: 'R', desc: 'Refresh live status' },
-      { key: '1-5', desc: 'Filter platform (All/TikTok/Twitch/Kick/YT)' },
-      { key: '←/→', desc: 'Previous / Next page' },
-      { key: 'G', desc: 'Area Guide (who\'s live)' },
-      { key: 'Esc', desc: 'Close detail' }
-    ]);
+    if (typeof VRKeyboardHints !== 'undefined') {
+      VRKeyboardHints.register([
+        { key: 'R', desc: 'Refresh live status' },
+        { key: '1-5', desc: 'Filter platform (All/TikTok/Twitch/Kick/YT)' },
+        { key: '←/→', desc: 'Previous / Next page' },
+        { key: 'G', desc: 'Area Guide (who\'s live)' },
+        { key: 'Esc', desc: 'Close detail' }
+      ]);
+    }
   </script>
   <!-- Shared presence tracker + keyboard shortcuts -->
   <script src="/vr/presence.js"></script>
@@ -2412,5 +2417,8 @@
     else window.addEventListener('load', init);
   })();
   </script>
+  <!-- VR AI Agent -->
+  <link rel="stylesheet" href="/vr/vr-ai-agent.css">
+  <script src="/vr/vr-ai-agent.js"></script>
 </body>
 </html>
