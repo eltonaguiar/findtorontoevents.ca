@@ -3,7 +3,13 @@
 name: Deploy Competition to Live Site
 
 on:
-  workflow_dispatch:  # Manual trigger
+  push:
+    branches: [main]
+    paths:
+      - 'STOCKS/competition/**'
+      - 'STOCKS/algorithm-competition.html'
+      - 'updates/index.html'
+  workflow_dispatch:
   workflow_run:
     workflows: ["Algorithm Competition Refresh"]
     types: [completed]
