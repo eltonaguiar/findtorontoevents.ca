@@ -271,9 +271,9 @@ a:hover { text-decoration: underline; }
 
 <div class="section-year">February 2026</div>
 
-<!-- Feb 16, 2026 — STOCKSCURSORS CLAW: Algorithm Competition Arena -->
-<div class="update-entry" style="--dot-color: #ffd700;" data-tags="algorithm,competition,stocks,crypto,forex,penny,meme,backtest,real-data,chart,yahoo-finance,alpha-engine,playwright,testing,audit" data-category="stocks,trading,crypto">
-  <div class="update-date">Feb 16, 2026</div>
+<!-- Feb 16, 2026 (v2) — Forward Test + Algorithm Competition Arena -->
+<div class="update-entry" style="--dot-color: #22c55e;" data-tags="forward-test,live,picks,algorithm,competition,stocks,crypto,forex,penny,meme,backtest,real-data,yahoo-finance,alpha-engine,playwright,audit" data-category="stocks,trading,crypto">
+  <div class="update-date">Feb 16, 2026 (Updated)</div>
   <div class="update-title">
     Algorithm Competition Arena &mdash; 12 Real Strategies, 5 Asset Classes, Real Yahoo Finance Data
     <span class="badge badge-feature">New</span>
@@ -317,9 +317,20 @@ a:hover { text-decoration: underline; }
       <li><strong>Simulation mode</strong> also available for what-if scenarios with configurable market conditions</li>
     </ul>
 
+    <p style="margin-top:12px;"><strong>NEW: Live Forward Test (not backtested):</strong></p>
+    <ul>
+      <li><strong>Forward-facing picks:</strong> All 12 algorithms now generate <strong>real forward picks daily at 9:30 AM EST</strong> with entry price, take-profit, stop-loss, and expiry date &mdash; locked BEFORE outcomes are known.</li>
+      <li><strong>Auto-resolution:</strong> Open picks checked against live Yahoo Finance prices every 6 hours. Marked WON (TP hit), LOST (SL hit), or EXPIRED (hold period exceeded).</li>
+      <li><strong>Full audit trail:</strong> Every pick logs: timestamp (EST), algorithm name, indicator values at signal time, entry price, TP/SL levels, and resolution details.</li>
+      <li><strong>Live dashboard section:</strong> Green "LIVE FORWARD TEST" banner shows open/won/lost counts, win rate, avg P&L, and individual pick cards with real-time status.</li>
+      <li><strong>Honest note:</strong> Forward picks just started (Feb 16, 2026). Win/loss data will accumulate over days/weeks. Statistical significance requires 50+ resolved picks. Until then, treat results as preliminary.</li>
+      <li><strong>GitHub Actions:</strong> <code>forward-test-daily.yml</code> generates weekdays 9:30 AM EST, resolves every 6 hours.</li>
+      <li><strong>Script:</strong> <code>STOCKS/competition/forward_test.py</code> (generate | resolve | status)</li>
+    </ul>
+
     <p style="margin-top:12px;"><strong>Dashboard Links:</strong></p>
     <ul>
-      <li><strong><a href="/STOCKS/competition/">Real Data Competition Dashboard</a></strong> &mdash; Full results with charts, leaderboard, trade logs</li>
+      <li><strong><a href="/STOCKS/competition/">Real Data Competition Dashboard</a></strong> &mdash; Backtest results + live forward test picks</li>
       <li><strong><a href="/STOCKS/algorithm-competition.html">Simulation Mode</a></strong> &mdash; Run what-if scenarios with configurable market conditions and speed</li>
     </ul>
 

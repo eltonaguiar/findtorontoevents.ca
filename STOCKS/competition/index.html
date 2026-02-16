@@ -130,8 +130,27 @@
       <li><strong>Indicators computed:</strong> RSI(14,21), Bollinger Bands(20,50), MACD(12,26,9), SMA/EMA(10,20,50,100,200), Hurst exponent(63d), trend strength, momentum, volatility &mdash; all from real price data.</li>
       <li><strong>Trade timestamps:</strong> Each trade shows an EST timestamp. These represent the <em>simulated execution time</em> on that historical trading day, not a real order placed at that moment.</li>
       <li><strong>Limitations:</strong> No slippage modeled. No commissions. Execution assumed at close price. Past performance does not predict future results.</li>
-      <li><strong>When will forward-facing data be available?</strong> Forward-facing results require live signal generation + real-time price tracking. This is on the roadmap &mdash; the competition framework will track live picks once connected to the signal engine.</li>
+      <li><strong>Forward-facing picks:</strong> See the <strong style="color:var(--green)">LIVE FORWARD TEST</strong> section below &mdash; algorithms generate picks daily at market open, tracked against real prices until TP/SL hit or expiry.</li>
     </ul>
+  </div>
+
+  <!-- FORWARD TEST SECTION -->
+  <div id="forwardSection" style="display:none;">
+    <div style="background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(6,182,212,0.08));border:2px solid var(--green);border-radius:16px;padding:24px;margin-bottom:24px;">
+      <h2 style="font-size:1.4rem;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+        <span style="display:inline-block;width:12px;height:12px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;"></span>
+        LIVE FORWARD TEST &mdash; Real Picks Tracked Against Live Prices
+      </h2>
+      <p style="color:var(--text-2);font-size:0.88rem;margin-bottom:6px;">
+        These picks were generated <strong>before</strong> outcomes were known. Entry prices locked at signal time. Resolved against real market prices.
+        <i class="info-tip" data-tip="Unlike the backtest above, these picks are FORWARD-FACING. The algorithm generated the signal, we recorded the entry price, and now we wait to see if TP or SL gets hit. This is the gold standard for strategy validation.">?</i>
+      </p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;" id="fwStats"></div>
+      <div id="fwPicksList" style="max-height:600px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
+      <p style="color:var(--text-3);font-size:0.75rem;margin-top:12px;">
+        Auto-generates weekdays 9:30 AM EST | Resolves every 6 hours | Data: <code>forward_picks.json</code>
+      </p>
+    </div>
   </div>
 
   <!-- Asset Class Tabs -->
@@ -479,6 +498,73 @@ function buildWinnerExplanation(winner, ac) {
 }
 
 loadData();
+
+// ── Forward Test Section ──
+async function loadForwardPicks() {
+  try {
+    const resp = await fetch('forward_picks.json');
+    if (!resp.ok) return;
+    const fw = await resp.json();
+    if (!fw.picks || fw.picks.length === 0) return;
+
+    document.getElementById('forwardSection').style.display = '';
+
+    const picks = fw.picks;
+    const open = picks.filter(p => p.status === 'OPEN');
+    const won = picks.filter(p => p.status === 'WON');
+    const lost = picks.filter(p => p.status === 'LOST');
+    const resolved = won.length + lost.length;
+    const wr = resolved > 0 ? (won.length / resolved * 100).toFixed(1) : 'N/A';
+    const pnls = picks.filter(p => p.pnl_pct !== null).map(p => p.pnl_pct);
+    const avgPnl = pnls.length > 0 ? (pnls.reduce((a,b) => a+b, 0) / pnls.length).toFixed(2) : 'N/A';
+
+    document.getElementById('fwStats').innerHTML = [
+      {label: 'Total Picks', value: picks.length, color: ''},
+      {label: 'Open', value: open.length, color: 'var(--cyan)'},
+      {label: 'Won', value: won.length, color: 'var(--green)'},
+      {label: 'Lost', value: lost.length, color: 'var(--red)'},
+      {label: 'Win Rate', value: wr === 'N/A' ? wr : wr + '%', color: parseFloat(wr) >= 50 ? 'var(--green)' : wr === 'N/A' ? '' : 'var(--red)'},
+      {label: 'Avg P&L', value: avgPnl === 'N/A' ? avgPnl : avgPnl + '%', color: parseFloat(avgPnl) >= 0 ? 'var(--green)' : avgPnl === 'N/A' ? '' : 'var(--red)'},
+      {label: 'Last Generated', value: fw.last_generate || 'Never', color: ''},
+      {label: 'Last Resolved', value: fw.last_resolve || 'Never', color: ''},
+    ].map(s => `<div style="background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;text-align:center;min-width:100px;">
+      <div style="font-size:1.2rem;font-weight:700;${s.color ? 'color:'+s.color : ''}">${s.value}</div>
+      <div style="font-size:0.7rem;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px">${s.label}</div>
+    </div>`).join('');
+
+    // Sort: open first, then resolved by date desc
+    const sorted = [...open, ...won.concat(lost).sort((a,b) => (b.resolved_at||'').localeCompare(a.resolved_at||''))];
+
+    document.getElementById('fwPicksList').innerHTML = sorted.map(p => {
+      const statusColor = p.status === 'OPEN' ? 'var(--cyan)' : p.status === 'WON' ? 'var(--green)' : 'var(--red)';
+      const statusBg = p.status === 'OPEN' ? 'rgba(6,182,212,0.12)' : p.status === 'WON' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)';
+      const pnlStr = p.pnl_pct !== null ? `<span style="color:${p.pnl_pct>=0?'var(--green)':'var(--red)'};font-weight:700">${p.pnl_pct>=0?'+':''}${p.pnl_pct}%</span>` : '';
+      const reasonStr = p.reasons ? Object.entries(p.reasons).slice(0,3).map(([k,v]) => `${k}:${typeof v==='number'?v.toFixed(2):v}`).join(', ') : '';
+      return `<div style="display:flex;align-items:center;gap:8px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.82rem;flex-wrap:wrap;">
+        <span style="background:${statusBg};color:${statusColor};padding:2px 10px;border-radius:4px;font-weight:700;font-size:0.72rem;min-width:55px;text-align:center">${p.status}</span>
+        <span style="font-weight:700;min-width:60px">${p.ticker}</span>
+        <span style="color:${ALGO_COLORS[p.algorithm.split(' ')[0]]||'var(--text-2)'};font-weight:600;min-width:90px;font-size:0.78rem">${p.algorithm}</span>
+        <span style="color:var(--text-3);font-size:0.72rem;min-width:80px">${p.asset_class}</span>
+        <span style="color:var(--text-2);font-size:0.78rem">Entry: $${p.entry_price} | TP: $${p.tp_price} (+${p.tp_pct}%) | SL: $${p.sl_price} (-${p.sl_pct}%)</span>
+        <span style="flex:1"></span>
+        ${pnlStr}
+        <span style="color:var(--text-3);font-size:0.7rem;font-family:monospace" title="${p.generated_at}">${p.generated_date}</span>
+        ${p.resolved_reason ? `<span style="color:var(--text-3);font-size:0.68rem">${p.resolved_reason}</span>` : `<span style="color:var(--text-3);font-size:0.68rem">exp: ${p.expiry_date}</span>`}
+      </div>`;
+    }).join('');
+
+    if (resolved === 0 && open.length > 0) {
+      document.getElementById('fwPicksList').insertAdjacentHTML('afterbegin',
+        `<div style="padding:12px;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;color:var(--orange);font-size:0.82rem;margin-bottom:8px;">
+          <strong>Picks are OPEN</strong> &mdash; ${open.length} forward picks generated, waiting for TP/SL to hit or expiry.
+          Win/loss data will populate as picks resolve over the coming days/weeks. Resolver runs every 6 hours via GitHub Actions.
+        </div>`);
+    }
+  } catch(e) {
+    // No forward picks file yet - that's fine, section stays hidden
+  }
+}
+loadForwardPicks();
 </script>
 </body>
 </html>

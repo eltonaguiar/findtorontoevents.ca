@@ -1,0 +1,74 @@
+# Forward Test: Generate daily picks + resolve open picks every 6 hours
+# This creates REAL forward-facing predictions tracked against live prices
+name: Forward Test Daily
+
+on:
+  schedule:
+    - cron: '30 14 * * 1-5'   # Generate: weekdays 9:30 AM EST (14:30 UTC)
+    - cron: '0 16,20,0,4 * * *'  # Resolve: every 6h (11AM, 3PM, 7PM, 11PM EST)
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to run'
+        required: true
+        default: 'both'
+        type: choice
+        options: ['generate', 'resolve', 'both']
+
+permissions:
+  contents: write
+
+jobs:
+  forward-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance pandas numpy
+
+      - name: Determine action
+        id: action
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "action=${{ inputs.action }}" >> $GITHUB_OUTPUT
+          else
+            HOUR=$(date -u +%H)
+            if [ "$HOUR" = "14" ]; then
+              echo "action=both" >> $GITHUB_OUTPUT
+            else
+              echo "action=resolve" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Generate forward picks
+        if: steps.action.outputs.action == 'generate' || steps.action.outputs.action == 'both'
+        run: python3 STOCKS/competition/forward_test.py generate
+        timeout-minutes: 5
+
+      - name: Resolve open picks
+        if: steps.action.outputs.action == 'resolve' || steps.action.outputs.action == 'both'
+        run: python3 STOCKS/competition/forward_test.py resolve
+        timeout-minutes: 5
+
+      - name: Print status
+        run: python3 STOCKS/competition/forward_test.py status
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add STOCKS/competition/forward_picks.json
+          if git diff --staged --quiet; then
+            echo "No changes"
+          else
+            ACTION="${{ steps.action.outputs.action }}"
+            git commit -m "forward-test: ${ACTION} picks ($(date -u +%Y-%m-%d %H:%M UTC))"
+            git push
+          fi
