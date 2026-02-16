@@ -397,6 +397,22 @@
       </div>
     </div>
 
+    <!-- Returns Comparison Chart -->
+    <div class="chart-section" id="returnsChartSection" style="display:none;">
+      <h2>Returns Comparison (% Change from Start)</h2>
+      <div class="chart-container" style="height: 300px;">
+        <canvas id="returnsChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Winner Announcement (shown at end) -->
+    <div id="winnerBanner" style="display:none; background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(168,85,247,0.1)); border: 2px solid var(--gold); border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 24px; animation: slideIn 0.5s ease-out;">
+      <div style="font-size: 3rem; margin-bottom: 8px;" id="winnerTrophy"></div>
+      <h2 style="font-size: 1.8rem; background: linear-gradient(135deg, var(--gold), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px;" id="winnerTitle"></h2>
+      <p style="color: var(--text-2); font-size: 1rem;" id="winnerDetail"></p>
+      <div style="display: flex; justify-content: center; gap: 24px; margin-top: 16px; flex-wrap: wrap;" id="winnerStats"></div>
+    </div>
+
     <!-- Two Column: Leaderboard + Picks -->
     <div class="two-col">
       <!-- Leaderboard -->
@@ -1174,6 +1190,9 @@ function startCompetition() {
   if (!competition || competition.day >= competition.maxDays) {
     competition = new CompetitionEngine(capital, condition);
     initChart();
+    initReturnsChart();
+    document.getElementById('returnsChartSection').style.display = '';
+    document.getElementById('winnerBanner').style.display = 'none';
   }
 
   isPaused = false;
@@ -1224,6 +1243,9 @@ function resetCompetition() {
   document.getElementById('picksFeed').innerHTML = '<div class="pick-item" style="justify-content:center;color:var(--text-3);">Start the competition to see live picks...</div>';
   document.getElementById('algoCardsGrid').innerHTML = '';
   if (chart) { chart.destroy(); chart = null; }
+  if (returnsChart) { returnsChart.destroy(); returnsChart = null; }
+  document.getElementById('returnsChartSection').style.display = 'none';
+  document.getElementById('winnerBanner').style.display = 'none';
   initChart();
 }
 
@@ -1253,6 +1275,7 @@ function runLoop() {
       updateLeaderboard();
       updateStats();
       updateMarketTicker();
+      if (returnsChart && competition.day % 5 === 0) updateReturnsChart();
     }
     if (competition.day % 3 === 0 || competition.day <= 5) {
       updatePicksFeed();
@@ -1263,6 +1286,61 @@ function runLoop() {
   }
 
   animFrameId = requestAnimationFrame(runLoop);
+}
+
+let returnsChart = null;
+
+function initReturnsChart() {
+  const ctx = document.getElementById('returnsChart').getContext('2d');
+  if (returnsChart) returnsChart.destroy();
+
+  const datasets = ALGO_DEFINITIONS.map(def => ({
+    label: def.shortName,
+    data: [],
+    borderColor: def.color,
+    backgroundColor: 'transparent',
+    borderWidth: def.id === 'meta_learner' ? 3 : 1.5,
+    pointRadius: 0,
+    tension: 0.3,
+  }));
+
+  returnsChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: [], datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 0 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1c1c2b',
+          titleColor: '#eeeef5',
+          bodyColor: '#a0a0b8',
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.raw >= 0 ? '+' : ''}${ctx.raw.toFixed(2)}%`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(42,42,64,0.3)' }, ticks: { color: '#666680', font: { size: 10 }, maxTicksLimit: 20 } },
+        y: {
+          grid: { color: 'rgba(42,42,64,0.3)' },
+          ticks: { color: '#666680', font: { size: 10 }, callback: v => v.toFixed(1) + '%' },
+        }
+      }
+    }
+  });
+}
+
+function updateReturnsChart() {
+  if (!competition || !returnsChart) return;
+  document.getElementById('returnsChartSection').style.display = '';
+  returnsChart.data.labels = Array.from({ length: competition.day + 1 }, (_, i) => `D${i}`);
+  competition.algorithms.forEach((algo, i) => {
+    returnsChart.data.datasets[i].data = algo.portfolioHistory.map(v => ((v / algo.startingCapital) - 1) * 100);
+  });
+  returnsChart.update();
 }
 
 function finishCompetition() {
@@ -1279,6 +1357,34 @@ function finishCompetition() {
   updateAlgoCards();
   updateStats();
   updateMarketTicker();
+
+  // Show returns chart
+  initReturnsChart();
+  updateReturnsChart();
+
+  // Show winner banner
+  const sorted = [...competition.algorithms].sort((a, b) => b.portfolioValue - a.portfolioValue);
+  const winner = sorted[0];
+  const second = sorted[1];
+  const third = sorted[2];
+  const beatsMarket = sorted.filter(a => a.totalReturn > competition.marketReturn).length;
+
+  document.getElementById('winnerBanner').style.display = '';
+  document.getElementById('winnerTrophy').textContent = '🏆';
+  document.getElementById('winnerTitle').textContent = `${winner.def.name} Wins!`;
+  document.getElementById('winnerDetail').textContent =
+    `Final portfolio: $${winner.portfolioValue.toLocaleString(undefined, {maximumFractionDigits: 0})} ` +
+    `(${winner.totalReturn >= 0 ? '+' : ''}${(winner.totalReturn * 100).toFixed(2)}%) | ` +
+    `${beatsMarket} of 12 algorithms beat the S&P 500 benchmark`;
+  document.getElementById('winnerStats').innerHTML = [
+    { label: '1st Place', name: winner.def.shortName, color: winner.def.color, ret: winner.totalReturn },
+    { label: '2nd Place', name: second.def.shortName, color: second.def.color, ret: second.totalReturn },
+    { label: '3rd Place', name: third.def.shortName, color: third.def.color, ret: third.totalReturn },
+  ].map(p => `<div style="background: var(--bg-2); border-radius: 12px; padding: 12px 20px; min-width: 160px;">
+    <div style="font-size: 0.75rem; color: var(--text-3); text-transform: uppercase;">${p.label}</div>
+    <div style="font-size: 1.1rem; font-weight: 700; color: ${p.color};">${p.name}</div>
+    <div style="font-size: 0.9rem; color: ${p.ret >= 0 ? 'var(--green)' : 'var(--red)'};">${p.ret >= 0 ? '+' : ''}${(p.ret * 100).toFixed(2)}%</div>
+  </div>`).join('');
 }
 
 // Speed slider
