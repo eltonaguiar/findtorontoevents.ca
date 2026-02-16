@@ -272,12 +272,13 @@ a:hover { text-decoration: underline; }
 <div class="section-year">February 2026</div>
 
 <!-- Feb 16, 2026 — STOCKSCURSORS CLAW: Algorithm Competition Arena -->
-<div class="update-entry" style="--dot-color: #ffd700;" data-tags="algorithm,competition,stocks,crypto,forex,penny,meme,backtest,real-data,chart,yahoo-finance,alpha-engine" data-category="stocks,trading,crypto">
+<div class="update-entry" style="--dot-color: #ffd700;" data-tags="algorithm,competition,stocks,crypto,forex,penny,meme,backtest,real-data,chart,yahoo-finance,alpha-engine,playwright,testing,audit" data-category="stocks,trading,crypto">
   <div class="update-date">Feb 16, 2026</div>
   <div class="update-title">
     Algorithm Competition Arena &mdash; 12 Real Strategies, 5 Asset Classes, Real Yahoo Finance Data
     <span class="badge badge-feature">New</span>
     <span class="badge badge-feature">Major</span>
+    <span class="badge badge-improvement">Tested</span>
   </div>
   <div class="update-body">
     <p><strong>12 real trading algorithms from our alpha_engine compete head-to-head on real Yahoo Finance market data across 5 asset classes.</strong> Every trade is logged with EST timestamps. Auto-refreshes weekly via GitHub Actions.</p>
@@ -322,15 +323,39 @@ a:hover { text-decoration: underline; }
       <li><strong><a href="/STOCKS/algorithm-competition.html">Simulation Mode</a></strong> &mdash; Run what-if scenarios with configurable market conditions and speed</li>
     </ul>
 
+    <p style="margin-top:12px;"><strong>Data Transparency &amp; Audit Trail:</strong></p>
+    <ul>
+      <li><strong>BACKTESTED label:</strong> Prominent orange banner on every page clearly states these are backtested results, NOT forward-facing live trades. Every chart and trade log section is labeled "(BACKTESTED)".</li>
+      <li><strong>Audit Trail section:</strong> Full methodology disclosure &mdash; data source (Yahoo Finance yfinance), indicators computed (RSI, Bollinger, MACD, Hurst, etc.), execution assumptions (close price, no slippage, no commissions), and reproducibility instructions.</li>
+      <li><strong>Trade-level audit:</strong> Every BUY/SELL shows simulated EST timestamp, ticker, shares, price, P&amp;L, hold days, and exit reason (STOP_LOSS / TAKE_PROFIT / HOLD_EXPIRY). BUY trades show signal reasons with indicator values at time of trade.</li>
+      <li><strong>Empty state handling:</strong> When algorithms generate 0 trades, N/A is shown for Sharpe/Win Rate with tooltip explaining why. Missing data shows helpful messages about when data will be populated.</li>
+      <li><strong>Info tooltips:</strong> Hover (?) icons on Return, Sharpe, Win Rate, Max DD, benchmark, and trade timestamps explaining what each metric means and its limitations.</li>
+      <li><strong>Forward-facing roadmap:</strong> Disclosure banner explains that forward-facing results require live signal generation + real-time price tracking, and notes this is on the roadmap.</li>
+    </ul>
+
+    <p style="margin-top:12px;"><strong>Playwright E2E Testing (35/35 pass):</strong></p>
+    <ul>
+      <li><strong>Zero JS errors:</strong> Both dashboards load without any JavaScript console errors</li>
+      <li><strong>Backtest disclosure:</strong> Banner verified visible with correct text (NOT forward-facing, Yahoo Finance, simulated, no slippage)</li>
+      <li><strong>All 5 tabs render:</strong> Every asset class tab loads correctly, content updates on switch</li>
+      <li><strong>Leaderboard:</strong> 12 algorithms per tab, correct column headers, zero-trade algos show N/A</li>
+      <li><strong>Trade log:</strong> EST timestamps present, tickers/actions/prices populated, labeled BACKTESTED</li>
+      <li><strong>Audit trail:</strong> Section visible with data source, indicators, execution assumptions, reproducibility</li>
+      <li><strong>No NaN/undefined:</strong> Rendered content verified clean (fixed NaN serialization bug in Python output)</li>
+      <li><strong>Simulation mode:</strong> Start/reset cycle, 12 algo cards, controls functional, no JS errors</li>
+      <li><strong>Test file:</strong> <code>tests/algorithm-competition.spec.ts</code> (35 tests)</li>
+    </ul>
+
     <p style="margin-top:12px;"><strong>Technical Details:</strong></p>
     <ul>
       <li><strong>Python backtester:</strong> <code>STOCKS/competition/run_competition.py</code> &mdash; downloads real data via yfinance, computes indicators, runs all 12 strategies</li>
       <li><strong>Strategies from:</strong> <code>alpha_engine/strategies/</code> (momentum, mean reversion, quality, value, earnings, ML) &amp; <code>alpha_engine/ensemble/</code> (meta learner, regime allocator, signal combiner)</li>
-      <li><strong>GitHub Actions:</strong> <code>algorithm-competition-refresh.yml</code> runs weekly Sundays 5:00 AM EST</li>
+      <li><strong>GitHub Actions:</strong> <code>algorithm-competition-refresh.yml</code> runs weekly Sundays 5:00 AM EST + <code>deploy-competition-to-site.yml</code> FTP deploys to findtorontoevents.ca</li>
       <li><strong>Chart.js</strong> portfolio growth visualization with S&amp;P 500 / BTC / DOGE benchmarks</li>
+      <li><strong>Bug fix:</strong> Python <code>NaN</code> values in JSON output caused browser <code>JSON.parse()</code> to fail silently. Added <code>sanitize_for_json()</code> to replace NaN/Infinity with null.</li>
     </ul>
 
-    <p style="margin-top:8px;"><span class="app-tag">Stocks</span> <span class="app-tag">Crypto</span> <span class="app-tag">Forex</span> <span class="app-tag">Penny Stocks</span> <span class="app-tag">Meme Coins</span> <span class="app-tag">Alpha Engine</span> <span class="app-tag">GitHub Actions</span> <span class="app-tag">Real Data</span></p>
+    <p style="margin-top:8px;"><span class="app-tag">Stocks</span> <span class="app-tag">Crypto</span> <span class="app-tag">Forex</span> <span class="app-tag">Penny Stocks</span> <span class="app-tag">Meme Coins</span> <span class="app-tag">Alpha Engine</span> <span class="app-tag">GitHub Actions</span> <span class="app-tag">Real Data</span> <span class="app-tag">Playwright</span> <span class="app-tag">Audit Trail</span></p>
   </div>
 </div>
 

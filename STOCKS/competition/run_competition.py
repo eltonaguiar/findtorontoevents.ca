@@ -869,6 +869,19 @@ def run_asset_class(asset_key, asset_config):
     }
 
 
+def sanitize_for_json(obj):
+    """Replace NaN/Inf with None (null) for valid JSON output."""
+    if isinstance(obj, float):
+        if np.isnan(obj) or np.isinf(obj):
+            return None
+        return obj
+    elif isinstance(obj, dict):
+        return {k: sanitize_for_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [sanitize_for_json(v) for v in obj]
+    return obj
+
+
 def main():
     print("=" * 60)
     print("  ALGORITHM COMPETITION ENGINE - REAL DATA")
@@ -885,6 +898,7 @@ def main():
             if result:
                 all_results[asset_key] = result
                 # Save individual result
+                result = sanitize_for_json(result)
                 with open(output_dir / f"competition-{asset_key}.json", 'w') as f:
                     json.dump(result, f, indent=2, default=str)
                 print(f"  Saved competition-{asset_key}.json")
@@ -917,6 +931,7 @@ def main():
     all_algos_all_classes.sort(key=lambda x: x['return_pct'], reverse=True)
     combined['overall_rankings'] = all_algos_all_classes
 
+    combined = sanitize_for_json(combined)
     with open(output_dir / "competition-results.json", 'w') as f:
         json.dump(combined, f, indent=2, default=str)
 

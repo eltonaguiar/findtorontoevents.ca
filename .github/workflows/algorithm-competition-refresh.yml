@@ -32,7 +32,15 @@ jobs:
       - name: Create slim JSON for dashboard
         run: |
           python3 -c "
-          import json, os
+          import json, os, math
+          def sanitize(obj):
+              if isinstance(obj, float):
+                  return None if (math.isnan(obj) or math.isinf(obj)) else obj
+              elif isinstance(obj, dict):
+                  return {k: sanitize(v) for k, v in obj.items()}
+              elif isinstance(obj, list):
+                  return [sanitize(v) for v in obj]
+              return obj
           with open('STOCKS/competition/competition-results.json') as f:
               data = json.load(f)
           slim = {
@@ -56,9 +64,9 @@ jobs:
                   slim_r['total_trades_logged'] = len(trades)
                   slim_ac['results'].append(slim_r)
               slim['asset_classes'][ac_key] = slim_ac
+          slim = sanitize(slim)
           with open('STOCKS/competition/competition-slim.json', 'w') as f:
               json.dump(slim, f, separators=(',', ':'))
-          # Remove the large combined file (not needed in repo)
           if os.path.exists('STOCKS/competition/competition-results.json'):
               os.remove('STOCKS/competition/competition-results.json')
           print('Slim JSON created successfully')
