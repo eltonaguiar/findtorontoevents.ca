@@ -271,6 +271,69 @@ a:hover { text-decoration: underline; }
 
 <div class="section-year">February 2026</div>
 
+<!-- Feb 16, 2026 — STOCKSCURSORS CLAW: Algorithm Competition Arena -->
+<div class="update-entry" style="--dot-color: #ffd700;" data-tags="algorithm,competition,stocks,crypto,forex,penny,meme,backtest,real-data,chart,yahoo-finance,alpha-engine" data-category="stocks,trading,crypto">
+  <div class="update-date">Feb 16, 2026</div>
+  <div class="update-title">
+    Algorithm Competition Arena &mdash; 12 Real Strategies, 5 Asset Classes, Real Yahoo Finance Data
+    <span class="badge badge-feature">New</span>
+    <span class="badge badge-feature">Major</span>
+  </div>
+  <div class="update-body">
+    <p><strong>12 real trading algorithms from our alpha_engine compete head-to-head on real Yahoo Finance market data across 5 asset classes.</strong> Every trade is logged with EST timestamps. Auto-refreshes weekly via GitHub Actions.</p>
+
+    <p style="margin-top:12px;"><strong>Winners by Asset Class (252 trading days, $100K starting capital):</strong></p>
+    <ul>
+      <li><strong>S&amp;P 500 Stocks:</strong> Meta Learner (God-Mode) <span style="color:#22c55e">+23.69%</span> (Sharpe 1.409) &mdash; beat SPY +13.12%. Regime-aware ensemble aggregating all 11 sub-strategies.</li>
+      <li><strong>Penny Stocks:</strong> Classic Momentum <span style="color:#22c55e">+662.05%</span> (Sharpe 2.317) &mdash; Jegadeesh &amp; Titman 6-month momentum with skip-month on small caps.</li>
+      <li><strong>Meme Coins:</strong> Bollinger Mean Reversion <span style="color:#22c55e">+35.36%</span> (Sharpe 1.163) &mdash; all 12 algorithms beat DOGE benchmark (-48%).</li>
+      <li><strong>Forex:</strong> Classic Momentum <span style="color:#22c55e">+7.23%</span> (Sharpe 1.733) &mdash; 11/12 algorithms beat UUP benchmark (-5%).</li>
+      <li><strong>Cryptocurrency:</strong> Trend Following <span style="color:#22c55e">+0.61%</span> &mdash; all 12 algorithms beat BTC benchmark (-37.58%).</li>
+    </ul>
+
+    <p style="margin-top:12px;"><strong>The 12 Competing Algorithms:</strong></p>
+    <ul>
+      <li><strong>Classic Momentum</strong> &mdash; Buy top-K past winners by 6-month return (Jegadeesh &amp; Titman)</li>
+      <li><strong>Trend Following</strong> &mdash; Buy stocks above 50/200 MA with strong trend strength</li>
+      <li><strong>Breakout Momentum</strong> &mdash; Buy stocks near 52-week highs with volume confirmation</li>
+      <li><strong>Bollinger Mean Reversion</strong> &mdash; Buy oversold (below lower BB), sell overbought</li>
+      <li><strong>Short-Term Reversal</strong> &mdash; Buy 5-day losers (oversold bounce), hold 3-5 days</li>
+      <li><strong>Quality Compounders</strong> &mdash; High ROE/ROIC, stable margins, low drawdown</li>
+      <li><strong>Value + Quality</strong> &mdash; Buy undervalued stocks with quality filter</li>
+      <li><strong>Dividend Aristocrats</strong> &mdash; 25+ years of consecutive dividend increases</li>
+      <li><strong>Earnings Drift (PEAD)</strong> &mdash; Post-earnings drift proxy with MACD confirmation</li>
+      <li><strong>Consecutive Beats (Safe Bet)</strong> &mdash; Stocks with 3+ consecutive positive return periods</li>
+      <li><strong>ML Ranker (LightGBM)</strong> &mdash; Composite ranking combining multiple indicators</li>
+      <li><strong>Meta Learner (God-Mode)</strong> &mdash; Regime-aware ensemble aggregating all strategies</li>
+    </ul>
+
+    <p style="margin-top:12px;"><strong>What's Real:</strong></p>
+    <ul>
+      <li><strong>Real market data</strong> from Yahoo Finance (last ~1 year of OHLCV prices)</li>
+      <li><strong>Real technical indicators:</strong> RSI, Bollinger Bands, MACD, moving averages (50/200), trend strength, Hurst exponent, momentum, volatility</li>
+      <li><strong>Real trade logs:</strong> Every BUY/SELL with date/time in EST, ticker, shares, price, P&amp;L</li>
+      <li><strong>Auto-refreshes weekly</strong> via GitHub Actions with fresh Yahoo Finance data</li>
+      <li><strong>Simulation mode</strong> also available for what-if scenarios with configurable market conditions</li>
+    </ul>
+
+    <p style="margin-top:12px;"><strong>Dashboard Links:</strong></p>
+    <ul>
+      <li><strong><a href="/STOCKS/competition/">Real Data Competition Dashboard</a></strong> &mdash; Full results with charts, leaderboard, trade logs</li>
+      <li><strong><a href="/STOCKS/algorithm-competition.html">Simulation Mode</a></strong> &mdash; Run what-if scenarios with configurable market conditions and speed</li>
+    </ul>
+
+    <p style="margin-top:12px;"><strong>Technical Details:</strong></p>
+    <ul>
+      <li><strong>Python backtester:</strong> <code>STOCKS/competition/run_competition.py</code> &mdash; downloads real data via yfinance, computes indicators, runs all 12 strategies</li>
+      <li><strong>Strategies from:</strong> <code>alpha_engine/strategies/</code> (momentum, mean reversion, quality, value, earnings, ML) &amp; <code>alpha_engine/ensemble/</code> (meta learner, regime allocator, signal combiner)</li>
+      <li><strong>GitHub Actions:</strong> <code>algorithm-competition-refresh.yml</code> runs weekly Sundays 5:00 AM EST</li>
+      <li><strong>Chart.js</strong> portfolio growth visualization with S&amp;P 500 / BTC / DOGE benchmarks</li>
+    </ul>
+
+    <p style="margin-top:8px;"><span class="app-tag">Stocks</span> <span class="app-tag">Crypto</span> <span class="app-tag">Forex</span> <span class="app-tag">Penny Stocks</span> <span class="app-tag">Meme Coins</span> <span class="app-tag">Alpha Engine</span> <span class="app-tag">GitHub Actions</span> <span class="app-tag">Real Data</span></p>
+  </div>
+</div>
+
 <!-- Feb 12, 2026 — OPUS 4.6 Battle Plan Implementation: 4-Phase System Ramp-Up -->
 <div class="update-entry" style="--dot-color: #a855f7;" data-tags="opus46,pipeline,run-all,commission,position-sizing,failover,fred,sports,views,schema,intelligence" data-category="stocks,trading,crypto,sports">
   <div class="update-date">Feb 12, 2026</div>
