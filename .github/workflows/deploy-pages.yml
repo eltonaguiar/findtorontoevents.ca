@@ -43,6 +43,22 @@ jobs:
             mkdir -p site/fc
             cp -r favcreators/docs/* site/fc/
           fi
+          # Algorithm Competition Arena
+          if [ -d STOCKS/competition ]; then
+            mkdir -p site/STOCKS/competition
+            cp STOCKS/competition/index.html site/STOCKS/competition/
+            cp STOCKS/competition/competition-slim.json site/STOCKS/competition/ 2>/dev/null || true
+            cp STOCKS/competition/competition-*.json site/STOCKS/competition/ 2>/dev/null || true
+          fi
+          if [ -f STOCKS/algorithm-competition.html ]; then
+            mkdir -p site/STOCKS
+            cp STOCKS/algorithm-competition.html site/STOCKS/
+          fi
+          # Predictions dashboard
+          if [ -d predictions ]; then
+            mkdir -p site/predictions
+            cp -r predictions/* site/predictions/
+          fi
 
       - name: Rewrite asset base path for GitHub Pages
         run: |
