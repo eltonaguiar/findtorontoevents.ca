@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Algorithm Competition Arena | Real Data Results</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg-0:#06060b;--bg-1:#0d0d16;--bg-2:#14141f;--bg-3:#1c1c2b;--border:#2a2a40;--text-1:#eeeef5;--text-2:#a0a0b8;--text-3:#666680;--gold:#ffd700;--silver:#c0c0c0;--bronze:#cd7f32;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--cyan:#06b6d4;--orange:#f97316;--pink:#ec4899}
+    html{scroll-behavior:smooth}
+    body{font-family:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-0);color:var(--text-1);min-height:100vh}
+    a{color:var(--purple);text-decoration:none}
+    .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(168,85,247,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(168,85,247,0.03) 1px,transparent 1px);background-size:40px 40px}
+    .bg-glow{position:fixed;top:-30vh;left:50%;transform:translateX(-50%);width:100vw;height:60vh;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(147,51,234,0.08) 0%,transparent 70%)}
+    .page{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:20px}
+
+    /* Header */
+    .header{text-align:center;padding:28px 20px 20px;border-bottom:1px solid var(--border);margin-bottom:24px}
+    .header h1{font-size:clamp(1.6rem,4vw,2.6rem);font-weight:800;background:linear-gradient(135deg,var(--gold),var(--orange),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-1px;margin-bottom:6px}
+    .header .sub{color:var(--text-2);font-size:0.95rem;margin-bottom:6px}
+    .header .gen{color:var(--text-3);font-size:0.8rem}
+    .nav-links{display:flex;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+    .nav-links a{padding:6px 14px;background:var(--bg-3);border-radius:6px;color:var(--text-2);font-size:0.82rem;transition:all 0.2s}
+    .nav-links a:hover{background:var(--purple);color:#fff}
+
+    /* Asset tabs */
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+    .tab{padding:10px 20px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:0.88rem;font-weight:600;transition:all 0.2s;color:var(--text-2)}
+    .tab:hover{border-color:var(--purple);color:var(--text-1)}
+    .tab.active{background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(99,102,241,0.15));border-color:var(--purple);color:var(--text-1)}
+
+    /* Winner Banner */
+    .winner-banner{background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(168,85,247,0.08));border:2px solid var(--gold);border-radius:16px;padding:28px;text-align:center;margin-bottom:24px}
+    .winner-banner .trophy{font-size:3rem;margin-bottom:6px}
+    .winner-banner h2{font-size:1.6rem;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+    .winner-banner .detail{color:var(--text-2);font-size:0.95rem;line-height:1.5}
+    .winner-banner .why{color:var(--text-2);font-size:0.85rem;margin-top:10px;padding:12px;background:var(--bg-2);border-radius:8px;text-align:left;max-width:700px;margin-left:auto;margin-right:auto}
+    .podium{display:flex;justify-content:center;gap:20px;margin-top:16px;flex-wrap:wrap}
+    .podium-card{background:var(--bg-2);border-radius:12px;padding:14px 22px;min-width:170px;text-align:center}
+    .podium-card .rank-label{font-size:0.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px}
+    .podium-card .name{font-size:1.05rem;font-weight:700;margin:4px 0}
+    .podium-card .ret{font-size:0.95rem;font-weight:600}
+
+    /* Stats grid */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+    .stat-card{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+    .stat-card .sv{font-size:1.3rem;font-weight:700}
+    .stat-card .sl{color:var(--text-3);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+    .positive{color:var(--green)}.negative{color:var(--red)}
+
+    /* Chart */
+    .chart-section{background:var(--bg-1);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden}
+    .chart-section::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--gold),var(--cyan))}
+    .chart-section h3{font-size:1.15rem;font-weight:700;margin-bottom:14px}
+    .chart-box{position:relative;height:400px}
+    @media(max-width:768px){.chart-box{height:280px}}
+
+    /* Table */
+    .table-section{background:var(--bg-1);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;overflow-x:auto;position:relative}
+    .table-section::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--orange))}
+    .table-section h3{font-size:1.15rem;font-weight:700;margin-bottom:14px}
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;padding:10px 12px;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-3);border-bottom:1px solid var(--border)}
+    td{padding:10px 12px;font-size:0.85rem;border-bottom:1px solid rgba(42,42,64,0.4);vertical-align:middle}
+    tr:hover td{background:rgba(168,85,247,0.04)}
+    .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-weight:700;font-size:0.8rem}
+    .r1{background:var(--gold);color:#000}.r2{background:var(--silver);color:#000}.r3{background:var(--bronze);color:#fff}.rx{background:var(--bg-3);color:var(--text-2)}
+
+    /* Trades Feed */
+    .trades-section{background:var(--bg-1);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden}
+    .trades-section::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--blue))}
+    .trades-section h3{font-size:1.15rem;font-weight:700;margin-bottom:14px}
+    .trades-list{max-height:500px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+    .trades-list::-webkit-scrollbar{width:6px}
+    .trades-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    .trade-item{display:flex;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.82rem}
+    .trade-time{color:var(--text-3);font-size:0.72rem;min-width:140px;font-family:monospace}
+    .trade-algo{font-weight:600;min-width:80px}
+    .trade-action{font-weight:700;padding:2px 8px;border-radius:4px;font-size:0.72rem;text-transform:uppercase}
+    .trade-buy{background:rgba(34,197,94,0.15);color:var(--green)}
+    .trade-sell{background:rgba(239,68,68,0.15);color:var(--red)}
+    .trade-ticker{font-weight:700;min-width:65px}
+    .trade-detail{color:var(--text-2);flex:1}
+    .trade-pnl{font-weight:600;min-width:80px;text-align:right}
+
+    /* Two-col */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+    @media(max-width:1024px){.two-col{grid-template-columns:1fr}}
+
+    /* Footer */
+    .footer{text-align:center;padding:24px;color:var(--text-3);font-size:0.8rem;border-top:1px solid var(--border);margin-top:32px}
+
+    /* loading */
+    .loading{text-align:center;padding:60px;color:var(--text-3);font-size:1.1rem}
+    .loading .spin{display:inline-block;width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--purple);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:600px){.page{padding:10px}.stats-grid{grid-template-columns:repeat(2,1fr)}.podium{gap:10px}.podium-card{min-width:130px;padding:10px 14px}}
+  </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="page">
+  <div class="header">
+    <h1>Algorithm Competition Arena</h1>
+    <p class="sub">12 real trading algorithms competing on real market data across 5 asset classes</p>
+    <p class="gen" id="genTime">Loading results...</p>
+    <div class="nav-links">
+      <a href="/STOCKS/index.html">Stocks Hub</a>
+      <a href="/predictions/dashboard.html">Predictions</a>
+      <a href="/STOCKS/algorithm-competition.html">Simulation Mode</a>
+      <a href="/index.html">Home</a>
+    </div>
+  </div>
+
+  <!-- Asset Class Tabs -->
+  <div class="tabs" id="tabs"></div>
+
+  <!-- Content (populated by JS) -->
+  <div id="content">
+    <div class="loading"><div class="spin"></div><br>Loading real competition data...</div>
+  </div>
+
+  <div class="footer">
+    <p>STOCKSCURSORS CLAW - Algorithm Competition Arena</p>
+    <p>Real market data from Yahoo Finance. Backtested using alpha_engine strategies. Not financial advice.</p>
+    <p>Source: alpha_engine/strategies/ &amp; alpha_engine/ensemble/ | Data period: ~1 year</p>
+  </div>
+</div>
+
+<script>
+const ALGO_COLORS = {
+  'Momentum':'#3b82f6','Trend':'#06b6d4','Breakout':'#f97316','BB Revert':'#22c55e',
+  'Reversal':'#ec4899','Quality':'#a855f7','Value':'#14b8a6','Dividend':'#84cc16',
+  'PEAD':'#f59e0b','SafeBet':'#6366f1','ML':'#f43f5e','GodMode':'#ffd700',
+};
+const ASSET_ICONS = {stocks:'📈',crypto:'🪙',forex:'💱',penny_stocks:'🎰',meme_coins:'🐸'};
+
+let DATA = null;
+let currentAC = null;
+let mainChart = null;
+
+async function loadData() {
+  try {
+    const resp = await fetch('competition-slim.json');
+    if (!resp.ok) throw new Error('Failed to load');
+    DATA = await resp.json();
+    document.getElementById('genTime').textContent = `Generated: ${DATA.generated_at} | Starting Capital: $${DATA.starting_capital.toLocaleString()}`;
+    buildTabs();
+    const first = Object.keys(DATA.asset_classes)[0];
+    switchTab(first);
+  } catch(e) {
+    document.getElementById('content').innerHTML = `<div class="loading" style="color:var(--red)">Failed to load competition data.<br>Run <code>python3 run_competition.py</code> to generate results.</div>`;
+  }
+}
+
+function buildTabs() {
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  for (const [key, ac] of Object.entries(DATA.asset_classes)) {
+    const t = document.createElement('div');
+    t.className = 'tab';
+    t.dataset.key = key;
+    t.textContent = `${ASSET_ICONS[key]||'📊'} ${ac.label}`;
+    t.onclick = () => switchTab(key);
+    tabs.appendChild(t);
+  }
+}
+
+function switchTab(key) {
+  currentAC = key;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.key === key));
+  renderAssetClass(DATA.asset_classes[key]);
+}
+
+function renderAssetClass(ac) {
+  const results = ac.results;
+  const winner = results[0];
+  const second = results[1];
+  const third = results[2];
+  const worst = results[results.length - 1];
+  const totalTrades = results.reduce((s,r) => s + r.total_trades, 0);
+  const avgSharpe = (results.reduce((s,r) => s + r.sharpe_ratio, 0) / results.length).toFixed(3);
+
+  let allTrades = [];
+  results.forEach(r => { if(r.trades_sample) allTrades = allTrades.concat(r.trades_sample); });
+  allTrades.sort((a,b) => (b.timestamp_est||b.date).localeCompare(a.timestamp_est||a.date));
+
+  const whyWins = buildWinnerExplanation(winner, ac);
+
+  const html = `
+    <!-- Winner Banner -->
+    <div class="winner-banner">
+      <div class="trophy">🏆</div>
+      <h2>${winner.algorithm} Wins ${ac.label}!</h2>
+      <p class="detail">
+        Return: <strong class="${winner.total_return_pct>=0?'positive':'negative'}">${winner.total_return_pct>=0?'+':''}${winner.total_return_pct}%</strong>
+        &nbsp;|&nbsp; Sharpe: <strong>${winner.sharpe_ratio}</strong>
+        &nbsp;|&nbsp; Win Rate: <strong>${winner.win_rate_pct}%</strong>
+        &nbsp;|&nbsp; Trades: <strong>${winner.total_trades}</strong>
+        &nbsp;|&nbsp; Max DD: <strong class="negative">-${winner.max_drawdown_pct}%</strong><br>
+        Benchmark (${ac.benchmark}): <strong class="${ac.benchmark_return_pct>=0?'positive':'negative'}">${ac.benchmark_return_pct>=0?'+':''}${ac.benchmark_return_pct}%</strong>
+        &nbsp;|&nbsp; ${ac.algorithms_beating_benchmark}/12 algorithms beat benchmark
+      </p>
+      <div class="why">${whyWins}</div>
+      <div class="podium">
+        <div class="podium-card"><div class="rank-label">🥇 1st Place</div><div class="name" style="color:var(--gold)">${winner.short_name}</div><div class="ret ${winner.total_return_pct>=0?'positive':'negative'}">${winner.total_return_pct>=0?'+':''}${winner.total_return_pct}%</div></div>
+        <div class="podium-card"><div class="rank-label">🥈 2nd Place</div><div class="name" style="color:var(--silver)">${second.short_name}</div><div class="ret ${second.total_return_pct>=0?'positive':'negative'}">${second.total_return_pct>=0?'+':''}${second.total_return_pct}%</div></div>
+        <div class="podium-card"><div class="rank-label">🥉 3rd Place</div><div class="name" style="color:var(--bronze)">${third.short_name}</div><div class="ret ${third.total_return_pct>=0?'positive':'negative'}">${third.total_return_pct>=0?'+':''}${third.total_return_pct}%</div></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="sv">${ac.trading_days}</div><div class="sl">Trading Days</div></div>
+      <div class="stat-card"><div class="sv">${ac.start_date}</div><div class="sl">Start Date</div></div>
+      <div class="stat-card"><div class="sv">${ac.end_date}</div><div class="sl">End Date</div></div>
+      <div class="stat-card"><div class="sv ${ac.benchmark_return_pct>=0?'positive':'negative'}">${ac.benchmark_return_pct>=0?'+':''}${ac.benchmark_return_pct}%</div><div class="sl">Benchmark (${ac.benchmark})</div></div>
+      <div class="stat-card"><div class="sv">${totalTrades.toLocaleString()}</div><div class="sl">Total Trades</div></div>
+      <div class="stat-card"><div class="sv">${avgSharpe}</div><div class="sl">Avg Sharpe</div></div>
+    </div>
+
+    <!-- Portfolio Chart -->
+    <div class="chart-section">
+      <h3>Portfolio Value Over Time (Real Data)</h3>
+      <div class="chart-box"><canvas id="mainChart"></canvas></div>
+    </div>
+
+    <div class="two-col">
+      <!-- Leaderboard -->
+      <div class="table-section">
+        <h3>Full Leaderboard</h3>
+        <table>
+          <thead><tr><th>Rank</th><th>Algorithm</th><th>Type</th><th>Final Value</th><th>Return</th><th>Sharpe</th><th>Win Rate</th><th>Trades</th><th>Max DD</th></tr></thead>
+          <tbody>
+            ${results.map((r,i) => {
+              const rc = i<3 ? `r${i+1}` : 'rx';
+              return `<tr>
+                <td><span class="rank-badge ${rc}">${i+1}</span></td>
+                <td><strong>${r.short_name}</strong></td>
+                <td style="color:var(--text-3);font-size:0.78rem">${r.type}</td>
+                <td>$${r.final_value.toLocaleString()}</td>
+                <td class="${r.total_return_pct>=0?'positive':'negative'}" style="font-weight:600">${r.total_return_pct>=0?'+':''}${r.total_return_pct}%</td>
+                <td>${r.sharpe_ratio}</td>
+                <td>${r.win_rate_pct}%</td>
+                <td>${r.total_trades}</td>
+                <td class="negative">-${r.max_drawdown_pct}%</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Trade Log -->
+      <div class="trades-section">
+        <h3>Recent Trades (${allTrades.length} shown of ${totalTrades} total)</h3>
+        <div class="trades-list">
+          ${allTrades.slice(0, 200).map(t => {
+            const isBuy = t.action === 'BUY';
+            const pnlStr = t.pnl !== undefined ? `<span class="${t.pnl>=0?'positive':'negative'}" style="font-weight:600">${t.pnl>=0?'+':''}$${t.pnl.toFixed(0)} (${t.return_pct>=0?'+':''}${t.return_pct}%)</span>` : '';
+            return `<div class="trade-item">
+              <span class="trade-time">${t.timestamp_est || t.date}</span>
+              <span class="trade-algo" style="color:${ALGO_COLORS[t.algo]||'var(--text-1)'}">${t.algo}</span>
+              <span class="trade-action ${isBuy?'trade-buy':'trade-sell'}">${t.action}</span>
+              <span class="trade-ticker">${t.ticker}</span>
+              <span class="trade-detail">${isBuy ? t.shares+' shares @ $'+t.price : (t.reason||'')+' ('+t.hold_days+'d)'}</span>
+              <span class="trade-pnl">${pnlStr || '$'+t.value.toLocaleString()}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('content').innerHTML = html;
+  buildChart(results, ac);
+}
+
+function buildChart(results, ac) {
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  if (mainChart) mainChart.destroy();
+
+  const datasets = results.map(r => ({
+    label: r.short_name,
+    data: r.portfolio_history.map(p => ({x: p.date, y: p.value})),
+    borderColor: ALGO_COLORS[r.short_name] || '#888',
+    backgroundColor: 'transparent',
+    borderWidth: r.short_name === 'GodMode' ? 3 : 1.5,
+    pointRadius: 0,
+    tension: 0.3,
+  }));
+
+  // Add benchmark
+  if (ac.benchmark_history && ac.benchmark_history.length > 0) {
+    datasets.push({
+      label: `Benchmark (${ac.benchmark})`,
+      data: ac.benchmark_history.map(p => ({x: p.date, y: p.value})),
+      borderColor: '#555',
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.3,
+      borderDash: [8, 4],
+    });
+  }
+
+  mainChart = new Chart(ctx, {
+    type: 'line',
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: { mode: 'nearest', intersect: false },
+      plugins: {
+        legend: { display: true, position: 'top', labels: { color: '#a0a0b8', font: { size: 11 }, boxWidth: 12, usePointStyle: true } },
+        tooltip: {
+          backgroundColor: '#1c1c2b', titleColor: '#eeeef5', bodyColor: '#a0a0b8', borderColor: '#2a2a40', borderWidth: 1,
+          callbacks: { label: ctx => `${ctx.dataset.label}: $${ctx.raw.y.toLocaleString()}` }
+        }
+      },
+      scales: {
+        x: { type: 'category', grid: { color: 'rgba(42,42,64,0.3)' }, ticks: { color: '#666680', font: { size: 10 }, maxTicksLimit: 15 } },
+        y: { grid: { color: 'rgba(42,42,64,0.3)' }, ticks: { color: '#666680', font: { size: 10 }, callback: v => '$'+(v/1000).toFixed(0)+'k' } }
+      }
+    }
+  });
+}
+
+function buildWinnerExplanation(winner, ac) {
+  const beatsBench = winner.total_return_pct > ac.benchmark_return_pct;
+  const alpha = (winner.total_return_pct - ac.benchmark_return_pct).toFixed(2);
+  let reason = `<strong>Why ${winner.algorithm} wins:</strong><br>`;
+
+  if (winner.type === 'Ensemble') {
+    reason += `The God-Mode ensemble dynamically shifts strategy weights based on market regime (volatility, trend strength). It aggregates signals from all 11 sub-strategies with regime-aware weighting (boosting defensive strategies in high-vol, momentum in low-vol). `;
+  } else if (winner.type === 'Momentum') {
+    reason += `Classic momentum (Jegadeesh & Titman style) buys past 6-month winners while skipping the most recent month to avoid short-term reversal contamination. This exploits behavioral herding and underreaction to information. `;
+  } else if (winner.type === 'Mean Reversion') {
+    reason += `Bollinger Band mean reversion buys stocks that are deeply oversold (below -1.5 standard deviations from 20-day mean) in stocks with low Hurst exponent (confirming mean-reverting behavior). It captures overreaction bounces. `;
+  } else if (winner.type === 'Trend') {
+    reason += `Trend following buys stocks above both 50-day and 200-day moving averages with strong trend strength (return/volatility ratio). It captures sustained directional moves driven by anchoring and slow information diffusion. `;
+  } else {
+    reason += `This strategy type (${winner.type}) generated the best risk-adjusted returns for this asset class over the test period. `;
+  }
+
+  reason += `<br><br>`;
+  reason += `<strong>Performance:</strong> ${winner.total_return_pct>=0?'+':''}${winner.total_return_pct}% return | Sharpe ${winner.sharpe_ratio} | ${winner.win_rate_pct}% win rate | ${winner.total_trades} trades<br>`;
+  if (beatsBench) {
+    reason += `<strong>Alpha:</strong> +${alpha}% above ${ac.benchmark} benchmark<br>`;
+  }
+  reason += `<strong>Risk:</strong> Max drawdown -${winner.max_drawdown_pct}% | Hold period: ~${winner.hold_period} days`;
+
+  return reason;
+}
+
+loadData();
+</script>
+</body>
+</html>
