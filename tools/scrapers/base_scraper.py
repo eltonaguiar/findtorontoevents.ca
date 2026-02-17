@@ -181,6 +181,7 @@ class ScrapedEvent:
     price_amount: float = 0.0
     is_free: bool = True
     description: str = ""
+    image: Optional[str] = None
     categories: List[str] = None
     tags: List[str] = None
     status: str = "UPCOMING"
