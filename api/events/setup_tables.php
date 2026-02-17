@@ -55,6 +55,7 @@ $sql_events_log = "CREATE TABLE IF NOT EXISTS `events_log` (
   `price_amount` decimal(10,2) DEFAULT NULL,
   `is_free` tinyint(1) DEFAULT 0,
   `description` text,
+  `image_url` varchar(2048) DEFAULT NULL,
   `categories` text,
   `status` varchar(50) DEFAULT 'UPCOMING',
   `tags` text,
@@ -79,6 +80,9 @@ $sql_stats_summary = "CREATE TABLE IF NOT EXISTS `stats_summary` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_stat_name` (`stat_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
+// Migration: add image_url column to existing events_log tables that predate this field
+$conn->query("ALTER TABLE `events_log` ADD COLUMN IF NOT EXISTS `image_url` varchar(2048) DEFAULT NULL AFTER `description`");
 
 // Create event_pulls table
 if (!$conn->query($sql_event_pulls)) {
