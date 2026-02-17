@@ -18,7 +18,7 @@ try:
     from .sankofa_square import SankofaSquareScraper
     from .city_of_toronto import CityOfTorontoEventsScraper
     from .unity_maps import UnityMapsScraper
-    from .allevents_calendar import AllEventsCalendarScraper
+    from .eventbrite_scraper import EventbriteScraper
     from .toronto_events_weekly import TorontoEventsWeeklyScraper
     from .american_arenas import AmericanArenasScraper
     from .creative_code_sheet import CreativeCodeSheetScraper
@@ -33,7 +33,7 @@ except ImportError:
     from sankofa_square import SankofaSquareScraper
     from city_of_toronto import CityOfTorontoEventsScraper
     from unity_maps import UnityMapsScraper
-    from allevents_calendar import AllEventsCalendarScraper
+    from eventbrite_scraper import EventbriteScraper
     from toronto_events_weekly import TorontoEventsWeeklyScraper
     from american_arenas import AmericanArenasScraper
     from creative_code_sheet import CreativeCodeSheetScraper
@@ -49,11 +49,11 @@ class UnifiedTorontoScraper:
     
     def __init__(self):
         self.scrapers = [
+            EventbriteScraper(),          # primary source — has images
             NathanPhillipsSquareScraper(),
             SankofaSquareScraper(),
             CityOfTorontoEventsScraper(),
             UnityMapsScraper(),
-            AllEventsCalendarScraper(),
             TorontoEventsWeeklyScraper(),
             AmericanArenasScraper(),
             CreativeCodeSheetScraper(),
