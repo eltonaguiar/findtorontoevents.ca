@@ -896,7 +896,7 @@
         </div>
       </div>
     </div>
-    <div class="fixed top-6 right-6 z-[200] flex gap-3 pointer-events-none"><button
+    <div id="top-right-controls" class="fixed top-6 right-6 z-[200] flex gap-3 items-center pointer-events-none"><button
         class="pointer-events-auto px-4 py-3 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[var(--pk-500)] text-white transition-all group overflow-hidden flex items-center gap-2"
         title="System Configuration (Top Right)">
         <div class="flex items-center gap-2 px-1"><span
@@ -2786,17 +2786,61 @@
   .event-card-hidden {
     display: none !important;
   }
+  /* Hide skeleton ghost cards once events have loaded */
+  .events-loaded .animate-pulse {
+    display: none !important;
+  }
+  /* Multi-source panel: clip to card boundary to prevent ghost overflow */
+  .quickview-multi-source {
+    position: relative;
+    z-index: 10;
+  }
+  /* Thumbnail mode: show image on cards */
+  .card-thumbnail {
+    display: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .thumbnails-on .card-thumbnail {
+    display: block;
+  }
+  /* Generated colour thumbnail (no real image) */
+  .card-thumb-placeholder {
+    display: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+  }
+  .thumbnails-on .card-thumb-placeholder {
+    display: flex;
+  }
 </style>
 
 <script>
 (function() {
   console.log('[FILTERS] Initializing multi-day filter and near me features');
-  
+
+  // Today's date boundary for past-event filtering (recalculated at filter time)
+  var __todayStart = (function() { var d = new Date(); d.setHours(0,0,0,0); return d; })();
+
   // State
   let showMultiDayEvents = false;
   let userLocation = null;
   let maxDistance = 10; // km
   let filterActive = false;
+
+  // Load thumbnail preference from localStorage
+  var _settings = (function() { try { return JSON.parse(localStorage.getItem('toronto-events-settings') || '{}'); } catch(e) { return {}; } })();
+  let thumbnailsEnabled = _settings.showThumbnails !== false; // default ON
   
   // Toronto postal code to coordinate mapping (approximate centers)
   const postalCodeCoords = {
@@ -2965,10 +3009,17 @@
     multiDayBtn.id = 'multiday-toggle';
     multiDayBtn.innerHTML = '📅 Show Multi-Day Events';
     
+    // Thumbnail Toggle Button
+    const thumbnailBtn = document.createElement('button');
+    thumbnailBtn.className = 'filter-toggle-btn' + (thumbnailsEnabled ? ' active' : '');
+    thumbnailBtn.id = 'thumbnail-toggle';
+    thumbnailBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg> Thumbnails';
+
     container.appendChild(nearMePanel);
     container.appendChild(nearMeBtn);
     container.appendChild(multiDayBtn);
-    
+    container.appendChild(thumbnailBtn);
+
     document.body.appendChild(container);
     
     // Event listeners
@@ -2981,6 +3032,15 @@
       multiDayBtn.classList.toggle('active', showMultiDayEvents);
       multiDayBtn.innerHTML = showMultiDayEvents ? '📅 Hide Multi-Day Events' : '📅 Show Multi-Day Events';
       applyFilters();
+    });
+
+    thumbnailBtn.addEventListener('click', function() {
+      thumbnailsEnabled = !thumbnailsEnabled;
+      thumbnailBtn.classList.toggle('active', thumbnailsEnabled);
+      var s = (function() { try { return JSON.parse(localStorage.getItem('toronto-events-settings') || '{}'); } catch(e) { return {}; } })();
+      s.showThumbnails = thumbnailsEnabled;
+      localStorage.setItem('toronto-events-settings', JSON.stringify(s));
+      applyThumbnails();
     });
     
     document.getElementById('use-location-btn').addEventListener('click', function() {
@@ -3106,6 +3166,14 @@
         }
       }
       
+      // Past events filter — hide events whose date is before today
+      if (shouldShow && eventData && eventData.date) {
+        var eventDate = new Date(eventData.date);
+        if (!isNaN(eventDate.getTime()) && eventDate < __todayStart) {
+          shouldShow = false;
+        }
+      }
+
       // Location filter
       if (shouldShow && filterActive && userLocation && maxDistance > 0) {
         const eventCoords = eventData ? 
@@ -3145,15 +3213,110 @@
     console.log('[FILTERS] Shown:', shownCount, 'Hidden:', hiddenCount);
   }
   
+  // Generate a stable colour from a string (for thumbnails)
+  function stringToColor(str) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) hash = (hash << 5) - hash + str.charCodeAt(i);
+    var colors = ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#10b981','#3b82f6','#ef4444','#14b8a6','#f97316','#a855f7'];
+    return colors[Math.abs(hash) % colors.length];
+  }
+
+  // Inject / toggle colour-coded thumbnails on event cards
+  function applyThumbnails() {
+    if (thumbnailsEnabled) {
+      document.body.classList.add('thumbnails-on');
+    } else {
+      document.body.classList.remove('thumbnails-on');
+      return;
+    }
+    const cards = document.querySelectorAll('[class*="glass-panel"]:not(.animate-pulse), [class*="event-card"], [class*="EventCard"]');
+    cards.forEach(function(card) {
+      if (card.querySelector('.card-thumb-placeholder, .card-thumbnail')) return; // already injected
+      const titleEl = card.querySelector('h2, h3, [class*="title"], [class*="Title"]');
+      if (!titleEl) return;
+      const title = (titleEl.textContent || '').trim();
+      if (!title) return;
+      // Find matching event
+      let emoji = '🎟';
+      let color = stringToColor(title);
+      let imageUrl = null;
+      if (window.__RAW_EVENTS__) {
+        const ev = window.__RAW_EVENTS__.find(function(e) {
+          return (e.title || '').toLowerCase().includes(title.toLowerCase().substring(0, 15));
+        });
+        if (ev) {
+          color = stringToColor(ev.title || title);
+          imageUrl = ev.image || ev.imageUrl || ev.thumbnail || null;
+          var cats = (ev.categories || []).join('').toLowerCase();
+          if (cats.includes('music') || cats.includes('concert')) emoji = '🎵';
+          else if (cats.includes('art') || cats.includes('gallery')) emoji = '🎨';
+          else if (cats.includes('food') || cats.includes('drink')) emoji = '🍽';
+          else if (cats.includes('sport') || cats.includes('fitness')) emoji = '⚽';
+          else if (cats.includes('film') || cats.includes('movie')) emoji = '🎬';
+          else if (cats.includes('festival')) emoji = '🎉';
+          else if (cats.includes('market') || cats.includes('fair')) emoji = '🛍';
+          else if (cats.includes('family') || cats.includes('kids')) emoji = '👨‍👩‍👧';
+          else if (cats.includes('tech') || cats.includes('digital')) emoji = '💻';
+          else if (cats.includes('comedy')) emoji = '😂';
+          else if (cats.includes('theatre') || cats.includes('theater')) emoji = '🎭';
+        }
+      }
+      var thumb;
+      if (imageUrl) {
+        // Real event photo
+        thumb = document.createElement('img');
+        thumb.className = 'card-thumbnail';
+        thumb.src = imageUrl;
+        thumb.alt = title;
+        thumb.loading = 'lazy';
+        thumb.onerror = function() {
+          // Fallback to colour placeholder if image fails
+          var ph = document.createElement('div');
+          ph.className = 'card-thumb-placeholder';
+          ph.style.background = color;
+          ph.style.boxShadow = '0 4px 12px ' + color + '66';
+          ph.textContent = emoji;
+          this.parentNode && this.parentNode.replaceChild(ph, this);
+        };
+      } else {
+        // Colour-coded placeholder
+        thumb = document.createElement('div');
+        thumb.className = 'card-thumb-placeholder';
+        thumb.style.background = color;
+        thumb.style.boxShadow = '0 4px 12px ' + color + '66';
+        thumb.textContent = emoji;
+      }
+      // Inject before the first text content block
+      const firstFlex = card.querySelector('.flex, [class*="flex"]');
+      if (firstFlex) {
+        firstFlex.insertBefore(thumb, firstFlex.firstChild);
+      } else {
+        card.insertBefore(thumb, card.firstChild);
+      }
+    });
+  }
+
   // Initialize
   function init() {
     createFilterControls();
-    
+
+    // Ghost-tile fix: hide skeleton pulse cards once real events arrive
+    function hideSkeletons() {
+      if (window.__RAW_EVENTS__ && window.__RAW_EVENTS__.length > 0) {
+        document.body.classList.add('events-loaded');
+      }
+    }
+    setTimeout(hideSkeletons, 1500);
+    setTimeout(hideSkeletons, 3000);
+    setTimeout(hideSkeletons, 6000);
+
     // Apply initial filters after events load
     setTimeout(applyFilters, 2000);
     setTimeout(applyFilters, 4000);
+    // Apply initial thumbnail state
+    setTimeout(applyThumbnails, 2500);
     
-    // Re-apply filters when new cards are added
+    // Re-apply filters/thumbnails when new cards are added (watch body to survive React hydration)
     const observer = new MutationObserver(function(mutations) {
       let shouldApply = false;
       mutations.forEach(function(mutation) {
@@ -3163,12 +3326,20 @@
       });
       if (shouldApply) {
         clearTimeout(window._filterTimeout);
-        window._filterTimeout = setTimeout(applyFilters, 300);
+        window._filterTimeout = setTimeout(function() {
+          applyFilters();
+          applyThumbnails();
+          hideSkeletons && hideSkeletons();
+        }, 300);
       }
     });
     
-    const main = document.querySelector('main') || document.body;
-    observer.observe(main, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // Extra retries after React hydration may wipe cards/thumbnails
+    [4000, 6000, 8000, 12000].forEach(function(d) {
+      setTimeout(function() { applyThumbnails(); applyFilters(); }, d);
+    });
   }
   
   // Start when DOM is ready
@@ -3305,57 +3476,113 @@
   setInterval(ensureSignInModal, 3000);
 })();
 </script>
-<!-- Sign-in island: button opens modal or goes to /fc/ when already logged in -->
+<!-- Sign-in island: button opens modal or goes to /fc/ when already logged in.
+     Uses its own body-level container (#signin-island-root) OUTSIDE React's hydration
+     tree so React re-renders never wipe it out.
+     Shows immediately (default "Sign in") then upgrades to "Account" after auth check. -->
 <script>
 (function(){
   var fcApi = 'https://findtorontoevents.ca/fc/api';
-  var baseIslandStyle = 'position:fixed;top:1.5rem;right:calc(1.5rem + 120px);z-index:9999;display:flex !important;align-items:center;pointer-events:none;visibility:visible !important;opacity:1 !important;';
   var btnStyle = 'pointer-events:auto;display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 1rem;background:rgba(0,0,0,0.4);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.1);border-radius:1rem;color:#fff;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);cursor:pointer;font-family:inherit;text-decoration:none;';
+
+  function getRoot() {
+    var root = document.getElementById('signin-island-root');
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'signin-island-root';
+      root.style.cssText = 'position:fixed;top:1.5rem;right:1.5rem;z-index:9999;display:flex;gap:0.75rem;align-items:center;pointer-events:none;';
+      document.body.appendChild(root);
+    }
+    return root;
+  }
+
+  function alignWithGear() {
+    var root = document.getElementById('signin-island-root');
+    if (!root) return;
+    var gear = document.getElementById('top-right-controls');
+    if (!gear) gear = document.querySelector('[title="System Configuration (Top Right)"]');
+    if (!gear) gear = document.querySelector('.fixed-ui-layer [title*="Configuration"]');
+    if (gear) {
+      var rect = gear.getBoundingClientRect();
+      var gearRight = window.innerWidth - rect.right;
+      var gearWidth = rect.width;
+      root.style.top = rect.top + 'px';
+      root.style.right = (gearRight + gearWidth + 12) + 'px';
+    }
+  }
+
   function getIslandHtml() {
     if (window.__fc_logged_in_user__) {
-      return '<div id="signin-island" style="' + baseIslandStyle + '"><a href="https://findtorontoevents.ca/fc/" style="' + btnStyle + '"><span style="font-size:1.25rem">\uD83D\uDD12</span><span>Account</span></a></div>';
+      return '<a id="signin-island" href="https://findtorontoevents.ca/fc/" style="' + btnStyle + '"><span style="font-size:1.25rem">\uD83D\uDD12</span><span>Account</span></a>';
     }
-    return '<div id="signin-island" style="' + baseIslandStyle + '"><button type="button" style="' + btnStyle + '"><span style="font-size:1.25rem">\uD83D\uDD12</span><span>Sign in</span></button></div>';
+    return '<button id="signin-island" type="button" style="' + btnStyle + '"><span style="font-size:1.25rem">\uD83D\uDD12</span><span>Sign in</span></button>';
   }
+
   function ensureSignInIsland() {
+    var root = getRoot();
     var existing = document.getElementById('signin-island');
     if (existing) {
-      var link = existing.querySelector('a[href*="/fc/"]');
-      var btn = existing.querySelector('button');
-      if (window.__fc_logged_in_user__ && btn && !link) {
+      var isLink = existing.tagName === 'A';
+      if (window.__fc_logged_in_user__ && !isLink) {
         existing.parentNode.removeChild(existing);
-      } else if (!window.__fc_logged_in_user__ && link) {
+      } else if (!window.__fc_logged_in_user__ && isLink) {
         existing.parentNode.removeChild(existing);
-      } else return;
+      } else {
+        if (existing.parentNode !== root) root.appendChild(existing);
+        alignWithGear();
+        return;
+      }
     }
     var wrap = document.createElement('div');
     wrap.innerHTML = getIslandHtml();
     var island = wrap.firstElementChild;
     if (island) {
-      document.body.appendChild(island);
-      var btn = island.querySelector('button');
-      if (btn) {
-        btn.onclick = function() { window.openSignInModal && window.openSignInModal(); };
-        btn.onmouseover = function() { this.style.background = '#6366f1'; };
-        btn.onmouseout = function() { this.style.background = 'rgba(0,0,0,0.4)'; };
+      root.appendChild(island);
+      if (island.tagName === 'BUTTON') {
+        island.onclick = function() { window.openSignInModal && window.openSignInModal(); };
+        island.onmouseover = function() { this.style.background = '#6366f1'; };
+        island.onmouseout = function() { this.style.background = 'rgba(0,0,0,0.4)'; };
       }
     }
+    alignWithGear();
   }
-  function run() {
-    ensureSignInIsland();
-    setTimeout(ensureSignInIsland, 500);
-    setTimeout(ensureSignInIsland, 1500);
-    setTimeout(ensureSignInIsland, 3000);
-    setTimeout(ensureSignInIsland, 6000);
-    setTimeout(ensureSignInIsland, 10000);
+
+  // Show the signin island IMMEDIATELY (default "Sign in" state).
+  // Don't wait for the auth fetch — upgrade to "Account" later if logged in.
+  ensureSignInIsland();
+
+  // React hydration error (#418) causes a full client re-render that replaces body
+  // children. Watch for our root being removed and re-inject instantly.
+  var _reinjecting = false;
+  var bodyObserver = new MutationObserver(function() {
+    if (_reinjecting) return;
+    if (!document.getElementById('signin-island-root')) {
+      _reinjecting = true;
+      ensureSignInIsland();
+      setTimeout(alignWithGear, 50);
+      _reinjecting = false;
+    }
+  });
+  if (document.body) {
+    bodyObserver.observe(document.body, { childList: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      bodyObserver.observe(document.body, { childList: true });
+      ensureSignInIsland();
+    });
   }
+
   function init() {
-    fetch(fcApi + '/get_me.php', { credentials: 'include' })
-      .then(function(r) { return r.json(); })
+    ensureSignInIsland();
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function() { controller.abort(); }, 8000);
+    fetch(fcApi + '/get_me.php', { credentials: 'include', signal: controller.signal })
+      .then(function(r) { clearTimeout(timeoutId); return r.json(); })
       .then(function(data) {
         if (data && data.user && data.user.id != null) {
           window.__fc_logged_in_user__ = data.user;
           window.__fc_debug_log_enabled__ = !!(data.debug_log_enabled);
+          ensureSignInIsland();
           var uid = data.user.id;
           fetch(fcApi + '/get_my_events.php?user_id=' + uid, { credentials: 'include' })
             .then(function(r2) { return r2.json(); })
@@ -3374,15 +3601,19 @@
         } else {
           window.__fc_debug_log_enabled__ = false;
         }
-        run();
       })
-      .catch(function() { run(); });
+      .catch(function() { clearTimeout(timeoutId); });
   }
+
+  // Re-align after React hydration replaces the gear button DOM
+  [200, 500, 1000, 1500, 3000, 6000].forEach(function(d) { setTimeout(alignWithGear, d); });
+  window.addEventListener('resize', alignWithGear);
+
   window.addEventListener('fc-logout', function() { ensureSignInIsland(); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
-  window.addEventListener('load', init);
-  setInterval(ensureSignInIsland, 3000);
+  window.addEventListener('load', function() { init(); alignWithGear(); });
+  setInterval(function() { ensureSignInIsland(); alignWithGear(); }, 5000);
 })();
 </script>
 <!-- Sign-in in nav (sidebar): button opens same modal -->
@@ -4136,6 +4367,55 @@
 <script src="/theme-registry.js"></script>
 <script src="/theme-animations.js"></script>
 <script src="/theme-switcher.js"></script>
+<style>
+/* Theme picker locked state for non-logged-in users */
+.theme-locked-overlay {
+  position: absolute; inset: 0; z-index: 99999;
+  background: rgba(10,10,18,0.72); backdrop-filter: blur(4px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; border-radius: inherit; pointer-events: auto;
+}
+.theme-locked-overlay p {
+  color: #a0a0b5; font-size: 13px; text-align: center; margin: 0; padding: 0 24px;
+}
+.theme-locked-overlay button {
+  padding: 10px 24px; border-radius: 50px; border: none;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+</style>
+<script>
+// Theme switcher: require login to apply themes
+(function() {
+  function lockThemePickerIfNeeded() {
+    // Find the theme switcher overlay/panel
+    var overlay = document.getElementById('theme-switcher-overlay') || document.querySelector('[id*="theme"][class*="overlay"], [id*="theme-panel"]');
+    if (!overlay) return;
+    if (window.__fc_logged_in_user__) {
+      // Remove lock if logged in
+      var lock = overlay.querySelector('.theme-locked-overlay');
+      if (lock) lock.remove();
+      return;
+    }
+    // Already locked
+    if (overlay.querySelector('.theme-locked-overlay')) return;
+    overlay.style.position = overlay.style.position || 'relative';
+    var lock = document.createElement('div');
+    lock.className = 'theme-locked-overlay';
+    lock.innerHTML = '<span style="font-size:2rem">🔐</span><p>Sign in to unlock theme customisation and save your preference across sessions.</p><button id="theme-lock-signin-btn">Sign In</button>';
+    overlay.appendChild(lock);
+    lock.querySelector('#theme-lock-signin-btn').onclick = function() {
+      window.openSignInModal && window.openSignInModal();
+    };
+  }
+  // Watch for the theme overlay to appear
+  var _themeLockObserver = new MutationObserver(lockThemePickerIfNeeded);
+  _themeLockObserver.observe(document.body, { childList: true, subtree: false });
+  // Also check when login state resolves
+  document.addEventListener('fc:login', lockThemePickerIfNeeded);
+  document.addEventListener('fc:logout', lockThemePickerIfNeeded);
+})();
+</script>
 <script>
 // Post-hydration fix: React hydration overwrites Quick Nav links with JS bundle data
 // Fix Movies & TV and Open App links to point to /MOVIESHOWS2/
