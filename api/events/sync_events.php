@@ -109,6 +109,7 @@ foreach ($events as $event) {
     $price_amount = isset($event['priceAmount']) ? (float)$event['priceAmount'] : 0;
     $is_free = isset($event['isFree']) ? (int)(bool)$event['isFree'] : 0;
     $description = isset($event['description']) ? $conn->real_escape_string($event['description']) : '';
+    $image_url = isset($event['image']) ? $conn->real_escape_string($event['image']) : '';
     $status = isset($event['status']) ? $conn->real_escape_string($event['status']) : 'UPCOMING';
     
     $categories = '';
@@ -125,7 +126,7 @@ foreach ($events as $event) {
     $check = $conn->query("SELECT id FROM events_log WHERE event_id = '$event_id'");
     if ($check && $check->num_rows > 0) {
         // Update existing event
-        $sql = "UPDATE events_log SET 
+        $sql = "UPDATE events_log SET
             pull_id = $pull_id,
             title = '$title',
             event_date = $event_date_sql,
@@ -137,6 +138,7 @@ foreach ($events as $event) {
             price_amount = $price_amount,
             is_free = $is_free,
             description = '$description',
+            image_url = " . ($image_url !== '' ? "'$image_url'" : 'NULL') . ",
             categories = '$categories',
             status = '$status',
             tags = '$tags',
@@ -149,8 +151,9 @@ foreach ($events as $event) {
         }
     } else {
         // Insert new event
-        $sql = "INSERT INTO events_log (event_id, pull_id, title, event_date, location, source, host, url, price, price_amount, is_free, description, categories, status, tags)
-            VALUES ('$event_id', $pull_id, '$title', $event_date_sql, '$location', '$source_name', '$host', '$url', '$price', $price_amount, $is_free, '$description', '$categories', '$status', '$tags')";
+        $image_url_val = $image_url !== '' ? "'$image_url'" : 'NULL';
+        $sql = "INSERT INTO events_log (event_id, pull_id, title, event_date, location, source, host, url, price, price_amount, is_free, description, image_url, categories, status, tags)
+            VALUES ('$event_id', $pull_id, '$title', $event_date_sql, '$location', '$source_name', '$host', '$url', '$price', $price_amount, $is_free, '$description', $image_url_val, '$categories', '$status', '$tags')";
         if ($conn->query($sql)) {
             $inserted++;
         } else {
