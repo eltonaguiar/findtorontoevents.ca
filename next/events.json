@@ -2241,7 +2241,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.214934Z",
+    "last_updated": "2026-02-18T13:15:17.433698Z",
     "isFree": true
   },
   {
@@ -2269,7 +2269,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.215246Z",
+    "last_updated": "2026-02-18T13:15:17.434017Z",
     "isFree": true
   },
   {
@@ -3118,7 +3118,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:06.275966Z",
+    "last_updated": "2026-02-18T13:15:21.370034Z",
     "isFree": true
   },
   {
@@ -3141,7 +3141,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:06.275989Z",
+    "last_updated": "2026-02-18T13:15:21.370055Z",
     "isFree": true
   },
   {
@@ -3164,7 +3164,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:06.276009Z",
+    "last_updated": "2026-02-18T13:15:21.370076Z",
     "isFree": true
   },
   {
@@ -4025,7 +4025,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:06.276028Z",
+    "last_updated": "2026-02-18T13:15:21.370094Z",
     "isFree": true
   },
   {
@@ -5169,7 +5169,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-17T13:13:06.276052Z",
+    "last_updated": "2026-02-18T13:15:21.370118Z",
     "isFree": true
   },
   {
@@ -5672,7 +5672,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-17T13:13:06.276072Z",
+    "last_updated": "2026-02-18T13:15:21.370138Z",
     "isFree": true
   },
   {
@@ -5695,7 +5695,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:06.276091Z",
+    "last_updated": "2026-02-18T13:15:21.370156Z",
     "isFree": true
   },
   {
@@ -5718,7 +5718,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:06.276115Z",
+    "last_updated": "2026-02-18T13:15:21.370180Z",
     "isFree": true
   },
   {
@@ -7098,7 +7098,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-17T13:13:06.276135Z",
+    "last_updated": "2026-02-18T13:15:21.370201Z",
     "isFree": true
   },
   {
@@ -9499,7 +9499,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:06.276153Z",
+    "last_updated": "2026-02-18T13:15:21.370219Z",
     "isFree": true
   },
   {
@@ -10769,7 +10769,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:06.276169Z",
+    "last_updated": "2026-02-18T13:15:21.370235Z",
     "isFree": true
   },
   {
@@ -11761,6 +11761,30 @@
     ]
   },
   {
+    "id": "44c787b8bfb60010ac578f5047743871",
+    "title": "Démystifier l’assurance Cyber pour les consultants TI",
+    "date": "2026-02-18T12:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "AQIII",
+    "url": "https://www.eventbrite.ca/e/billets-demystifier-lassurance-cyber-pour-les-consultants-ti-1975611676707",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Participez à ce webinaire gratuit sur l’assurance Cyber-risques et la responsabilité professionnelle adaptée aux consultants indépendants TI",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1173004656%2F1123168505853%2F1%2Foriginal.20251215-193442?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=b8afea49da9443bcd61c947b461dbee8",
+    "categories": [
+      "Arts"
+    ],
+    "tags": [
+      "Art"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:15:06.267259Z",
+    "isFree": true
+  },
+  {
     "id": "e57eef4e4dd5b8f3c1b73c7bdaf22147",
     "title": "Toronto Symphony Orchestra: Mahler's Ninth Symphony",
     "date": "2026-02-18T14:00:00-05:00",
@@ -11800,6 +11824,30 @@
     "tags": [
       "Business"
     ]
+  },
+  {
+    "id": "cd331d5e7179c55c3698333e8cfd8e7a",
+    "title": "ELAISIAN PRESENTA:  NUOVA WEBAPP,  QUADERNO AI e CALCOLATORE TERRENO",
+    "date": "2026-02-18T18:30:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Elaisian Srl",
+    "url": "https://www.eventbrite.co.uk/e/biglietti-elaisian-presenta-nuova-webapp-quaderno-ai-e-calcolatore-terreno-1982189537265",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "ELAISIAN PRESENTA: LA NUOVA  WEBAPP, IL QUADERNO AI (qdca) e il CALCOLATORE PER VALUTARE TERRENO",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176452261%2F201743450441%2F1%2Foriginal.20260202-144257?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C205%2C998%2C499&s=86b1a6867890974c63b0893aadbbcf6d",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:32.591709Z",
+    "isFree": true
   },
   {
     "id": "925c96cad151379db1b3f56a9cb591dc",
@@ -12025,6 +12073,30 @@
     ]
   },
   {
+    "id": "02abd17798ce1551a33cba350e591703",
+    "title": "SCRIVERE UNA FIABA CON MADDALENA VAGLIO TANET",
+    "date": "2026-02-18T19:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Mediaterraneo Servizi",
+    "url": "https://www.eventbrite.it/e/biglietti-scrivere-una-fiaba-con-maddalena-vaglio-tanet-1980940543491",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Laboratorio online di scrittura fiabesca per adulti",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1175424228%2F190991582545%2F1%2Foriginal.20260121-085038?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=d93fb711b49c1c322a65de01dcdd2697",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:31.171870Z",
+    "isFree": true
+  },
+  {
     "id": "87e2ac73c3601cf1eaa679946cd9e549",
     "title": "All That Glitters at My House - An Interactive Burlesque Show!",
     "date": "2026-02-19T12:00:00-05:00",
@@ -12041,6 +12113,30 @@
     ],
     "status": "UPCOMING",
     "lastUpdated": "2026-01-26T02:29:08.904Z"
+  },
+  {
+    "id": "766c6f8af5a14165ccefcbd939b51a92",
+    "title": "Webinaire de février : Prise en main de l'outil MesCompétences",
+    "date": "2026-02-19T13:30:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Alicia de MesCompétences",
+    "url": "https://www.eventbrite.fr/e/billets-webinaire-de-fevrier-prise-en-main-de-loutil-mescompetences-1979110854843",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Démo de l'outil MesCompétences pour les accompagnateurs professionnels et bénévoles de chercheurs d'emploi puis temps de questions/réponses.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F514236269%2F155649919608%2F1%2Foriginal.20230513-202329?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=86%2C0%2C1254%2C627&s=70c6c4fce2d2fc57648829b7d189707c",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:15:09.182486Z",
+    "isFree": true
   },
   {
     "id": "fbb6ca4a7f835f29ba42b7ed642ff3ed",
@@ -12404,6 +12500,31 @@
     ]
   },
   {
+    "id": "7b9d6b05658c10f71ac5716203c7d968",
+    "title": "Howard W. French: The Second Emancipation",
+    "date": "2026-02-19T19:00:00Z",
+    "location": "Atrium - Toronto Reference Library",
+    "address": "789 Yonge Street, Toronto, ON M4W 2G8, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Toronto Public Library",
+    "url": "https://www.eventbrite.ca/e/howard-w-french-the-second-emancipation-registration-1980497411070",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Journalist and author Howard W. French shares his book The Second Emancipation: Nkrumah, Pan-Africanism, and Global Blackness at High Tide",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1174774764%2F80638293243%2F1%2Foriginal.20260113-203904?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2880%2C1440&s=69b8f5fd4a7bb345e96daf02e6e1d545",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:16.028835Z",
+    "isFree": true
+  },
+  {
     "id": "4a351254ba07668ec4e9c5f59d9e9a74",
     "title": "Jo Koy: Just Being Koy Tour",
     "date": "2026-02-19T20:00:00-05:00",
@@ -12422,6 +12543,31 @@
     "tags": [
       "General"
     ]
+  },
+  {
+    "id": "a5582a61c8ce6fbb4b0103b4823d7612",
+    "title": "Open Studio with Ojo Agi",
+    "date": "2026-02-20T16:00:00Z",
+    "location": "Nia Centre for the Arts",
+    "address": "524 Oakwood Avenue, Toronto, ON M6E 2X1, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Nia Centre for the Arts",
+    "url": "https://www.eventbrite.ca/e/open-studio-with-ojo-agi-tickets-1982023264940",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "An artful evening of exchange and reflection...",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176266606%2F34587090648%2F1%2Foriginal.20260130-162436?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=1%2C332%2C998%2C499&s=22f06ac9ce834bf860cf2b237a2e506e",
+    "categories": [
+      "Arts"
+    ],
+    "tags": [
+      "Art"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:44.363064Z",
+    "isFree": true
   },
   {
     "id": "33fe8b5a4adfabd354391a871d50b770",
@@ -12463,6 +12609,33 @@
     "tags": [
       "General"
     ]
+  },
+  {
+    "id": "fc2d710496bdff361fe0a7913a97d131",
+    "title": "Friday Night: Sample Chief Takeover at the AGO",
+    "date": "2026-02-20T18:00:00Z",
+    "location": "Art Gallery of Ontario",
+    "address": "317 Dundas Street West, Toronto, ON M5T 1G4, Toronto, ON",
+    "lat": 43.6536,
+    "lng": -79.3925,
+    "source": "Eventbrite",
+    "host": "Sample Chief",
+    "url": "https://www.eventbrite.ca/e/friday-night-sample-chief-takeover-at-the-ago-tickets-1982303433933",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Bringing Walker Court to life with a multi-sensory experience filled with the sounds and rhythms of the continent and the diaspora.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176629382%2F572140554877%2F1%2Foriginal.jpg?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=1dff98809082c87636b06a1f8196e422",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:24.813142Z",
+    "isFree": true
   },
   {
     "id": "b2f7cf094251d814be7fd8a2d241b577",
@@ -12942,6 +13115,58 @@
     ]
   },
   {
+    "id": "544c6e5349199c1a7f520a7222dd11b5",
+    "title": "Toronto Healthcare, Pharma & Business Networking Event",
+    "date": "2026-02-20T19:00:00Z",
+    "location": "Mademoiselle Raw Bar + Grill",
+    "address": "563 King Street West, Toronto, ON M5V 1M1, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "SUM OF FIVE",
+    "url": "https://www.eventbrite.ca/e/toronto-healthcare-pharma-business-networking-event-tickets-1980921731223",
+    "price": "$12",
+    "price_amount": 12.19,
+    "is_free": false,
+    "description": "SUM OF FIVE | Meet Professionals In Healthcare, Pharma & Business",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176356972%2F257659744648%2F1%2Foriginal.20260201-015031?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=43c4e36283d19c8b78a01a1fe3a00260",
+    "categories": [
+      "Business"
+    ],
+    "tags": [
+      "Business",
+      "Networking",
+      "Professional"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:41.513727Z",
+    "isFree": false
+  },
+  {
+    "id": "42abfeba169eb54acfe70413539c9c74",
+    "title": "Book Launch: Fancy Gap by Zak Jones",
+    "date": "2026-02-20T19:00:00Z",
+    "location": "918 Bathurst Centre for Culture, Arts, Media and Education",
+    "address": "918 Bathurst Street, Toronto, ON M5R 3G5, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Penguin Random House Canada",
+    "url": "https://www.eventbrite.ca/e/book-launch-fancy-gap-by-zak-jones-tickets-1982047075157",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Join us for an unforgettable evening as we celebrate the launch of Fancy Gap, the unflinching debut novel by Zak Jones!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176295628%2F2266705279473%2F1%2Foriginal.20260130-213801?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=46cf36bbcc47864dcb3e9cb1b58f8609",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:42.393773Z",
+    "isFree": true
+  },
+  {
     "id": "eaf73de76fabbda904b45cbf0de8b89d",
     "title": "Friday Speed Dating 2.0 in Etobicoke",
     "date": "2026-02-20T19:30:00-05:00",
@@ -12965,6 +13190,33 @@
     ]
   },
   {
+    "id": "064ad884975b449a152ff43abf75c4e9",
+    "title": "Freedom Friday: A Gospel Choir Workshop Experience",
+    "date": "2026-02-20T19:30:00Z",
+    "location": "Evangel Temple Toronto",
+    "address": "4190 Yonge Street, Toronto, ON M2P 1N9, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Toronto Mass Choir Inc.",
+    "url": "https://www.eventbrite.ca/e/freedom-friday-a-gospel-choir-workshop-experience-tickets-1968219103321",
+    "price": "$28",
+    "price_amount": 27.96,
+    "is_free": false,
+    "description": "Join us for Freedom Friday: A Gospel Choir Experience, where we'll lift our voices in celebration and praise together!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1170945190%2F120164962585%2F1%2Foriginal.20251114-053524?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=645c4b052b087aaf4a2598d21777d0ae",
+    "categories": [
+      "Community",
+      "Business"
+    ],
+    "tags": [
+      "Celebration",
+      "Workshop"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:43.400810Z",
+    "isFree": false
+  },
+  {
     "id": "dd91293b5edd38aeb2e4611bae444907",
     "title": "Wheel, Sound&Shape in Toronto",
     "date": "2026-02-20T20:00:00-05:00",
@@ -12983,6 +13235,32 @@
     "tags": [
       "General"
     ]
+  },
+  {
+    "id": "c996954455979141598cd59698e2ffc2",
+    "title": "BAD BUNNY - PERREO TAKEOVER @MYST",
+    "date": "2026-02-20T22:30:00Z",
+    "end_date": "2026-02-21T03:00:00Z",
+    "location": "Myst Toronto",
+    "address": "423 College Street, Toronto, ON M5T 1T1, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "HOUSE OF PERREO",
+    "url": "https://www.eventbrite.ca/e/bad-bunny-perreo-takeover-myst-tickets-1982603433239",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Join us for the best Latin parties in Toronto! Ladies FREE on Guestlist before 11:30 PM Register now",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1177082016%2F403544886963%2F1%2Foriginal.20260209-175530?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=8b5295592b32dbd660b5f8fa683236db",
+    "categories": [
+      "Arts"
+    ],
+    "tags": [
+      "Art"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-02-18T13:14:25.367201Z",
+    "isFree": true
   },
   {
     "id": "34d64139bbfd30af7d05a4073f693fe7",
@@ -13074,6 +13352,31 @@
     "tags": [
       "Arts"
     ]
+  },
+  {
+    "id": "18c34594bd3a15c2a300232e75b913d4",
+    "title": "Linkon Luck and Love",
+    "date": "2026-02-21T11:00:00Z",
+    "location": "Cummer Avenue United Church",
+    "address": "53 Cummer Avenue, Toronto, ON M2M 2E5, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Studio and Stall Collective",
+    "url": "https://www.eventbrite.ca/e/linkon-luck-and-love-tickets-1976522280347",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Come join us for a fun Lunar New Year & Valentine Love and Deepspace event to shop local vendors, take photos, craft, play games & more!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1172113770%2F2985188163728%2F1%2Foriginal.20251202-013511?w=480&auto=format%2Ccompress&q=75&sharp=10&s=970e961668d352553534fbac7c8bc65d",
+    "categories": [
+      "Sports"
+    ],
+    "tags": [
+      "Game"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:45.421534Z",
+    "isFree": true
   },
   {
     "id": "01aad0f168343a98d721d24239859e9c",
@@ -13384,25 +13687,56 @@
     ]
   },
   {
-    "id": "aa4e7f7e63f0fde57ed1c7ce6506db5f",
-    "title": "Pilates with Sisters x Ramadan Uplift (Charity event!)",
-    "date": "2026-02-21T21:30:00-05:00",
-    "location": "Toronto, ON",
-    "source": "AllEvents.in",
-    "host": "Toronto",
-    "url": "https://allevents.in/toronto/pilates-with-sisters-x-ramadan-uplift-charity-event/100001980420634429",
-    "price": "Free",
-    "priceAmount": 0,
-    "isFree": true,
-    "description": "",
+    "id": "f88e998380b499606e09ae55ffd817d5",
+    "title": "Zomboy - Toronto",
+    "date": "2026-02-21T21:00:00Z",
+    "location": "Phoenix Concert Theatre",
+    "address": "410 Sherbourne Street, Toronto, ON M5X 1K2, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "True Rhythm",
+    "url": "https://www.eventbrite.ca/e/zomboy-toronto-tickets-1974534919096",
+    "price": "$46",
+    "price_amount": 46.39,
+    "is_free": false,
+    "description": "Get ready to experience an electrifying night with Zomboy in Toronto, where the bass will be dropping and the crowd will be jumping!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1174330605%2F2706031650721%2F1%2Foriginal.20260108-174424?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=618%2C0%2C2404%2C1202&s=f6908e445bb8296b9bb4e52d4cbc5539",
     "categories": [
-      "Community"
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:19.779032Z",
+    "isFree": false
+  },
+  {
+    "id": "aa4e7f7e63f0fde57ed1c7ce6506db5f",
+    "title": "Pilates with Sisters x Ramadan Uplift  (Charity event!)",
+    "date": "2026-02-21T21:30:00Z",
+    "location": "ALIVE Movement Studio",
+    "source": "Eventbrite",
+    "host": "Sisters Pilates",
+    "url": "https://www.eventbrite.ca/e/pilates-with-sisters-x-ramadan-uplift-charity-event-tickets-1980420634429",
+    "price": "$65",
+    "priceAmount": 0,
+    "isFree": false,
+    "description": "Get ready to sweat it out with the Sisters in a Pilates session that will uplift your spirit and support a great cause during Ramadan!",
+    "categories": [
+      "General"
     ],
     "status": "UPCOMING",
     "lastUpdated": "2026-01-26T16:46:38.812Z",
     "tags": [
-      "Community"
-    ]
+      "General"
+    ],
+    "address": "2240 Lake Shore Boulevard West, ##229, Toronto, ON M8V 0B1, Toronto, ON",
+    "price_amount": 65.0,
+    "is_free": false,
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1174674824%2F2662134828961%2F1%2Foriginal.20260112-223442?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C3%2C1600%2C800&s=11b4963de4cf9f8f04252bf49cf0e929",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:46.430623Z"
   },
   {
     "id": "1a155c5e2a24c84dd695682b2af509e1",
@@ -13448,6 +13782,57 @@
     ]
   },
   {
+    "id": "1fa1910e506f612f4ddf3e2f39e15090",
+    "title": "FROSTLINE 003 – Techno/Tech-House Rave",
+    "date": "2026-02-21T22:00:00Z",
+    "end_date": "2026-02-22T03:00:00Z",
+    "location": "Geary Avenue Warehouse",
+    "address": "209 Geary Avenue, Toronto, ON M6H 2C1, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Ticketed Events",
+    "url": "https://www.eventbrite.ca/e/frostline-003-technotech-house-rave-tickets-1981053143280",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Toronto’s coldest techno rave continues! Techno, tech-house, strobe lights, and a warehouse vibe all night long.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1177035116%2F2022629425073%2F1%2Foriginal.20260209-050814?w=480&auto=format%2Ccompress&q=75&sharp=10&s=42781099e2f5390bad5a8b4507df370c",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-02-18T13:14:17.038999Z",
+    "isFree": true
+  },
+  {
+    "id": "cf320ab11d9e397cff84c1750dd3039c",
+    "title": "Aaron Sevilla: Toronto",
+    "date": "2026-02-21T22:00:00Z",
+    "location": "Grand Bizarre",
+    "address": "15 Saskatchewan Road, Toronto, ON M6K 3C3, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Puzzles Entertainment Inc.",
+    "url": "https://www.eventbrite.ca/e/aaron-sevilla-toronto-tickets-1981951682836",
+    "price": "$34",
+    "price_amount": 33.95,
+    "is_free": false,
+    "description": "Aaron Sevilla plays music that makes bodies move before minds catch up. Percussive. Warm. Infectious.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176188166%2F2585247619781%2F1%2Foriginal.20260129-184040?w=480&auto=format%2Ccompress&q=75&sharp=10&s=9bfd0d2b8ec6d5973a22b95474efab5e",
+    "categories": [
+      "Music"
+    ],
+    "tags": [
+      "Music"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:26.399692Z",
+    "isFree": false
+  },
+  {
     "id": "7edce197bcf7a52b6f54e35787839cbf",
     "title": "KulchaShock: Legacy in Motion – Black History Month Market (Yonge–Eglinton)",
     "date": "2026-02-22T12:00:00-05:00",
@@ -13489,6 +13874,31 @@
     ]
   },
   {
+    "id": "03debaf3223f3b1e5f2bc28272525b6b",
+    "title": "Nervous System Reset - 6 Weeks Healing&Boosting Journey",
+    "date": "2026-02-22T12:15:00Z",
+    "location": "Dance ConneXion (Midtown)",
+    "address": "2063 Yonge Street, #Unit 201, Toronto, ON M4S 2A2, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Namaste Ann",
+    "url": "https://www.eventbrite.ca/e/nervous-system-reset-6-weeks-healingboosting-journey-tickets-1982135435445",
+    "price": "$258",
+    "price_amount": 258.23,
+    "is_free": false,
+    "description": "Join us in person for a 6-week journey to heal, reset, and boost your nervous system vibes! 105 minutes, once  a week",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176500421%2F563125560581%2F1%2Foriginal.20260202-213227?crop=focalpoint&fit=crop&w=480&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=2ceaee1bf02d84daca45ada01cf6cd9d",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:23.894420Z",
+    "isFree": false
+  },
+  {
     "id": "b927ce25f6c2542d71bfb7f98ac10e87",
     "title": "Soundbath Meditation + Incense Making | Wellness Workshop",
     "date": "2026-02-22T14:00:00-05:00",
@@ -13507,6 +13917,31 @@
     "tags": [
       "Business"
     ]
+  },
+  {
+    "id": "f176bd1053f50d4979cfc1b68e56d03d",
+    "title": "Curiosity Café (Revisited)- Paying Attention",
+    "date": "2026-02-22T14:00:00Z",
+    "location": "Madison Avenue Pub",
+    "address": "14 Madison Avenue, Toronto, ON M5R 2S1, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Being and Becoming",
+    "url": "https://www.eventbrite.ca/e/curiosity-cafe-revisited-paying-attention-tickets-1982649061715",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Back and Better than Ever, People!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1177033760%2F1851374987143%2F1%2Foriginal.20260209-042538?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=1%2C435%2C1586%2C793&s=f56b566eb8fc95ba5984e5ab7abf230b",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:47.303813Z",
+    "isFree": true
   },
   {
     "id": "a16e2d5adecbb16c31891ffddce62ee4",
@@ -13816,6 +14251,81 @@
     ]
   },
   {
+    "id": "0f2d8d60e5d99f88fd95e59a7813004f",
+    "title": "Listening Room: Leon Thomas",
+    "date": "2026-02-22T19:30:00Z",
+    "end_date": "2026-02-26T23:00:00Z",
+    "location": "Longboat Hall",
+    "address": "103 Dovercourt Road, Toronto, ON M6J 3C2, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Davie Studios Inc.",
+    "url": "https://www.eventbrite.ca/e/listening-room-leon-thomas-tickets-1982034068253",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Listening Room is a jam series inspired by the Soulquarian's process of music creation.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176284665%2F1086342123123%2F1%2Foriginal.20260130-193420?crop=focalpoint&fit=crop&w=480&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.494&fp-y=0.018&s=82a8a6c28527ebec36f34a0781623d15",
+    "categories": [
+      "Music"
+    ],
+    "tags": [
+      "Music"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-02-18T13:15:04.794022Z",
+    "isFree": true
+  },
+  {
+    "id": "c9a1f98c03dccf350d791cb2918f0ac2",
+    "title": "La valenza formativa del linguaggio esteso pratiche e strumenti",
+    "date": "2026-02-23T17:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Scuola.net",
+    "url": "https://www.eventbrite.it/e/biglietti-la-valenza-formativa-del-linguaggio-esteso-pratiche-e-strumenti-1980939691944",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Esploriamo come il linguaggio esteso contribuisca allo sviluppo delle competenze sociali, della comunicazione efficace e dell’empatia.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1175316811%2F85676076591%2F1%2Foriginal.20260120-083724?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=8aab85368fa0d5f2b94fbac8080c6123",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:35.180099Z",
+    "isFree": true
+  },
+  {
+    "id": "d55da7054dc81ce2dfbac3db0ff6cbfc",
+    "title": "Invested in Punishment: Private Interests in Canadian Incarceration",
+    "date": "2026-02-23T18:00:00Z",
+    "location": "The Goodman Pub and Kitchen",
+    "address": "207 Queens Quay West, Toronto, ON M5J 1A7, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Brains and Barstools",
+    "url": "https://www.eventbrite.ca/e/invested-in-punishment-private-interests-in-canadian-incarceration-tickets-1976007730314",
+    "price": "$33",
+    "price_amount": 33.28,
+    "is_free": false,
+    "description": "Brains and Barstools brings captivating professors to Toronto bars for vivid lectures that spark curiosity and connection over drinks.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1110855153%2F244357381390%2F1%2Foriginal.20250901-190418?w=480&auto=format%2Ccompress&q=75&sharp=10&s=8231522181231d3269453fd05c48cf74",
+    "categories": [
+      "Nightlife"
+    ],
+    "tags": [
+      "Bar"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:18.060575Z",
+    "isFree": false
+  },
+  {
     "id": "7f111ecdfe6fc8dabb3aefecca55268e",
     "title": "momondays Toronto... featuring Blair Packham, Rodney Whittenberg, and Angela Saini!",
     "date": "2026-02-23T18:30:00-05:00",
@@ -13904,6 +14414,54 @@
     ]
   },
   {
+    "id": "de6123cc500e487d6d2cd1757d3b7b67",
+    "title": "The Neuroscience of Unstoppable: Rewire Your Brain for Lasting Confidence",
+    "date": "2026-02-24T11:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Rise & Thrive Global",
+    "url": "https://www.eventbrite.com.au/e/the-neuroscience-of-unstoppable-rewire-your-brain-for-lasting-confidence-registration-1982146641964",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "FREE Masterclass - Discover why your patterns keep returning and the neuroscience framework that creates lasting change in just 90 minutes.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176505622%2F2988195939804%2F1%2Foriginal.20260202-221849?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C3240%2C1620&s=4c4215cc03c6fb3978e1bf6227d6574f",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:49.309392Z",
+    "isFree": true
+  },
+  {
+    "id": "5298c7ae498043c543bb89eb948f7706",
+    "title": "Mainstreaming pour le dépistage des cancers héréditaires",
+    "date": "2026-02-24T12:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Service événementiel du CHUM",
+    "url": "https://www.eventbrite.ca/e/billets-mainstreaming-pour-le-depistage-des-cancers-hereditaires-1976193696544",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Conférence sur l’intégration du dépistage des cancers héréditaires «Mainstreaming» : indications cliniques, consentement et interprétation",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1107738773%2F2120180324603%2F1%2Foriginal.20250828-154114?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=e63dc7085ef8866e2325accbe295afac",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:15:12.278005Z",
+    "isFree": true
+  },
+  {
     "id": "17e64db72ae4b0311d63668d421800a1",
     "title": "Plot Twist Cafe – A Toronto Book Club",
     "date": "2026-02-24T18:00:00-05:00",
@@ -13924,6 +14482,30 @@
       "Food & Drink",
       "Nightlife"
     ]
+  },
+  {
+    "id": "2dc9f86d8a7e261cf85adf2487ba47d2",
+    "title": "Next steps towards an inclusive Royal College of Pharmacy",
+    "date": "2026-02-24T18:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "UK Pharmacy Professional Leadership Advisory Board",
+    "url": "https://www.eventbrite.co.uk/e/next-steps-towards-an-inclusive-royal-college-of-pharmacy-tickets-1980632169135",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "A discussion for pharmacy technicians and others working in pharmacy across the UK.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1051583293%2F314867489166%2F1%2Foriginal.20250612-124505?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C3240%2C1620&s=372f1a5cd45b6f58977b23025792cbdf",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:50.475381Z",
+    "isFree": true
   },
   {
     "id": "803dd06e4ee18a6de7ff9ac65717849b",
@@ -14062,6 +14644,30 @@
     ]
   },
   {
+    "id": "62aa1549c9bf87926339e6fb4f353101",
+    "title": "Menopause 101: A Q&A with the experts",
+    "date": "2026-02-24T19:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "SOGC",
+    "url": "https://www.eventbrite.ca/e/menopause-101-a-qa-with-the-experts-tickets-1977622033739",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Join us live on Zoom where you can listen, learn and ask the experts your burning menopause questions.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1175991603%2F2575999019611%2F1%2Foriginal.20260127-204216?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=fae7658830f1c58bad53c2891fadb6be",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:47.958948Z",
+    "isFree": true
+  },
+  {
     "id": "9a35d8f53d5fb402c994c52a050f6afa",
     "title": "February Networking Mixer for GTA Business Owners & Entrepreneurs",
     "date": "2026-02-24T19:30:00-05:00",
@@ -14149,6 +14755,30 @@
     ]
   },
   {
+    "id": "769b9328144cd89696019da8e0e80493",
+    "title": "Farmland Bird Index, censimento ornitologico 2025-2029. Annualità 2025.",
+    "date": "2026-02-25T10:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Lipu, Settore Conservazione",
+    "url": "https://www.eventbrite.it/e/biglietti-farmland-bird-index-censimento-ornitologico-2025-2029-annualita-2025-1980623358783",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Presentazione degli Indicatori Farmland Bird Index e dei principali risultati del monitoraggio ornitologico nazionale per l'annualità 2025.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1175053090%2F1982594518803%2F1%2Foriginal.20260116-143831?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=39fee6115bc2a257f256eb06124e5cde",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:37.870597Z",
+    "isFree": true
+  },
+  {
     "id": "0c5d1c35e30f5eea0e5e247e5fe147e9",
     "title": "Tranquility in a Teacup",
     "date": "2026-02-25T13:00:00-05:00",
@@ -14168,6 +14798,57 @@
     "tags": [
       "General"
     ]
+  },
+  {
+    "id": "3cd756bc4fae73f172644009ada9894e",
+    "title": "NSW Workers Compensation Reforms Explained Webinar",
+    "date": "2026-02-25T14:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "icare NSW",
+    "url": "https://www.eventbrite.com.au/e/nsw-workers-compensation-reforms-explained-webinar-tickets-1982643440903",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Join us for a 45 minute webinar during which we will discuss the recently announced NSW Workers Compensation reforms.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1173435265%2F221375311192%2F1%2Foriginal.20251223-032755?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=a5d30be785f19d61b3b7ca4eccd37f85",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:51.159422Z",
+    "isFree": true
+  },
+  {
+    "id": "0e586e4a28dc5534c99b4dc0a9dd83ee",
+    "title": "Corso di Educazione e Sicurezza Stradale",
+    "date": "2026-02-25T14:30:00Z",
+    "location": "Rom",
+    "source": "Eventbrite",
+    "host": "Associazione Familiari e Vittime della Strada",
+    "url": "https://www.eventbrite.it/e/biglietti-corso-di-educazione-e-sicurezza-stradale-1688786418639",
+    "price": "$12",
+    "price_amount": 11.88,
+    "is_free": false,
+    "description": "Il corso si inserisce nell'ambito del Progetto PES-Prevenire, Educare, Sensibilizzare promosso dalla AFVS Associazione Vittime della Strada",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1121296993%2F546138427231%2F1%2Foriginal.20250911-154502?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2158%2C1079&s=5b39a9281949e4da4775c2437b6b94f2",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:36.534557Z",
+    "address": "100 Queens Park, Toronto, ON M5S 2C6",
+    "lat": 43.6677,
+    "lng": -79.3948,
+    "isFree": false
   },
   {
     "id": "732b987c72a26b07e64e981a29d56727",
@@ -14279,6 +14960,78 @@
     "tags": [
       "Tech"
     ]
+  },
+  {
+    "id": "14d5af9aef1c1f7ba4b6978e133f99fc",
+    "title": "Webinar trauma-sensitief werken",
+    "date": "2026-02-26T10:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Various Organizers",
+    "url": "https://www.eventbrite.nl/e/tickets-webinar-trauma-sensitief-werken-1981884014438",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Leer hoe je online trauma-sensitief werkt en mensen écht begrijpt in deze interactieve webinar!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176107495%2F2990308657021%2F1%2Foriginal.png?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C940%2C470&s=3c7a588800564db7b07172a6b38ec4c4",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:56.139566Z",
+    "isFree": true
+  },
+  {
+    "id": "ba96e533280f328090e7318733777516",
+    "title": "Lunchwebinar Grensoverschrijdend gedrag voorkomen in de zorg",
+    "date": "2026-02-26T12:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Various Organizers",
+    "url": "https://www.eventbrite.com/e/tickets-lunchwebinar-grensoverschrijdend-gedrag-voorkomen-in-de-zorg-1982772455790",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Leer over het BOT-model. Zo kun je als zorgverlener en zorgmanager grensoverschrijdend gedrag voorkomen of inperken.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1177158064%2F2983827034052%2F1%2Foriginal.20260210-114727?crop=focalpoint&fit=crop&w=1000&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.508&fp-y=0.227&s=87fbc598c866a499b2e0c6d99e89618c",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:54.842213Z",
+    "isFree": true
+  },
+  {
+    "id": "88c86f062af8fbfbb73ffbd2646a7ed3",
+    "title": "Hoe een evacuatieplan opstellen?",
+    "date": "2026-02-26T12:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "WDP - Warehouses with brains",
+    "url": "https://www.eventbrite.be/e/tickets-hoe-een-evacuatieplan-opstellen-1894816610489",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Maak een evacuatieplan dat voldoet aan de Codex én werkt op de vloer. Best practices voor routes, nooduitgangen en signalisatie.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1173118047%2F394044714025%2F1%2Foriginal.20251217-095552?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C28%2C1200%2C600&s=98a04b18338c47352172f28b13f62fef",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:57.748504Z",
+    "isFree": true
   },
   {
     "id": "24545d784b4d9e5fafba0c2dea22ca8a",
@@ -14452,6 +15205,30 @@
     "tags": [
       "Comedy"
     ]
+  },
+  {
+    "id": "ee38d92af05db9cb13217462d10779d7",
+    "title": "Career Fair: Exclusive Tech Hiring Event-New Tickets Available",
+    "date": "2026-02-27T09:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Tech Career Fair",
+    "url": "https://www.eventbrite.com/e/career-fair-exclusive-tech-hiring-event-new-tickets-available-tickets-63049080497",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Tech Career Fair focus on helping companies achieve their diversity and inclusivity initiative with more diverse non-traditional candidates",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F682597209%2F197361445633%2F1%2Foriginal.20240125-160053?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C940%2C470&s=7dca73982b7b7f6db9f96591f112ee1c",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:39.026121Z",
+    "isFree": true
   },
   {
     "id": "8c73d1f1fb6001bc7784a273ef4faedf",
@@ -14767,7 +15544,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.214062Z",
+    "last_updated": "2026-02-18T13:15:17.432853Z",
     "isFree": true
   },
   {
@@ -14829,6 +15606,31 @@
     "tags": [
       "Sports & Fitness"
     ]
+  },
+  {
+    "id": "abc27b00a46fcf1067dfa232dae36475",
+    "title": "3rd Annual PDAC Cocktail Reception",
+    "date": "2026-02-28T16:00:00Z",
+    "location": "Fairmont Royal York",
+    "address": "100 Front Street West, Toronto, ON M5J 1E3, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "The Bay Street Agency",
+    "url": "https://www.eventbrite.ca/e/3rd-annual-pdac-cocktail-reception-tickets-1981253603863",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Join us for an exclusive, high-impact event commencing PDAC at the Royal York. Bringing together over 750+ engaged attendees.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1177703407%2F2989518037153%2F1%2Foriginal.20260217-065347?w=480&auto=format%2Ccompress&q=75&sharp=10&s=e7fd871e27862789057693ab00b38d39",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:18.661369Z",
+    "isFree": true
   },
   {
     "id": "7e58630504bbdebbe3637792abcca7ac",
@@ -15123,6 +15925,57 @@
     ]
   },
   {
+    "id": "222da6be63af1e5721a45f517c54ff44",
+    "title": "Ethan Miller Live In Toronto",
+    "date": "2026-02-28T20:30:00Z",
+    "location": "El Mocambo",
+    "address": "464 Spadina Avenue, #462, Toronto, ON M5T 2G8, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Ethan Miller",
+    "url": "https://www.eventbrite.com/e/ethan-miller-live-in-toronto-tickets-1975869998354",
+    "price": "$34",
+    "price_amount": 33.59,
+    "is_free": false,
+    "description": "Come scream some country songs with your friends.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1174170118%2F2979932377971%2F1%2Foriginal.20260107-021019?crop=focalpoint&fit=crop&w=480&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.748&fp-y=0.493&s=4fba3ee3244660a93cbfa72fec6b728b",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:21.920723Z",
+    "isFree": false
+  },
+  {
+    "id": "f545b2b75a3616ef88752ec862cb6566",
+    "title": "SIF & GAWP Present: Night Shift",
+    "date": "2026-02-28T22:00:00Z",
+    "end_date": "2026-03-01T03:00:00Z",
+    "location": "Geary Avenue Warehouse",
+    "address": "209 Geary Avenue, Toronto, ON M6H 2C1, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Ticketed Events",
+    "url": "https://www.eventbrite.ca/e/sif-gawp-present-night-shift-tickets-1981780417577",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Stay warm this winter with a night of filthy techno and great vibez",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1175965794%2F2022629425073%2F1%2Foriginal.20260127-165942?crop=focalpoint&fit=crop&w=480&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=6f1ac02eb2d8577f10758706d1b46a94",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-02-18T13:14:20.675137Z",
+    "isFree": true
+  },
+  {
     "id": "01a2c001ebe3234e905ad38447f9bfc1",
     "title": "Parking Ottawa Senators at Toronto Maple Leafs",
     "date": "2026-03-01T00:00:00-05:00",
@@ -15386,6 +16239,30 @@
     ]
   },
   {
+    "id": "da7c59e8ebe4ba12ca7a93e18d839af4",
+    "title": "Pink La Blonde X Dia Light : Le Duo Parfait pour un Balayage Magnifié",
+    "date": "2026-03-02T10:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "L'OREAL PROFESSIONNEL",
+    "url": "https://www.eventbrite.ca/e/billets-pink-la-blonde-x-dia-light-le-duo-parfait-pour-un-balayage-magnifie-1965600934307",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "La technologie acide unique de Dia Light pour une santé et une brillance optimales des cheveux.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1177478344%2F143515453803%2F1%2Foriginal.20260213-163713?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C800%2C400&s=0257cc896ad4c758ec4eff7b4ddb7ef4",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:15:16.521531Z",
+    "isFree": true
+  },
+  {
     "id": "bac36ae4d90567e154609656204e4158",
     "title": "DakhaBrakha",
     "date": "2026-03-02T19:00:00-05:00",
@@ -15428,6 +16305,80 @@
     "tags": [
       "Business"
     ]
+  },
+  {
+    "id": "315f746b59161349e90f2cdc60e1b723",
+    "title": "Online Lenteland Q&A",
+    "date": "2026-03-02T20:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Lenteland",
+    "url": "https://www.eventbrite.nl/e/tickets-online-lenteland-qa-1981320806869",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Lenteland groeit! We starten bijna met de 7e boerderij en zijn inmiddels met honderden mede-eigenaren.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1175544656%2F1943218986063%2F1%2Foriginal.20260122-131228?crop=focalpoint&fit=crop&w=1000&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=8955c8f7d9a320397f690c9297b4eb19",
+    "categories": [
+      "Arts"
+    ],
+    "tags": [
+      "Art"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:59.171073Z",
+    "isFree": true
+  },
+  {
+    "id": "d2f7b6ab7c2761386f9c8890ff2b6d04",
+    "title": "Lo spirito dei tempi",
+    "date": "2026-03-03T14:30:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Social Impact Agenda per l'Italia",
+    "url": "https://www.eventbrite.it/e/biglietti-lo-spirito-dei-tempi-1981411171151",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Esercizi di orientamento nel presente per il mondo \"impact\" (e non solo)",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176152639%2F192323782118%2F1%2Foriginal.20260129-122311?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=bc7d3cdf6ff390fda2fec8b9d94b2823",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:40.517543Z",
+    "isFree": true
+  },
+  {
+    "id": "de2dc1ab0df0ede487572a917c04d992",
+    "title": "FIFA World Cup 2026™ 100 Days to Go",
+    "date": "2026-03-03T17:30:00Z",
+    "location": "Rebel",
+    "address": "11 Polson Street, Toronto, ON M5A 1A4, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "City of Toronto",
+    "url": "https://www.eventbrite.ca/e/fifa-world-cup-2026tm-100-days-to-go-tickets-1982526764922",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "100 Days to Go is an all-ages, community-driven celebration counting down to the FIFA World Cup 2026™",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1176919015%2F2282841296423%2F1%2Foriginal.20260206-223327?crop=focalpoint&fit=crop&w=480&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=47403c7ddf28ca1cdf507a1d3f0e7365",
+    "categories": [
+      "Community"
+    ],
+    "tags": [
+      "Community",
+      "Celebration"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:28.416045Z",
+    "isFree": true
   },
   {
     "id": "d4b2e1b9c9cbfb54f3eb79f6f695d588",
@@ -15474,6 +16425,30 @@
       "Music",
       "Arts"
     ]
+  },
+  {
+    "id": "7088b0e12cf7821c92ebd3f3019c9054",
+    "title": "(ONLINE) John Lithgow and Mark Rosenblatt on GIANT",
+    "date": "2026-03-04T18:30:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "The Temple Emanu-El Streicker Centers",
+    "url": "https://www.eventbrite.com/e/online-john-lithgow-and-mark-rosenblatt-on-giant-tickets-1978159606634",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Discussion with John Lithgow and Mark Rosenblatt on the upcoming Broadway run of GIANT.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1173137177%2F2802773536521%2F1%2Foriginal.20251217-160235?crop=focalpoint&fit=crop&w=1000&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.518&fp-y=0.322&s=27e7fe20db1e1d50b9fe73250633a5c8",
+    "categories": [
+      "Sports"
+    ],
+    "tags": [
+      "Run"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:51.840914Z",
+    "isFree": true
   },
   {
     "id": "db4b78e86213b5cffb9b32bf629d0493",
@@ -15567,6 +16542,33 @@
     "tags": [
       "Business"
     ]
+  },
+  {
+    "id": "6af1a3705fdaf5880f3e8c0f8952385c",
+    "title": "AI voor L&D professionals",
+    "date": "2026-03-05T11:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "LUDO",
+    "url": "https://www.eventbrite.com/e/tickets-ai-voor-ld-professionals-1982576790550",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Ontdek in deze gratis workshop hoe je AI gebruikt als sparringpartner en versneller voor opleidingen, workshops, meetings, ...",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1177058766%2F228008136218%2F1%2Foriginal.20260209-141447?crop=focalpoint&fit=crop&w=1000&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=a2b3eacbef6ef5dc13106c7dacbc75d3",
+    "categories": [
+      "Arts",
+      "Business"
+    ],
+    "tags": [
+      "Art",
+      "Professional",
+      "Workshop"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:15:00.732805Z",
+    "isFree": true
   },
   {
     "id": "7b6a370b7233bb3d022504275e6b79c1",
@@ -15684,6 +16686,30 @@
       "Sports & Fitness",
       "Dating"
     ]
+  },
+  {
+    "id": "f93f5f3d3ae0eadb9d94648c68f1f627",
+    "title": "Skills // Dialoog #3 / Het Duiden van de Onderstroom",
+    "date": "2026-03-05T19:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "number 5 foundation",
+    "url": "https://www.eventbrite.nl/e/tickets-skills-dialoog-3-het-duiden-van-de-onderstroom-1687606338989",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Game Changers die in diverse contexten werkzaam zijn, krijgen de kans om hun vaardigheden verder te verdiepen en versterken.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1143524063%2F2883884284961%2F1%2Foriginal.20251003-105454?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=1%2C688%2C5888%2C2944&s=c864f8442902d4885972bc97958c087c",
+    "categories": [
+      "Sports"
+    ],
+    "tags": [
+      "Game"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:15:02.388786Z",
+    "isFree": true
   },
   {
     "id": "f410d52082abbc0c380640522c9d0669",
@@ -15843,6 +16869,31 @@
     ]
   },
   {
+    "id": "43584c5e60b5dc8e2a3abea1a45850f0",
+    "title": "Nacho Redondo en Toronto",
+    "date": "2026-03-06T20:00:00Z",
+    "location": "Isabel Bader Theatre",
+    "address": "93 Charles Street West, Toronto, ON M5S 2C7, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Nacho Redondo",
+    "url": "https://www.eventbrite.com/e/nacho-redondo-en-toronto-tickets-1976940164249",
+    "price": "$39",
+    "price_amount": 39.19,
+    "is_free": false,
+    "description": "Traumas es el la nueva hora de standup del comediante Nacho Redondo.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1172337317%2F1118586907603%2F1%2Foriginal.20251204-193306?crop=focalpoint&fit=crop&w=480&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.487&fp-y=0.072&s=d87ef7aacac6fc8c808c178e59341560",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:22.896017Z",
+    "isFree": false
+  },
+  {
     "id": "cdb057e756e1f88542ac6a87b89cabad",
     "title": "Bad Omens with Beartooth and PRESIDENT",
     "date": "2026-03-07T00:00:00-05:00",
@@ -15861,6 +16912,33 @@
     "tags": [
       "Arts"
     ]
+  },
+  {
+    "id": "928768552d45ca9ec052f74138105ab7",
+    "title": "KOTATSU 2026: Japanese Cinema at Innis Town Hall",
+    "date": "2026-03-07T00:00:00Z",
+    "end_date": "2026-03-08T22:30:00Z",
+    "location": "Innis Town Hall",
+    "address": "2 Sussex Avenue, Toronto, ON M5S 1J5, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "The Japan Foundation, Toronto",
+    "url": "https://www.eventbrite.ca/e/kotatsu-2026-japanese-cinema-at-innis-town-hall-tickets-1982974456981",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "JFT's annual winter film showcase is back on Mar 7 & 8, with 5 Japanese films, from acclaimed contemporary films to restored classics!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1177421378%2F65976824379%2F1%2Foriginal.20260212-221712?w=480&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=9cfce5d27b485f75275e8ca0086f4bbf",
+    "categories": [
+      "Arts"
+    ],
+    "tags": [
+      "Film",
+      "Cinema"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-02-18T13:14:29.390167Z",
+    "isFree": true
   },
   {
     "id": "14a933f3552fbbc6af4f217869b8c4b5",
@@ -16270,7 +17348,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.214449Z",
+    "last_updated": "2026-02-18T13:15:17.433240Z",
     "isFree": true
   },
   {
@@ -17236,6 +18314,30 @@
     "tags": [
       "General"
     ]
+  },
+  {
+    "id": "6f3e4b7b8507699ee1fc57c74a9ab8e9",
+    "title": "ADHD online in verbinding",
+    "date": "2026-03-17T19:30:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Oudervereniging Balans",
+    "url": "https://www.eventbrite.nl/e/tickets-adhd-online-in-verbinding-1976740951398",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Zoom-meeting voor ouders van kinderen met ADHD/ADD, onder leiding van ervaringsdeskundige ouders die werken bij/voor Balans.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1172240817%2F242424573786%2F1%2Foriginal.20251203-155253?w=1000&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2160%2C1080&s=8f29628ad02571630da6b36d5dc89b93",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:15:03.831778Z",
+    "isFree": true
   },
   {
     "id": "c9cd4ef76e6af9099089219ff10bd89f",
@@ -19145,7 +20247,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.818946Z",
+    "last_updated": "2026-02-18T13:15:17.050276Z",
     "isFree": true
   },
   {
@@ -20070,7 +21172,31 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.819049Z",
+    "last_updated": "2026-02-18T13:15:17.050369Z",
+    "isFree": true
+  },
+  {
+    "id": "2c3ca66491711077b1fa6be66a63e029",
+    "title": "Black Girl Book Fair!",
+    "date": "2026-04-25T12:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Jacque Aye",
+    "url": "https://www.eventbrite.com/e/black-girl-book-fair-tickets-1979838497241",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "We're a virtual book fair--for adults! Celebrating Black voices in fantasy fiction.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1174070766%2F1007219303453%2F1%2Foriginal.20260106-030959?crop=focalpoint&fit=crop&w=1000&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.668&fp-y=0.597&s=218b33a88d40667dfa6c7b792e1a0c78",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-02-18T13:14:53.679775Z",
     "isFree": true
   },
   {
@@ -20432,7 +21558,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.819170Z",
+    "last_updated": "2026-02-18T13:15:17.050462Z",
     "isFree": true
   },
   {
@@ -21248,7 +22374,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-17T13:13:00.819355Z",
+    "last_updated": "2026-02-18T13:15:17.050637Z",
     "isFree": true
   },
   {
@@ -21271,7 +22397,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.333088Z",
+    "last_updated": "2026-02-18T13:15:17.579206Z",
     "isFree": true
   },
   {
@@ -21651,7 +22777,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.819456Z",
+    "last_updated": "2026-02-18T13:15:17.050733Z",
     "isFree": true
   },
   {
@@ -21860,7 +22986,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.819532Z",
+    "last_updated": "2026-02-18T13:15:17.050808Z",
     "isFree": true
   },
   {
@@ -22474,7 +23600,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.819634Z",
+    "last_updated": "2026-02-18T13:15:17.050907Z",
     "isFree": true
   },
   {
@@ -22904,7 +24030,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.819738Z",
+    "last_updated": "2026-02-18T13:15:17.051021Z",
     "isFree": true
   },
   {
@@ -23047,7 +24173,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.819792Z",
+    "last_updated": "2026-02-18T13:15:17.051073Z",
     "isFree": true
   },
   {
@@ -23133,7 +24259,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.819836Z",
+    "last_updated": "2026-02-18T13:15:17.051114Z",
     "isFree": true
   },
   {
@@ -23204,7 +24330,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-17T13:13:00.819952Z",
+    "last_updated": "2026-02-18T13:15:17.051207Z",
     "isFree": true
   },
   {
@@ -23250,7 +24376,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.819983Z",
+    "last_updated": "2026-02-18T13:15:17.051236Z",
     "isFree": true
   },
   {
@@ -23526,7 +24652,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820057Z",
+    "last_updated": "2026-02-18T13:15:17.051308Z",
     "isFree": true
   },
   {
@@ -23658,7 +24784,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820143Z",
+    "last_updated": "2026-02-18T13:15:17.051391Z",
     "isFree": true
   },
   {
@@ -23706,7 +24832,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820168Z",
+    "last_updated": "2026-02-18T13:15:17.051416Z",
     "isFree": true
   },
   {
@@ -23864,7 +24990,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820224Z",
+    "last_updated": "2026-02-18T13:15:17.051469Z",
     "isFree": true
   },
   {
@@ -24014,7 +25140,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820281Z",
+    "last_updated": "2026-02-18T13:15:17.051523Z",
     "isFree": true
   },
   {
@@ -24120,7 +25246,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820345Z",
+    "last_updated": "2026-02-18T13:15:17.051582Z",
     "isFree": true
   },
   {
@@ -24206,7 +25332,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820466Z",
+    "last_updated": "2026-02-18T13:15:17.051698Z",
     "isFree": true
   },
   {
@@ -24252,7 +25378,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820497Z",
+    "last_updated": "2026-02-18T13:15:17.051727Z",
     "isFree": true
   },
   {
@@ -24330,7 +25456,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.217574Z",
+    "last_updated": "2026-02-18T13:15:17.436305Z",
     "isFree": true
   },
   {
@@ -24376,7 +25502,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820542Z",
+    "last_updated": "2026-02-18T13:15:17.051770Z",
     "isFree": true
   },
   {
@@ -24457,7 +25583,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.217293Z",
+    "last_updated": "2026-02-18T13:15:17.436021Z",
     "isFree": true
   },
   {
@@ -24501,19 +25627,19 @@
     "is_free": true,
     "description": "Nuit Blanche Video HeaderStart VideoSound:OffNuit BlancheShareThis PageShare toFacebook(opens in a new window)Share toX(opens in a new window)Share toLinkedIn(opens in a new window)Share toCopy Link(opens in a new window)PrintTranslateReturns October 3, 2026Toronto’s free all-night celebration of contemporary art transforms public spaces into extraordinary landscapes from 7 p.m. on October 3 to 7 a.m. on October 4.For the 20th anniversary, the 2026 theme,Tomorrow’s Memories, looks back to the ar",
     "categories": [
-      "Arts",
-      "Nightlife"
+      "Nightlife",
+      "Arts"
     ],
     "tags": [
-      "Celebration",
+      "Art",
       "Nuit Blanche",
-      "Installation",
       "Community",
-      "Art"
+      "Installation",
+      "Celebration"
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-17T13:13:01.372156Z",
+    "last_updated": "2026-02-18T13:15:17.628919Z",
     "address": "100 Queens Park, Toronto, ON M5S 2C6",
     "lat": 43.6677,
     "lng": -79.3948,
@@ -24549,7 +25675,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.216850Z",
+    "last_updated": "2026-02-18T13:15:17.435583Z",
     "isFree": true
   },
   {
@@ -24595,7 +25721,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820634Z",
+    "last_updated": "2026-02-18T13:15:17.051857Z",
     "isFree": true
   },
   {
@@ -24746,7 +25872,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-17T13:13:00.820760Z",
+    "last_updated": "2026-02-18T13:15:17.051987Z",
     "isFree": true
   },
   {
@@ -24793,7 +25919,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.820807Z",
+    "last_updated": "2026-02-18T13:15:17.052034Z",
     "isFree": true
   },
   {
@@ -24828,7 +25954,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.216412Z",
+    "last_updated": "2026-02-18T13:15:17.435150Z",
     "isFree": true
   },
   {
@@ -24878,7 +26004,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.215875Z",
+    "last_updated": "2026-02-18T13:15:17.434610Z",
     "isFree": true
   },
   {
@@ -24925,7 +26051,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-17T13:13:00.820938Z",
+    "last_updated": "2026-02-18T13:15:17.052145Z",
     "isFree": true
   },
   {
@@ -24952,7 +26078,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-17T13:13:00.820965Z",
+    "last_updated": "2026-02-18T13:15:17.052173Z",
     "isFree": true
   },
   {
@@ -25003,7 +26129,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:01.215552Z",
+    "last_updated": "2026-02-18T13:15:17.434313Z",
     "isFree": true
   },
   {
@@ -25050,7 +26176,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-17T13:13:00.821024Z",
+    "last_updated": "2026-02-18T13:15:17.052230Z",
     "isFree": true
   }
 ]
