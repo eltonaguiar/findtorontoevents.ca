@@ -44,7 +44,7 @@ try {
             break;
 
         case 'list':
-            $limit = isset($_GET['limit']) ? min((int)$_GET['limit'], 500) : 100;
+            $limit = isset($_GET['limit']) ? min((int)$_GET['limit'], 5000) : 5000;
             $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
 
             $where = '1=1';

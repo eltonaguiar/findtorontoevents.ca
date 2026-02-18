@@ -218,26 +218,101 @@
         .browse-close {
             position: fixed;
             top: 24px;
-            right: 24px;
+            left: 24px;
             z-index: 101;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
+            border-radius: 12px;
+            height: 44px;
+            padding: 0 18px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
             color: white;
-            font-size: 24px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .browse-close:hover {
             background: rgba(0, 0, 0, 0.8);
-            transform: scale(1.1);
+            transform: scale(1.02);
+        }
+
+        /* Fresh section */
+        .fresh-section {
+            max-width: 1400px;
+            margin: 0 auto 32px;
+        }
+        .fresh-section-title {
+            font-size: 22px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .fresh-row {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .fresh-row::-webkit-scrollbar { height: 4px; }
+        .fresh-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+        .fresh-card {
+            flex: 0 0 180px;
+            scroll-snap-align: start;
+            position: relative;
+            cursor: pointer;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .fresh-card:hover { transform: scale(1.05); }
+        .fresh-card img {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            display: block;
+        }
+        .fresh-card-rank {
+            position: absolute;
+            bottom: 0;
+            left: -4px;
+            font-size: 72px;
+            font-weight: 900;
+            line-height: 0.8;
+            color: transparent;
+            -webkit-text-stroke: 2.5px #e50914;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+        .fresh-card-title {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 40px 10px 10px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+        .fresh-card-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #e50914;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
         }
 
         .browse-view.active {
@@ -572,6 +647,49 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
+        }
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 8px;
+            align-items: center;
+        }
+        .toast {
+            background: rgba(30, 30, 30, 0.95);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            animation: toastIn 0.3s ease forwards;
+            pointer-events: auto;
+            max-width: 90vw;
+            text-align: center;
+        }
+        .toast.toast-out {
+            animation: toastOut 0.3s ease forwards;
+        }
+        .toast.toast-success { border-color: rgba(34, 197, 94, 0.4); }
+        .toast.toast-warning { border-color: rgba(245, 158, 11, 0.4); }
+        @keyframes toastIn {
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-10px) scale(0.95); }
         }
 
         /* Sidebar Actions */
@@ -1882,7 +2000,7 @@
 
     <!-- Browse/Catalog View -->
     <div class="browse-view" id="browseView">
-        <button class="browse-close" onclick="toggleBrowse()">✕</button>
+        <button class="browse-close" onclick="toggleBrowse()">← Back</button>
         <div class="browse-header">
             <h1>Browse All Movies & TV Shows</h1>
             <p style="opacity: 0.7;">Search by name, filter by genre, year, or content type</p>
@@ -1902,6 +2020,8 @@
                     <div class="filter-buttons">
                         <button class="filter-chip active" data-type="all"
                             onclick="setContentTypeFilter('all')">All</button>
+                        <button class="filter-chip" data-type="fresh-2026"
+                            onclick="setContentTypeFilter('fresh-2026')" style="border-color: rgba(239, 68, 68, 0.5); color: #fca5a5;">Fresh 🔥 2026</button>
                         <button class="filter-chip" data-type="now-playing"
                             onclick="setContentTypeFilter('now-playing')">Now Playing</button>
                         <button class="filter-chip" data-type="movie"
@@ -1919,12 +2039,20 @@
                     </div>
                 </div>
 
+                <!-- Language Filter -->
+                <div class="filter-section" style="flex: 0 0 auto;">
+                    <div class="filter-label">Language</div>
+                    <div class="filter-buttons">
+                        <button class="filter-chip active" data-lang="all" onclick="setLangFilter('all')">All</button>
+                        <button class="filter-chip" data-lang="en" onclick="setLangFilter('en')">English Only</button>
+                    </div>
+                </div>
+
                 <!-- Genre Filter -->
                 <div class="filter-section">
                     <div class="filter-label">Genre</div>
                     <div class="filter-buttons" id="genreFilters">
                         <button class="filter-chip active" data-genre="all" onclick="setGenreFilter('all')">All</button>
-                        <!-- Genres will be populated dynamically -->
                     </div>
                 </div>
 
@@ -1944,6 +2072,15 @@
             <!-- Results Count -->
             <div class="browse-results-count" id="browseResultsCount">Loading...</div>
         </div>
+
+        <!-- Fresh 🔥 Section (Top 10 + Trending) -->
+        <div class="fresh-section" id="freshSection">
+            <div class="fresh-section-title">🔥 Top 10 Fresh Content</div>
+            <div class="fresh-row" id="freshTop10Row"></div>
+            <div class="fresh-section-title" style="margin-top: 24px;">📈 Trending Today</div>
+            <div class="fresh-row" id="freshTrendingRow"></div>
+        </div>
+
         <div class="browse-grid" id="browseGrid"></div>
     </div>
 
@@ -2038,7 +2175,39 @@
         <div class="loading">Loading movies...</div>
     </div>
 
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <script>
+        const TMDB_GENRE_MAP = {
+            '10759': 'Action & Adventure', '16': 'Animation', '18': 'Drama',
+            '35': 'Comedy', '80': 'Crime', '99': 'Documentary',
+            '10751': 'Family', '10762': 'Kids', '9648': 'Mystery',
+            '10763': 'News', '10764': 'Reality', '10765': 'Sci-Fi & Fantasy',
+            '10766': 'Soap', '10767': 'Talk', '10768': 'War & Politics',
+            '37': 'Western', '28': 'Action', '12': 'Adventure',
+            '14': 'Fantasy', '36': 'History', '27': 'Horror',
+            '10402': 'Music', '10749': 'Romance', '878': 'Science Fiction',
+            '10770': 'TV Movie', '53': 'Thriller', '10752': 'War'
+        };
+
+        function resolveGenre(g) {
+            return TMDB_GENRE_MAP[g] || g;
+        }
+
+        function showToast(message, type) {
+            type = type || 'success';
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(function() {
+                toast.classList.add('toast-out');
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 2500);
+        }
+
         const API_URL = '/MOVIESHOWS3/api/get-movies.php';
         let allMovies = [];
         let allMotivationalVideos = [];
@@ -2621,6 +2790,7 @@
             searchQuery: '',
             contentType: 'all',
             genre: 'all',
+            lang: 'all',
             yearFrom: null,
             yearTo: null
         };
@@ -2955,12 +3125,63 @@
             const isActive = browseView.classList.toggle('active');
 
             if (isActive) {
-                // Initialize genre filters from database
                 populateGenreFilters();
-                // Reset and apply filters
+                populateFreshSection();
                 applyBrowseFilters();
             }
         }
+
+        function populateFreshSection() {
+            var currentYear = new Date().getFullYear();
+            var freshMovies = allMovies.filter(function(m) {
+                return parseInt(m.release_year) >= currentYear && m.trailer_id;
+            }).sort(function(a, b) {
+                return parseFloat(b.imdb_rating || 0) - parseFloat(a.imdb_rating || 0);
+            });
+
+            var top10 = freshMovies.slice(0, 10);
+            var trending = freshMovies.slice(10, 25);
+
+            var top10Row = document.getElementById('freshTop10Row');
+            top10Row.innerHTML = top10.map(function(m, i) {
+                var idx = filteredMovies.findIndex(function(fm) { return fm.id === m.id; });
+                var thumb = m.thumbnail || 'https://placehold.co/180x270/1a1a1a/666?text=' + encodeURIComponent(m.title);
+                return '<div class="fresh-card" onclick="' + (idx >= 0 ? 'playMovieFromBrowse(' + idx + ')' : '') + '">' +
+                    '<img src="' + thumb + '" alt="' + escapeHtml(m.title) + '" onerror="this.src=\'https://placehold.co/180x270/1a1a1a/666?text=No+Image\'">' +
+                    '<div class="fresh-card-rank">' + (i + 1) + '</div>' +
+                    '<div class="fresh-card-title">' + escapeHtml(m.title) + '</div>' +
+                    (m.imdb_rating ? '<div class="fresh-card-badge">⭐ ' + m.imdb_rating + '</div>' : '') +
+                    '</div>';
+            }).join('');
+
+            var trendingRow = document.getElementById('freshTrendingRow');
+            trendingRow.innerHTML = trending.map(function(m) {
+                var idx = filteredMovies.findIndex(function(fm) { return fm.id === m.id; });
+                var thumb = m.thumbnail || 'https://placehold.co/180x270/1a1a1a/666?text=' + encodeURIComponent(m.title);
+                return '<div class="fresh-card" onclick="' + (idx >= 0 ? 'playMovieFromBrowse(' + idx + ')' : '') + '">' +
+                    '<img src="' + thumb + '" alt="' + escapeHtml(m.title) + '" onerror="this.src=\'https://placehold.co/180x270/1a1a1a/666?text=No+Image\'">' +
+                    '<div class="fresh-card-title">' + escapeHtml(m.title) + '</div>' +
+                    (m.type === 'tv' ? '<div class="fresh-card-badge">TV</div>' : '') +
+                    '</div>';
+            }).join('');
+
+            document.getElementById('freshSection').style.display = (top10.length > 0) ? '' : 'none';
+        }
+
+        function setLangFilter(lang) {
+            browseFilters.lang = lang;
+            document.querySelectorAll('[data-lang]').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            document.querySelector('[data-lang="' + lang + '"]').classList.add('active');
+            applyBrowseFilters();
+        }
+
+        var ENGLISH_GENRE_NAMES = ['Action', 'Adventure', 'Animation', 'Comedy', 'Crime',
+            'Documentary', 'Drama', 'Family', 'Fantasy', 'History', 'Horror', 'Music',
+            'Mystery', 'Romance', 'Science Fiction', 'TV Movie', 'Thriller', 'War', 'Western',
+            'Action & Adventure', 'Kids', 'News', 'Reality', 'Sci-Fi & Fantasy', 'Soap',
+            'Talk', 'War & Politics'];
 
         function toggleQueue() {
             document.getElementById('queueOverlay').classList.toggle('active');
@@ -3096,14 +3317,12 @@
         }
 
         function populateGenreFilters() {
-            // Extract unique genres from all movies (check both 'genres' and 'genre' fields)
             const genresSet = new Set();
             filteredMovies.forEach(movie => {
                 const genreStr = movie.genres || movie.genre;
                 if (genreStr) {
-                    const genres = genreStr.split(',').map(g => g.trim());
-                    genres.forEach(genre => {
-                        if (genre) genresSet.add(genre);
+                    genreStr.split(',').map(g => g.trim()).forEach(genre => {
+                        if (genre) genresSet.add(resolveGenre(genre));
                     });
                 }
             });
@@ -3111,7 +3330,6 @@
             const genres = Array.from(genresSet).sort();
             const genreFiltersContainer = document.getElementById('genreFilters');
 
-            // Keep the "All" button and add genre buttons
             const allButton = genreFiltersContainer.querySelector('[data-genre="all"]');
             genreFiltersContainer.innerHTML = '';
             genreFiltersContainer.appendChild(allButton);
@@ -3168,10 +3386,31 @@
             } else if (browseFilters.contentType === 'motivation') {
                 // Show only motivational videos in browse
                 results = [...allMotivationalVideos];
+            } else if (browseFilters.contentType === 'fresh-2026') {
+                var cy = new Date().getFullYear();
+                results = results.filter(function(m) {
+                    return parseInt(m.release_year) >= cy;
+                });
+                results.sort(function(a, b) {
+                    return parseFloat(b.imdb_rating || 0) - parseFloat(a.imdb_rating || 0);
+                });
             } else if (browseFilters.contentType === 'movie') {
                 results = results.filter(m => m.type === 'movie');
             } else if (browseFilters.contentType === 'tv') {
                 results = results.filter(m => m.type === 'tv');
+            }
+
+            // Apply language filter (heuristic: English content has genre names in English)
+            if (browseFilters.lang === 'en') {
+                results = results.filter(function(m) {
+                    var genreStr = m.genres || m.genre || '';
+                    var genres = genreStr.split(',').map(function(g) { return resolveGenre(g.trim()); });
+                    var hasEnglishGenre = genres.some(function(g) {
+                        return ENGLISH_GENRE_NAMES.indexOf(g) >= 0;
+                    });
+                    var titleIsLatin = /^[\x20-\x7E\u00C0-\u024F]+$/.test(m.title);
+                    return hasEnglishGenre && titleIsLatin;
+                });
             }
 
             // Apply search query
@@ -3182,12 +3421,11 @@
                 );
             }
 
-            // Apply genre filter (check both 'genres' and 'genre' fields)
             if (browseFilters.genre !== 'all') {
                 results = results.filter(m => {
                     const genreStr = m.genres || m.genre;
                     if (!genreStr) return false;
-                    const genres = genreStr.split(',').map(g => g.trim().toLowerCase());
+                    const genres = genreStr.split(',').map(g => resolveGenre(g.trim()).toLowerCase());
                     return genres.includes(browseFilters.genre.toLowerCase());
                 });
             }
@@ -3209,6 +3447,11 @@
 
             browseFilteredMovies = results;
             renderBrowseGrid();
+
+            var freshEl = document.getElementById('freshSection');
+            if (freshEl) {
+                freshEl.style.display = (browseFilters.contentType === 'all' && !searchQuery) ? '' : 'none';
+            }
         }
 
         function setContentTypeFilter(type) {
@@ -3241,69 +3484,136 @@
         }
 
         function addToQueueFromBrowseFiltered(movieId) {
-            const movie = browseFilteredMovies.find(m => m.id === movieId);
+            const movie = browseFilteredMovies.find(m => m.id == movieId);
 
-            if (movie && !myQueue.find(m => m.id === movie.id)) {
+            if (movie && !myQueue.find(m => m.id == movie.id)) {
                 myQueue.push(movie);
                 localStorage.setItem('movieQueue', JSON.stringify(myQueue));
                 document.getElementById('queueCount').textContent = myQueue.length;
-                alert(`\u2705 Added "${movie.title}" to queue`);
+                showToast('\u2705 Added "' + movie.title + '" to queue', 'success');
 
-                // Update queue if it's open
                 if (document.getElementById('queuePanel').classList.contains('active')) {
                     renderQueue();
                 }
             } else if (movie) {
-                alert('Already in queue!');
+                showToast('Already in queue!', 'warning');
             }
         }
 
-        function playMovieFromBrowse(index) {
-            // Stop ALL currently playing videos first
-            document.querySelectorAll('.video-card iframe').forEach(iframe => {
-                const currentSrc = iframe.src;
-                if (currentSrc && currentSrc.includes('autoplay=1')) {
-                    // Remove src to stop playback
-                    iframe.src = '';
-                    // Restore with autoplay=0 after a tiny delay
-                    setTimeout(() => {
-                        iframe.src = currentSrc.replace(/autoplay=1/, 'autoplay=0');
-                    }, 50);
-                }
-            });
+        var _browseScrolling = false;
+        var _currentlyPlaying = null;
 
-            // Close browse view
+        function _removeBrowseOverlay() {
+            var ov = document.getElementById('browse-play-overlay');
+            if (ov) ov.remove();
+        }
+
+                function playMovieFromBrowse(index) {
+            _browseScrolling = true;
+
+            // Stop any currently playing video
+            var current = document.querySelector('.video-card iframe[src*="autoplay=1"]');
+            if (current) {
+                var s = current.src;
+                current.src = '';
+                setTimeout(function() { current.src = s.replace(/autoplay=1/, 'autoplay=0'); }, 50);
+            }
+
+            _removeBrowseOverlay();
             document.getElementById('browseView').classList.remove('active');
+            document.getElementById('muteOverlay').classList.add('hidden');
 
-            // Wait for transition, then scroll and trigger playback
-            setTimeout(() => {
-                const container = document.getElementById('container');
-                container.scrollTo({
-                    top: index * window.innerHeight,
-                    behavior: 'smooth'
+            var movie = filteredMovies[index];
+            if (!movie || !movie.trailer_id) {
+                console.error('[playMovieFromBrowse] No movie or trailer_id at index', index);
+                _browseScrolling = false;
+                return;
+            }
+
+            var container = document.getElementById('container');
+            var targetTop = index * window.innerHeight;
+            var muted = (videoMuteStates[index] === false) ? 0 : 1;
+            
+            // Pre-create the overlay before scrolling to ensure it's ready
+            var ytSrc = 'https://www.youtube.com/embed/' + movie.trailer_id +
+                '?autoplay=1&mute=' + muted + '&controls=1&playsinline=1&loop=0&modestbranding=1&rel=0&enablejsapi=1';
+
+            // Chromium defers iframe rendering at extreme scroll offsets (>500K px).
+            // CRITICAL FIX: Must set explicit dimensions on both overlay AND iframe
+            var overlay = document.createElement('div');
+            overlay.id = 'browse-play-overlay';
+            // Use explicit viewport dimensions instead of inset:0
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:150;background:#000;';
+
+            var iframe = document.createElement('iframe');
+            iframe.id = 'browse-player-frame';
+            iframe.src = ytSrc;
+            // Explicit dimensions are REQUIRED - percentage alone doesn't work
+            iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;';
+            iframe.setAttribute('loading', 'eager');
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            iframe.allowFullscreen = true;
+            
+            // CRITICAL: Scroll FIRST, then add overlay
+            // This prevents the scroll listener from firing immediately
+            container.scrollTo({ top: targetTop, behavior: 'instant' });
+            
+            // Small delay to let scroll complete before adding overlay
+            setTimeout(function() {
+                overlay.appendChild(iframe);
+                document.body.appendChild(overlay);
+
+                // Add unmute button
+                var unmBtn = document.createElement('button');
+                unmBtn.id = 'browse-unmute-btn';
+                unmBtn.textContent = '🔇 Tap to Unmute';
+                unmBtn.style.cssText = 'position:absolute;bottom:80px;left:50%;transform:translateX(-50%);z-index:1000;padding:12px 24px;background:rgba(255,68,68,0.95);color:#fff;border:none;border-radius:12px;font-size:16px;cursor:pointer;opacity:1;visibility:visible;';
+                unmBtn.onclick = function() {
+                    iframe.src = iframe.src.replace(/mute=1/, 'mute=0');
+                    videoMuteStates[index] = false;
+                    unmBtn.remove();
+                };
+                if (muted) overlay.appendChild(unmBtn);
+
+                // Set up YouTube player API if available
+                if (typeof YT !== 'undefined' && YT.Player) {
+                    iframe.addEventListener('load', function onLoad() {
+                        iframe.removeEventListener('load', onLoad);
+                        console.log('[browse] overlay iframe loaded for ' + movie.title);
+                        try {
+                            new YT.Player('browse-player-frame', {
+                                events: {
+                                    onStateChange: function(event) {
+                                        if (event.data === YT.PlayerState.ENDED) {
+                                            _removeBrowseOverlay();
+                                            var nextIdx = index + 1;
+                                            if (nextIdx < filteredMovies.length) {
+                                                container.scrollTo({ top: nextIdx * window.innerHeight, behavior: 'smooth' });
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        } catch(e) {}
+                    });
+                }
+
+                // Add a close button to the overlay so users can dismiss it
+                var closeBtn = document.createElement('button');
+                closeBtn.textContent = '✕';
+                closeBtn.style.cssText = 'position:absolute;top:16px;right:16px;z-index:1001;width:44px;height:44px;background:rgba(0,0,0,0.7);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:50%;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);';
+                closeBtn.onclick = function() { _removeBrowseOverlay(); };
+                overlay.appendChild(closeBtn);
+
+                // Attach scroll listener (scroll already completed before overlay was added)
+                container.addEventListener('scroll', function onScroll() {
+                    container.removeEventListener('scroll', onScroll);
+                    _removeBrowseOverlay();
                 });
 
-                // Use scrollend event for reliable timing (works with DevTools closed)
-                const handleScrollEnd = () => {
-                    const targetIframe = document.getElementById(`player-${index}`);
-                    if (targetIframe) {
-                        const currentSrc = targetIframe.src;
-                        if (!currentSrc.includes('autoplay=1')) {
-                            targetIframe.src = currentSrc.replace(/autoplay=[01]/, 'autoplay=1');
-                        }
-                    }
-
-                    // Show mute overlay if all videos are muted
-                    updateMuteOverlay();
-                };
-
-                // Use scrollend event if supported, otherwise fallback to timeout
-                if ('onscrollend' in container) {
-                    container.addEventListener('scrollend', handleScrollEnd, { once: true });
-                } else {
-                    setTimeout(handleScrollEnd, 800);
-                }
-            }, 350);
+                _currentlyPlaying = String(index);
+                _browseScrolling = false;
+            }, 100);  // 100ms delay after scroll
         }
 
         function addToQueueFromBrowse(index) {
@@ -3313,14 +3623,14 @@
                 myQueue.push(movie);
                 localStorage.setItem('movieQueue', JSON.stringify(myQueue));
                 document.getElementById('queueCount').textContent = myQueue.length;
-                alert(`✅ Added "${movie.title}" to queue`);
+                showToast('\u2705 Added "' + movie.title + '" to queue', 'success');
 
                 // Update queue if it's open
                 if (document.getElementById('queuePanel').classList.contains('active')) {
                     renderQueue();
                 }
             } else if (movie) {
-                alert('Already in queue!');
+                showToast('Already in queue!', 'warning');
             }
         }
 
@@ -3332,9 +3642,9 @@
                 myQueue.push(movie);
                 localStorage.setItem('movieQueue', JSON.stringify(myQueue));
                 document.getElementById('queueCount').textContent = myQueue.length;
-                alert(`✅ Added "${movie.title}" to queue`);
+                showToast('\u2705 Added "' + movie.title + '" to queue', 'success');
             } else if (movie) {
-                alert('Already in queue!');
+                showToast('Already in queue!', 'warning');
             }
         }
 
@@ -3400,7 +3710,7 @@
             const movie = filteredMovies[currentIndex];
 
             if (!movie) {
-                alert('⚠️ No video to like');
+                showToast('No video to like', 'warning');
                 return;
             }
 
@@ -3413,7 +3723,6 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Update local state
                     if (data.is_liked) {
                         if (!userLikes.includes(movie.id)) {
                             userLikes.push(movie.id);
@@ -3425,15 +3734,13 @@
                     }
                     likeCounts[movie.id] = data.like_count;
 
-                    // Show feedback
-                    const message = data.is_liked ? `❤️ Liked "${movie.title}"!` : `💔 Unliked "${movie.title}"`;
-                    alert(message);
+                    showToast(data.is_liked ? '\u2764\ufe0f Liked "' + movie.title + '"!' : '\ud83d\udc94 Unliked "' + movie.title + '"', 'success');
                 } else {
-                    alert('❌ Failed to like movie');
+                    showToast('Failed to like movie', 'warning');
                 }
             } catch (error) {
                 console.error('Like error:', error);
-                alert('❌ Network error. Please try again.');
+                showToast('Network error. Please try again.', 'warning');
             }
         }
 
@@ -3443,20 +3750,17 @@
             const movie = filteredMovies[currentIndex];
 
             if (!movie) {
-                alert('⚠️ No video to share');
+                showToast('No video to share', 'warning');
                 return;
             }
 
-            // Build shareable URL with video index as hash
             const baseUrl = window.location.origin + window.location.pathname;
-            const shareUrl = `${baseUrl}#video=${currentIndex}`;
+            const shareUrl = baseUrl + '#video=' + currentIndex;
 
-            // Copy to clipboard
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                alert(`🔗 Link copied!\n\n"${movie.title}"\n${shareUrl}`);
-            }).catch(() => {
-                // Fallback if clipboard API fails
-                alert(`🔗 Share this link:\n\n"${movie.title}"\n${shareUrl}`);
+            navigator.clipboard.writeText(shareUrl).then(function() {
+                showToast('\ud83d\udd17 Link copied for "' + movie.title + '"', 'success');
+            }).catch(function() {
+                showToast('\ud83d\udd17 Share: ' + shareUrl, 'success');
             });
         }
 
@@ -4012,6 +4316,7 @@
         }, 1000);
 
         // Intersection Observer for autoplay on scroll
+        // Intersection Observer for autoplay on scroll
         function setupScrollAutoplay() {
             const options = {
                 root: null,
@@ -4019,9 +4324,9 @@
                 threshold: 0.75  // Increased threshold for better detection
             };
 
-            let currentlyPlaying = null;
-
             const observer = new IntersectionObserver((entries) => {
+                if (_browseScrolling) return;
+
                 // Find the most visible video
                 let mostVisible = null;
                 let highestRatio = 0;
@@ -4040,42 +4345,32 @@
                     const iframe = mostVisible.target.querySelector('iframe');
                     const index = mostVisible.target.dataset.index;
 
-                    if (currentlyPlaying !== index) {
+                    if (_currentlyPlaying !== index) {
                         console.log(`Playing video ${index}`);
 
-                        // FIRST: STOP ALL other videos by removing their src completely, then restoring with autoplay=0
-                        document.querySelectorAll('.video-card').forEach(card => {
-                            const cardIndex = card.dataset.index;
-                            if (cardIndex !== index) {
-                                const cardIframe = card.querySelector('iframe');
-                                if (cardIframe) {
-                                    // Store the current src
-                                    const currentSrc = cardIframe.src;
-                                    // Only stop if it's currently playing
-                                    if (currentSrc.includes('autoplay=1')) {
-                                        // Remove src to stop playback
-                                        cardIframe.src = '';
-                                        // Restore with autoplay=0 after a tiny delay
-                                        setTimeout(() => {
-                                            cardIframe.src = currentSrc.replace(/autoplay=1/, 'autoplay=0');
-                                        }, 50);
-                                    }
+                        // Stop ONLY the previously playing video (not all 2900+ cards)
+                        if (_currentlyPlaying !== null) {
+                            const prevCard = document.querySelector('.video-card[data-index="' + _currentlyPlaying + '"]');
+                            if (prevCard) {
+                                const prevIframe = prevCard.querySelector('iframe');
+                                if (prevIframe && prevIframe.src.includes('autoplay=1')) {
+                                    const stoppedSrc = prevIframe.src.replace(/autoplay=1/, 'autoplay=0');
+                                    prevIframe.src = '';
+                                    setTimeout(() => { prevIframe.src = stoppedSrc; }, 50);
                                 }
                             }
-                        });
+                        }
 
                         // THEN: Play the new video
                         const currentSrc = iframe.src;
-                        const isInitialLoad = currentlyPlaying === null;
+                        const isInitialLoad = _currentlyPlaying === null;
                         if (!currentSrc.includes('autoplay=1')) {
                             iframe.src = currentSrc.replace(/autoplay=[01]/, 'autoplay=1');
                         } else if (!isInitialLoad) {
-                            // Only force reload if we're SWITCHING from another video
-                            // Don't reload on initial load — the iframe already has autoplay=1
                             iframe.src = iframe.src;
                         }
 
-                        currentlyPlaying = index;
+                        _currentlyPlaying = index;
 
                         // Update alt trailer button for new video
                         updateAltTrailerButton();
@@ -4083,10 +4378,8 @@
                         // Re-initialize YouTube player after iframe reloads (for auto-scroll on video end)
                         if (typeof YT !== 'undefined' && YT.Player) {
                             if (isInitialLoad && currentSrc.includes('autoplay=1')) {
-                                // Initial load — iframe isn't reloading, init YT player directly
                                 initYouTubePlayer(index);
                             } else {
-                                // Wait for iframe to finish loading before binding YT.Player
                                 iframe.addEventListener('load', function onLoad() {
                                     iframe.removeEventListener('load', onLoad);
                                     initYouTubePlayer(index);
@@ -4104,7 +4397,7 @@
 
             // Force play the first video after a short delay (only if observer didn't already handle it)
             setTimeout(() => {
-                if (currentlyPlaying !== null) {
+                if (_currentlyPlaying !== null) {
                     console.log('First video already playing via observer, skipping force play');
                     return;
                 }
@@ -4113,8 +4406,8 @@
                     const firstIframe = firstCard.querySelector('iframe');
                     if (firstIframe) {
                         console.log('Force playing first video');
-                        firstIframe.src = firstIframe.src; // Reload to trigger autoplay
-                        currentlyPlaying = '0';
+                        firstIframe.src = firstIframe.src;
+                        _currentlyPlaying = '0';
                         // Re-bind YT.Player after force reload
                         if (typeof YT !== 'undefined' && YT.Player) {
                             firstIframe.addEventListener('load', function onLoad() {

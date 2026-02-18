@@ -139,7 +139,7 @@ const MovieShowsDB = {
      * Get all movies from database
      */
     async getMovies(options = {}) {
-        const { type, year, limit = 100, offset = 0 } = options;
+        const { type, year, limit = 5000, offset = 0 } = options;
         
         let endpoint = `movies.php?action=list&limit=${limit}&offset=${offset}`;
         if (type) endpoint += `&type=${type}`;
@@ -148,7 +148,7 @@ const MovieShowsDB = {
         try {
             const response = await this.fetchAPI(endpoint);
             if (response.success) {
-                return response.data;
+                return response.movies;
             }
         } catch (error) {
             // Silently fail - use fallback
@@ -167,7 +167,7 @@ const MovieShowsDB = {
         try {
             const response = await this.fetchAPI(`movies.php?action=search&q=${encodeURIComponent(query)}&limit=${limit}`);
             if (response.success) {
-                return response.data;
+                return response.movies;
             }
         } catch (error) {
             // Silently fail - use local search
@@ -190,7 +190,7 @@ const MovieShowsDB = {
             
             const response = await this.fetchAPI(endpoint);
             if (response.success) {
-                return response.data;
+                return response.movies;
             }
         } catch (error) {
             // Silently fail - use local random
@@ -210,7 +210,7 @@ const MovieShowsDB = {
         try {
             const response = await this.fetchAPI('movies.php?action=stats');
             if (response.success) {
-                return response.data;
+                return response.movies;
             }
         } catch (error) {
             // Silently fail - use local stats
@@ -278,7 +278,7 @@ const MovieShowsDB = {
             if (response.success && response.data.length > 0) {
                 // Update localStorage with DB data
                 localStorage.setItem('movieshows-queue', JSON.stringify(response.data));
-                return response.data;
+                return response.movies;
             }
         } catch (error) {
             // Silently fail - use localStorage
@@ -408,7 +408,7 @@ const MovieShowsDB = {
         try {
             const response = await this.fetchAPI('user.php?action=preferences');
             if (response.success) {
-                return response.data;
+                return response.movies;
             }
         } catch (error) {
             // Silently fail - use localStorage
