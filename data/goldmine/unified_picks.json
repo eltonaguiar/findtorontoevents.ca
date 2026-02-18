@@ -1,7 +1,78 @@
 {
-    "timestamp": "2026-02-18 13:12:03",
-    "total_picks": 1,
+    "timestamp": "2026-02-18 13:59:47",
+    "total_picks": 2,
     "picks": [
+        {
+            "uuid": "meme_32",
+            "symbol": "SIREN",
+            "name": "SIREN",
+            "type": "meme_coin",
+            "source": "meme_scanner",
+            "algorithm": "meme_scanner",
+            "direction": "long",
+            "entry_price": "0.236485",
+            "score": "73",
+            "confidence": "73",
+            "target_pct": "2",
+            "risk_pct": "1.5",
+            "pick_date": "2026-02-18 13:50:22",
+            "status": "active",
+            "collected_at": "2026-02-18 13:59:47",
+            "factors": {
+                "explosive_volume": {
+                    "score": 10,
+                    "max": 25,
+                    "vol_usd_24h": 10766819,
+                    "method": "aggregate"
+                },
+                "parabolic_momentum": {
+                    "score": 20,
+                    "max": 20,
+                    "mom_15m": 5.88,
+                    "mom_5m": 7.62
+                },
+                "rsi_hype_zone": {
+                    "score": 15,
+                    "max": 15,
+                    "rsi": 72.7
+                },
+                "social_proxy": {
+                    "score": 12,
+                    "max": 15,
+                    "velocity": 11.8,
+                    "mom_1h": 5.88,
+                    "vol_rank": 2,
+                    "method": "aggregate"
+                },
+                "volume_concentration": {
+                    "score": 8,
+                    "max": 10,
+                    "pct": 55.8,
+                    "method": "price_range"
+                },
+                "breakout_4h": {
+                    "score": 7,
+                    "max": 10,
+                    "breakout_pct": 0.86,
+                    "high_4h": 0.234471
+                },
+                "low_cap_bonus": {
+                    "score": 1,
+                    "max": 5,
+                    "vol_usd": 10766819
+                },
+                "volatility": {
+                    "atr": 0.00333343,
+                    "atr_pct": 1.41
+                },
+                "btc_regime": {
+                    "regime": "chop",
+                    "btc_trend_pct": 0,
+                    "adjustment": 0,
+                    "raw_score": 73
+                }
+            }
+        },
         {
             "uuid": "meme_31",
             "symbol": "SIREN",
@@ -17,7 +88,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-02-18 12:58:46",
             "status": "active",
-            "collected_at": "2026-02-18 13:12:03",
+            "collected_at": "2026-02-18 13:59:47",
             "factors": {
                 "explosive_volume": {
                     "score": 10,
