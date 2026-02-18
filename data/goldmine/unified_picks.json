@@ -1,6 +1,6 @@
 {
-    "timestamp": "2026-02-18 14:49:17",
-    "total_picks": 2,
+    "timestamp": "2026-02-18 15:36:05",
+    "total_picks": 1,
     "picks": [
         {
             "uuid": "meme_32",
@@ -17,7 +17,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-02-18 13:50:22",
             "status": "active",
-            "collected_at": "2026-02-18 14:49:17",
+            "collected_at": "2026-02-18 15:36:05",
             "factors": {
                 "explosive_volume": {
                     "score": 10,
@@ -70,77 +70,6 @@
                     "btc_trend_pct": 0,
                     "adjustment": 0,
                     "raw_score": 73
-                }
-            }
-        },
-        {
-            "uuid": "meme_31",
-            "symbol": "SIREN",
-            "name": "SIREN",
-            "type": "meme_coin",
-            "source": "meme_scanner",
-            "algorithm": "meme_scanner",
-            "direction": "long",
-            "entry_price": "0.235447",
-            "score": "71",
-            "confidence": "71",
-            "target_pct": "2",
-            "risk_pct": "1.5",
-            "pick_date": "2026-02-18 12:58:46",
-            "status": "active",
-            "collected_at": "2026-02-18 14:49:17",
-            "factors": {
-                "explosive_volume": {
-                    "score": 10,
-                    "max": 25,
-                    "vol_usd_24h": 10463601,
-                    "method": "aggregate"
-                },
-                "parabolic_momentum": {
-                    "score": 20,
-                    "max": 20,
-                    "mom_15m": 4.75,
-                    "mom_5m": 5.48
-                },
-                "rsi_hype_zone": {
-                    "score": 15,
-                    "max": 15,
-                    "rsi": 72.6
-                },
-                "social_proxy": {
-                    "score": 12,
-                    "max": 15,
-                    "velocity": 9.5,
-                    "mom_1h": 4.75,
-                    "vol_rank": 2,
-                    "method": "aggregate"
-                },
-                "volume_concentration": {
-                    "score": 3,
-                    "max": 10,
-                    "pct": 38.2,
-                    "method": "price_range"
-                },
-                "breakout_4h": {
-                    "score": 10,
-                    "max": 10,
-                    "breakout_pct": 8.15,
-                    "high_4h": 0.217701
-                },
-                "low_cap_bonus": {
-                    "score": 1,
-                    "max": 5,
-                    "vol_usd": 10463601
-                },
-                "volatility": {
-                    "atr": 0.00247536,
-                    "atr_pct": 1.05
-                },
-                "btc_regime": {
-                    "regime": "chop",
-                    "btc_trend_pct": 0,
-                    "adjustment": 0,
-                    "raw_score": 71
                 }
             }
         }
