@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-02-19 09:52:25",
+    "timestamp": "2026-02-19 10:48:20",
     "total_picks": 1,
     "picks": [
         {
@@ -17,7 +17,7 @@
             "risk_pct": "2",
             "pick_date": "2026-02-19 09:41:51",
             "status": "active",
-            "collected_at": "2026-02-19 09:52:25",
+            "collected_at": "2026-02-19 10:48:20",
             "factors": {
                 "explosive_volume": {
                     "score": 15,
