@@ -1,7 +1,78 @@
 {
-    "timestamp": "2026-02-20 15:39:50",
-    "total_picks": 1,
+    "timestamp": "2026-02-20 15:57:01",
+    "total_picks": 2,
     "picks": [
+        {
+            "uuid": "meme_38",
+            "symbol": "TIBBIR",
+            "name": "TIBBIR",
+            "type": "meme_coin",
+            "source": "meme_scanner",
+            "algorithm": "meme_scanner",
+            "direction": "long",
+            "entry_price": "0.154881",
+            "score": "72",
+            "confidence": "72",
+            "target_pct": "2",
+            "risk_pct": "1.5",
+            "pick_date": "2026-02-20 15:53:44",
+            "status": "active",
+            "collected_at": "2026-02-20 15:57:01",
+            "factors": {
+                "explosive_volume": {
+                    "score": 6,
+                    "max": 25,
+                    "vol_usd_24h": 8813949,
+                    "method": "aggregate"
+                },
+                "parabolic_momentum": {
+                    "score": 20,
+                    "max": 20,
+                    "mom_15m": 9.99,
+                    "mom_5m": 8.59
+                },
+                "rsi_hype_zone": {
+                    "score": 15,
+                    "max": 15,
+                    "rsi": 70.5
+                },
+                "social_proxy": {
+                    "score": 12,
+                    "max": 15,
+                    "velocity": 15,
+                    "mom_1h": 9.99,
+                    "vol_rank": 1.5,
+                    "method": "aggregate"
+                },
+                "volume_concentration": {
+                    "score": 8,
+                    "max": 10,
+                    "pct": 53.4,
+                    "method": "price_range"
+                },
+                "breakout_4h": {
+                    "score": 10,
+                    "max": 10,
+                    "breakout_pct": 7.08,
+                    "high_4h": 0.144644
+                },
+                "low_cap_bonus": {
+                    "score": 1,
+                    "max": 5,
+                    "vol_usd": 8813949
+                },
+                "volatility": {
+                    "atr": 0.00204093,
+                    "atr_pct": 1.32
+                },
+                "btc_regime": {
+                    "regime": "chop",
+                    "btc_trend_pct": 0,
+                    "adjustment": 0,
+                    "raw_score": 72
+                }
+            }
+        },
         {
             "uuid": "meme_37",
             "symbol": "PENGUIN",
@@ -17,7 +88,7 @@
             "risk_pct": "1.6",
             "pick_date": "2026-02-20 15:10:35",
             "status": "active",
-            "collected_at": "2026-02-20 15:39:50",
+            "collected_at": "2026-02-20 15:57:01",
             "factors": {
                 "explosive_volume": {
                     "score": 10,
