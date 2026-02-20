@@ -1,5 +1,78 @@
 {
-    "timestamp": "2026-02-20 08:45:52",
-    "total_picks": 0,
-    "picks": []
+    "timestamp": "2026-02-20 09:45:25",
+    "total_picks": 1,
+    "picks": [
+        {
+            "uuid": "meme_35",
+            "symbol": "TRUMP",
+            "name": "TRUMP",
+            "type": "meme_coin",
+            "source": "meme_scanner",
+            "algorithm": "meme_scanner",
+            "direction": "long",
+            "entry_price": "3.714",
+            "score": "71",
+            "confidence": "71",
+            "target_pct": "2",
+            "risk_pct": "1.5",
+            "pick_date": "2026-02-20 09:37:51",
+            "status": "active",
+            "collected_at": "2026-02-20 09:45:25",
+            "factors": {
+                "explosive_volume": {
+                    "score": 12,
+                    "max": 25,
+                    "ratio": 4.6,
+                    "recent_avg": 9067.6,
+                    "method": "candle"
+                },
+                "parabolic_momentum": {
+                    "score": 20,
+                    "max": 20,
+                    "mom_15m": 4.92,
+                    "mom_5m": 2.6
+                },
+                "rsi_hype_zone": {
+                    "score": 5,
+                    "max": 15,
+                    "rsi": 89.2
+                },
+                "social_proxy": {
+                    "score": 15,
+                    "max": 15,
+                    "velocity": 22.7,
+                    "mom_1h": 4.92,
+                    "vol_ratio": 4.6,
+                    "method": "candle"
+                },
+                "volume_concentration": {
+                    "score": 10,
+                    "max": 10,
+                    "pct": 84.7,
+                    "method": "candle"
+                },
+                "breakout_4h": {
+                    "score": 4,
+                    "max": 10,
+                    "breakout_pct": 0.3,
+                    "high_4h": 3.703
+                },
+                "low_cap_bonus": {
+                    "score": 5,
+                    "max": 5,
+                    "vol_usd": 283294
+                },
+                "volatility": {
+                    "atr": 0.02678571,
+                    "atr_pct": 1
+                },
+                "btc_regime": {
+                    "regime": "chop",
+                    "btc_trend_pct": 0,
+                    "adjustment": 0,
+                    "raw_score": 71
+                }
+            }
+        }
+    ]
 }
