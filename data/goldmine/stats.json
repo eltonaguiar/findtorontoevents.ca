@@ -1,13 +1,7 @@
 {
-    "timestamp": "2026-02-20 17:53:34",
-    "by_type": {
-        "meme_coin": 2
-    },
-    "by_source": {
-        "meme_scanner": 2
-    },
-    "by_algorithm": {
-        "meme_scanner": 2
-    },
+    "timestamp": "2026-02-20 18:30:12",
+    "by_type": [],
+    "by_source": [],
+    "by_algorithm": [],
     "high_confidence": 0
 }
