@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-02-20 16:43:08",
+    "timestamp": "2026-02-20 17:07:24",
     "total_picks": 3,
     "picks": [
         {
@@ -17,7 +17,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-02-20 15:53:44",
             "status": "active",
-            "collected_at": "2026-02-20 16:43:08",
+            "collected_at": "2026-02-20 17:07:24",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -88,7 +88,7 @@
             "risk_pct": "1.6",
             "pick_date": "2026-02-20 15:10:35",
             "status": "active",
-            "collected_at": "2026-02-20 16:43:08",
+            "collected_at": "2026-02-20 17:07:24",
             "factors": {
                 "explosive_volume": {
                     "score": 10,
@@ -159,7 +159,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-02-20 16:23:26",
             "status": "active",
-            "collected_at": "2026-02-20 16:43:08",
+            "collected_at": "2026-02-20 17:07:24",
             "factors": {
                 "explosive_volume": {
                     "score": 10,
