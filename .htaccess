@@ -18,6 +18,11 @@ RewriteRule ^movieshows3(.*)$ /MOVIESHOWS3$1 [R=301,NC,L]
 # Stats page at /stats (root): serve stats/index.html
 RewriteRule ^stats/?$ stats/index.html [L]
 
+# CIS-CSM study guide (case-sensitive host; lowercase alias → canonical)
+RewriteRule ^servicenow/csm/?$ /servicenow/CSM/ [R=301,L]
+RewriteRule ^servicenow/CSM/?$ servicenow/CSM/index.html [L]
+RewriteRule ^servicenow/?$ servicenow/index.html [L]
+
 # Redirect legacy/alias URLs to stats (events count, sources, summary)
 RewriteRule ^debug/?$ /stats/ [R=301,L]
 RewriteRule ^info/?$ /stats/ [R=301,L]
