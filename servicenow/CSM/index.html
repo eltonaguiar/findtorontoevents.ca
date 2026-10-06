@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CIS-CSM study guide | ServiceNow Customer Service Management</title>
+  <meta name="description" content="CIS-CSM preparation: what CSM is, exam domains, key quotes, data model tables, and a hands-on checklist. Concepts first, code later." />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(255, 255, 255, 0.06);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.68);
+      --border: rgba(255, 255, 255, 0.12);
+      --accent: #7c5cff;
+      --cyan: #67e8f9;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1100px 600px at 20% 0%, rgba(124, 92, 255, 0.35), transparent),
+        radial-gradient(900px 500px at 90% 10%, rgba(12, 210, 255, 0.18), transparent),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    a { color: #c4b5fd; }
+    a:hover { color: #fff; }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 28px 18px 96px; }
+    .crumb { color: var(--muted); font-size: 14px; }
+    h1 { font-size: clamp(28px, 4vw, 42px); letter-spacing: 0.3px; margin: 10px 0 8px; }
+    h2 { margin-top: 2.2em; padding-top: 0.4em; border-top: 1px solid var(--border); }
+    h3 { margin-top: 1.4em; }
+    .lede, .muted { color: var(--muted); }
+    .panel {
+      margin: 16px 0;
+      padding: 16px 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    blockquote {
+      margin: 12px 0;
+      padding: 12px 16px;
+      border-left: 3px solid var(--accent);
+      background: rgba(124, 92, 255, 0.12);
+      border-radius: 0 12px 12px 0;
+      color: var(--text);
+    }
+    blockquote footer { color: var(--muted); font-size: 13px; margin-top: 8px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 12px 0 20px;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    th { color: var(--cyan); font-weight: 600; }
+    code, .k {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.88em;
+      background: rgba(255,255,255,0.08);
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+    nav.toc ol { padding-left: 1.2em; }
+    nav.toc li { margin: 4px 0; }
+    ul.check li { margin: 6px 0; }
+    .note { font-size: 14px; color: var(--muted); }
+    .urls a { display: inline-block; margin-right: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="crumb"><a href="../../">Home</a> · <a href="../">ServiceNow</a> · CIS-CSM</p>
+    <h1>CIS-CSM study guide</h1>
+    <p class="lede">Certified Implementation Specialist — Customer Service Management. This page is the concept layer: who the customer is, what they own, what they are entitled to, and how a case is routed and closed. Script Includes come after that.</p>
+    <p class="urls note">
+      This page: <a href="./">servicenow/CSM/</a>
+      · GitHub Pages: <a href="https://eltonaguiar.github.io/findtorontoevents.ca/servicenow/CSM/">eltonaguiar.github.io/findtorontoevents.ca/servicenow/CSM/</a>
+      · Code samples: <a href="https://github.com/eltonaguiar/servicenow_scriptincludesample">Script Include repo</a>
+    </p>
+
+    <nav class="toc panel" id="toc">
+      <strong>Table of contents</strong>
+      <ol>
+        <li><a href="#what">What CSM is (quotes)</a></li>
+        <li><a href="#exam">Exam facts and study time</a></li>
+        <li><a href="#d1">Domain 1 — Foundational data model (27%)</a></li>
+        <li><a href="#d2">Domain 2 — CSM configuration (38%)</a></li>
+        <li><a href="#d3">Domain 3 — Case management (17%)</a></li>
+        <li><a href="#d4">Domain 4 — Workspace, portals, catalog, analytics (8%)</a></li>
+        <li><a href="#d5">Domain 5 — Best practices and Knowledge (10%)</a></li>
+        <li><a href="#samples">Official sample question patterns</a></li>
+        <li><a href="#itsm">ITSM vs CSM</a></li>
+        <li><a href="#pdi">Hands-on PDI checklist</a></li>
+        <li><a href="#code">When code actually matters</a></li>
+        <li><a href="#train">Official training list</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="what">1. What CSM is</h2>
+    <p>Keep one sentence in your head: CSM is <strong>external service management</strong> — who the customer is, what they own, what they are allowed to receive, how they reach you, and how work is fulfilled.</p>
+
+    <blockquote>
+      The Certified Implementation Specialist – Customer Service Management exam confirms you have the knowledge and skills to <strong>configure, implement, and maintain</strong> the ServiceNow CSM application. This certification validates their ability to <strong>manage data models, configure case routing, oversee case processes, and utilize CSM workspaces, portals, and analytics</strong>.
+      <footer>ServiceNow CIS-CSM exam blueprint, KB0011529 (updated November 2025)</footer>
+    </blockquote>
+
+    <blockquote>
+      ServiceNow's Customer Service Management (CSM) application is a way for <strong>service providers to manage relationships between themselves and the customers</strong> who use and/or purchase their services and products.
+      <footer>ServiceNow Community — CSM Fundamentals</footer>
+    </blockquote>
+
+    <blockquote>
+      The process itself should not be confused with an application designed to help manage and improve the process. The latter is where ServiceNow's Customer Service Management application plays a part.
+      <footer>Same article — process vs product</footer>
+    </blockquote>
+
+    <blockquote>
+      CSM provides an <strong>end-to-end service management solution</strong> with an integrated problem, change, configuration, work order management, and a structured service catalog. It helps <strong>break down the classic silos</strong> … by connecting customer service with <strong>engineering, field service, finance</strong>, and other teams.
+      <footer>Same article — why CSM is not a standalone ticketing app</footer>
+    </blockquote>
+
+    <blockquote>
+      Customer service is all about providing services to customers <strong>before, during, and after</strong> the purchase of a product and/or service.
+      <footer>Why the data model includes products, install base, and entitlements</footer>
+    </blockquote>
+
+    <blockquote>
+      Customers reach out to customer service support to <strong>report an issue or problem, ask a question, make a request or complaint</strong> … in relation to products they have purchased. Customer service support is responsible for <strong>streamlining customer interactions</strong> while acting as the <strong>intermediary</strong> between the customer and the service operations teams.
+      <footer>Intake → case → fulfillment</footer>
+    </blockquote>
+
+    <p class="note">Official questions are based on ServiceNow training, product docs, and the developer site — not random dumps. Blueprint: <a href="https://learning.servicenow.com/lxp/en/credentials/certified-implementation-specialist-customer-service-management?id=kb_article_view&amp;sysparm_article=KB0011529">KB0011529</a>.</p>
+
+    <h2 id="exam">2. Exam facts and study time</h2>
+    <table>
+      <thead><tr><th>Item</th><th>Official fact</th></tr></thead>
+      <tbody>
+        <tr><td>Code</td><td>CIS-CSM</td></tr>
+        <tr><td>Items</td><td>60 (multiple choice + multiple select)</td></tr>
+        <tr><td>Time</td><td>90 minutes</td></tr>
+        <tr><td>Pass</td><td>Predetermined cut score; not always 70%; not published</td></tr>
+        <tr><td>Multi-select</td><td>States how many to pick; no partial credit</td></tr>
+        <tr><td>Window</td><td>Register/pay, then 90 days to sit</td></tr>
+        <tr><td>Delivery</td><td>Pearson VUE center or OnVUE</td></tr>
+        <tr><td>Keep it</td><td>Annual delta + CMP fee</td></tr>
+      </tbody>
+    </table>
+    <p>About three-quarters of the exam is data model + configuration.</p>
+    <table>
+      <thead><tr><th>Domain</th><th>Weight</th><th>~questions</th></tr></thead>
+      <tbody>
+        <tr><td>Foundational data model</td><td>27%</td><td>~16</td></tr>
+        <tr><td><strong>CSM configuration</strong></td><td><strong>38%</strong></td><td><strong>~23</strong></td></tr>
+        <tr><td>Case management</td><td>17%</td><td>~10</td></tr>
+        <tr><td>Workspace / portals / catalog / analytics</td><td>8%</td><td>~5</td></tr>
+        <tr><td>Best practices + Knowledge</td><td>10%</td><td>~6</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="d1">3. Domain 1 — Foundational data model (27%)</h2>
+    <p>Blueprint: business models, product models, install base, contracts and entitlements.</p>
+
+    <h3>Business models</h3>
+    <table>
+      <thead><tr><th>Model</th><th>Who is the customer</th><th>Primary records</th></tr></thead>
+      <tbody>
+        <tr><td>B2B</td><td>A company</td><td>Account + Contacts</td></tr>
+        <tr><td>B2C</td><td>An individual</td><td>Consumer</td></tr>
+        <tr><td>B2B2C</td><td>Company + that company’s consumers</td><td>Accounts + consumers</td></tr>
+        <tr><td>B2B2E</td><td>Business-to-employee style support</td><td>Often location / employee service framing</td></tr>
+      </tbody>
+    </table>
+    <blockquote>
+      Business-to-business (B2B) is a business model where commercial transactions are conducted <strong>between two or more companies</strong>. Business-to-consumer (B2C) is a business model where companies sell products and or services <strong>directly to consumers</strong>.
+      <footer>CSM Fundamentals</footer>
+    </blockquote>
+    <blockquote>
+      Foundation data includes all of the data <strong>crucial to support customers as efficiently as possible</strong>. Most of the foundation data can be imported and configured using <strong>Customer Service Management Guided Setup</strong>.
+    </blockquote>
+
+    <h3>Core people/org records</h3>
+    <table>
+      <thead><tr><th>Concept</th><th>Table</th><th>Extends</th><th>Remember</th></tr></thead>
+      <tbody>
+        <tr><td>Account</td><td><code>customer_account</code></td><td><code>core_company</code></td><td>Company customer</td></tr>
+        <tr><td>Contact</td><td><code>customer_contact</code></td><td><code>sys_user</code></td><td>Person at an account; can log into Customer Portal</td></tr>
+        <tr><td>Consumer</td><td><code>csm_consumer</code></td><td>—</td><td>B2C person</td></tr>
+        <tr><td>Consumer user</td><td><code>csm_consumer_user</code></td><td><code>sys_user</code></td><td>Created on Consumer Service Portal self-registration</td></tr>
+      </tbody>
+    </table>
+    <blockquote>
+      Account [<code>customer_account</code>] <strong>extends the Core Company</strong> [<code>core_company</code>] table. An account can have one or more associated <strong>cases, contacts, assets, service contracts, entitlements, relationships</strong>.
+    </blockquote>
+    <blockquote>
+      An external account can have <strong>multiple contacts</strong>, but a contact can be associated with <strong>only one account</strong>. Contact [<code>customer_contact</code>] <strong>extends the User</strong> [<code>sys_user</code>] table.
+    </blockquote>
+    <p class="note">Contact relationships are the exception path that lets a contact work across related accounts. Accounts and consumers can have multiple addresses but only one primary address.</p>
+
+    <h3>Hierarchy vs relationship</h3>
+    <ul>
+      <li><strong>Account hierarchy:</strong> Parent Account field. Parent–subsidiary. A customer admin (<code>sn_customerservice.customer_admin</code>) can see subsidiary assets/users and create/view cases for subsidiaries on the portal.</li>
+      <li><strong>Account relationship:</strong> Explicit From → To record, based on a relationship type (partner-to-account or account-to-account).</li>
+      <li><strong>Partner:</strong> Sells to and supports customers; can report/manage cases on behalf of customers; can also be a customer.</li>
+    </ul>
+    <p>Official sample: an account relationship record includes <strong>Account From</strong> and <strong>Account To</strong>.</p>
+
+    <h3>Product → install base → entitlement → case</h3>
+    <p><strong>Product model</strong> (what you sell) → <strong>Sold product</strong> (what this customer bought) → <strong>Install base item</strong> (provisioned instance) → <strong>Contract / entitlement</strong> (allowed support) → <strong>Case</strong> (work, with entitlement attached).</p>
+    <blockquote>
+      Sold products are products and components that have been sold to an account or a consumer and can have multiple contracts. An <strong>install base item</strong> is an instance of sold product that has been <strong>provisioned</strong> for an account or consumer.
+      <footer>ServiceNow docs</footer>
+    </blockquote>
+    <blockquote>
+      <strong>Entitlement checks</strong> occur as part of post-sales support … to determine <strong>what services customers are eligible to receive</strong> for the products they've purchased.
+    </blockquote>
+    <p class="note">Zurich: <code>sn_customerservice.advanced_entitlements</code> — true = multiple entitlements on a case (related list); false = single Entitlement field.</p>
+
+    <h2 id="d2">4. Domain 2 — CSM configuration (38%)</h2>
+    <p>Heaviest domain. Blueprint: CSM in ServiceNow, routing and assignment, case types, channels.</p>
+    <blockquote>
+      While they share the same core requirements such as <strong>accounts, contacts, partners, contracts, entitlements</strong>, each industry type also has specific needs … by creating <strong>industry-specific data models</strong> … In addition, <strong>case types</strong> can be created that are more suited to that particular industry.
+    </blockquote>
+    <ul>
+      <li>Customers arrive on a <strong>channel</strong>. That often creates an <strong>Interaction</strong>. Lookup and Verify identifies the person. Then a <strong>Case</strong> is created.</li>
+      <li>Typical channels: email, chat, walk-up, telephony, portal/catalog, virtual agent, engagement messenger.</li>
+      <li><strong>Advanced Work Assignment (AWA)</strong> routes work using service channels, queues, assignment rules, capacity, and skills.</li>
+      <li>Official sample: AWA service channels used by CSM include <strong>Walk-up, Chat, and Case</strong>.</li>
+      <li><strong>Case type:</strong> specialized case with its own form, process, playbook, often a table extension.</li>
+      <li><strong>Service definition:</strong> ties catalog / portal / case type so intake is consistent.</li>
+      <li>Prefer configuration (case types, playbooks, AWA, assignment rules) over custom code.</li>
+    </ul>
+    <table>
+      <thead><tr><th>Mechanism</th><th>Typical use</th></tr></thead>
+      <tbody>
+        <tr><td>Assignment rules</td><td>If these conditions, this group/user</td></tr>
+        <tr><td>AWA</td><td>Skills, capacity, presence, queues, omnichannel</td></tr>
+        <tr><td>Playbooks / PAD</td><td>Guided process after the case exists</td></tr>
+        <tr><td>Matching rules / skills</td><td>Right specialist, not just any agent</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="d3">5. Domain 3 — Case management (17%)</h2>
+    <p>Blueprint: state flows, major issue management, case digests and service definitions, CSM workspace, case actions / tasks / escalations.</p>
+    <p>Official sample: the <strong>final state of a case is Closed</strong> (not Resolved).</p>
+    <p>Typical flow to explain: New → Open → Awaiting Info / Work in Progress → Resolved → (customer accepts) → <strong>Closed</strong>.</p>
+    <p><strong>Major issue management</strong> is CSM’s cousin of Major Incident: one parent issue, many affected customers, child/related cases, case digest / communications, often knowledge + targeted communications.</p>
+    <blockquote>
+      A great thing about CSM is that it can be easily integrated with other ServiceNow products … It can <strong>link a case to an incident, problem, change, or request</strong>. Another great example is its integration with <strong>FSM</strong> for on-site support … by creating a <strong>work order</strong>.
+      <footer>Implementation-path framing (NowBen / common architecture story)</footer>
+    </blockquote>
+
+    <h2 id="d4">6. Domain 4 — Workspace, portals, catalog, analytics (8%)</h2>
+    <table>
+      <thead><tr><th>Surface</th><th>Audience</th><th>Remember</th></tr></thead>
+      <tbody>
+        <tr><td>CSM Configurable Workspace</td><td>Agents</td><td>Day-to-day case work</td></tr>
+        <tr><td>Customer Service Portal</td><td>B2B contacts</td><td>Cases, knowledge, catalog for the account</td></tr>
+        <tr><td>Consumer Service Portal</td><td>B2C consumers</td><td>Self-register → <code>csm_consumer_user</code></td></tr>
+        <tr><td>Service Catalog</td><td>Both</td><td>Often record producers that create cases</td></tr>
+        <tr><td>Special handling notes</td><td>Agents</td><td>Pop-up instructions (VIP, safety, hold)</td></tr>
+        <tr><td>SLAs</td><td>Operations</td><td>When we must respond/resolve</td></tr>
+        <tr><td>Targeted communications</td><td>Customers</td><td>Publications to selected accounts/consumers</td></tr>
+        <tr><td>Platform Analytics</td><td>Managers</td><td>Persona dashboards, CSM metrics</td></tr>
+      </tbody>
+    </table>
+    <p>Do not confuse agent workspace with customer portal. Do not confuse <strong>SLA</strong> (when we must act) with <strong>entitlement</strong> (whether they are allowed the service).</p>
+
+    <h2 id="d5">7. Domain 5 — Best practices and Knowledge (10%)</h2>
+    <p>Official sample: methodology for CSM implementations is <strong>Now Create</strong>.</p>
+    <p>Blueprint: ServiceNow architecture, customer service end-to-end processes, defining project scope, Guided Setup, configure-before-customize.</p>
+    <table>
+      <thead><tr><th>Knowledge topic</th><th>Why CSM cares</th></tr></thead>
+      <tbody>
+        <tr><td>Article Quality Index (AQI)</td><td>Measure article usefulness</td></tr>
+        <tr><td>Knowledge blocks</td><td>Show/hide text by user criteria</td></tr>
+        <tr><td>Search</td><td>Portal + workspace deflection</td></tr>
+        <tr><td>Bulk translations</td><td>Global customer base</td></tr>
+      </tbody>
+    </table>
+    <p>Deflection path: portal search / Virtual Agent → knowledge → if needed, case.</p>
+
+    <h2 id="samples">8. Official sample question patterns</h2>
+    <ol>
+      <li>Account relationship includes <strong>Account From</strong> and <strong>Account To</strong>.</li>
+      <li>CSM AWA channels (select three): <strong>Walk-up, Chat, Case</strong>.</li>
+      <li>Final case state: <strong>Closed</strong>.</li>
+      <li>CSM implementation methodology: <strong>Now Create</strong>.</li>
+    </ol>
+    <p class="note">Style: exact records, exact states, branded methodology names, multi-select with no partial credit.</p>
+
+    <h2 id="itsm">9. ITSM vs CSM</h2>
+    <table>
+      <thead><tr><th></th><th>ITSM</th><th>CSM</th></tr></thead>
+      <tbody>
+        <tr><td>Customer</td><td>Internal employee</td><td>External account/consumer</td></tr>
+        <tr><td>Work record</td><td>Incident / request</td><td>Case</td></tr>
+        <tr><td>Who is this?</td><td>User / CI</td><td>Lookup and Verify, hierarchy, entitlement</td></tr>
+        <tr><td>Major event</td><td>Major incident</td><td>Major issue</td></tr>
+        <tr><td>Portal</td><td>Employee Center / ESS</td><td>Customer / Consumer portals</td></tr>
+        <tr><td>Eligibility</td><td>Usually employment</td><td>Contract + entitlement</td></tr>
+        <tr><td>Field work</td><td>Sometimes</td><td>Work order / FSM</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="pdi">10. Hands-on PDI checklist</h2>
+    <ol class="check">
+      <li>Activate CSM (+ install base / contracts if needed) and open Guided Setup.</li>
+      <li>Create a parent account, child account, contacts, account relationship, partner.</li>
+      <li>Create a consumer and register via Consumer Service Portal.</li>
+      <li>Create a product model, sold product, install base item.</li>
+      <li>Create a contract and entitlement; open a case and attach entitlement.</li>
+      <li>Create two case types and a service definition / catalog record producer.</li>
+      <li>Stand up AWA for Case and Chat; watch a case land in a queue.</li>
+      <li>Walk a case New → … → Closed; add a task and an escalation.</li>
+      <li>Create a special handling note and an SLA.</li>
+      <li>Publish a knowledge article with a knowledge block and find it on the portal.</li>
+      <li>Open CSM Configurable Workspace and resolve the same case from there.</li>
+    </ol>
+
+    <h2 id="code">11. When code actually matters</h2>
+    <p>CIS-CSM is not CAD. You will not pass by memorizing GlideAjax. Code shows up in real projects as entitlement lookups, GlideQuery helpers, or REST to a billing/product system.</p>
+    <p>Use <a href="https://github.com/eltonaguiar/servicenow_scriptincludesample">servicenow_scriptincludesample</a> after this page: GlideQuery vs GlideRecord vs GlideAggregate, GlideAjax (<code>AbstractAjaxProcessor</code>, return a string), <code>gs</code> / GlideUser, RESTMessageV2.</p>
+    <p>Rule: configure first (case type, AWA, playbook, assignment, portal). Script only when the data model and process cannot express the rule.</p>
+
+    <h2 id="train">12. Official training list</h2>
+    <ul>
+      <li>Welcome to ServiceNow</li>
+      <li>Administration Fundamentals</li>
+      <li>Get Started with Now Create</li>
+      <li>Platform Implementation</li>
+      <li>CSM Essentials + CSM Essentials Simulator</li>
+      <li>Knowledge Management for CSM Fundamentals</li>
+      <li>CSM Best Practices for Implementation</li>
+    </ul>
+    <p class="note">Extras named on the blueprint: Customer Data / Product Fundamentals, Service Model Foundation, Case Types &amp; Service Definition &amp; Catalog, Playbooks/PAD, AWA, CCaaS, portals, Virtual Agent, Workspace/UI Builder, Now Assist for CSM, Workforce Optimization. Official practice: MeasureUp (KB0013408).</p>
+
+    <p class="panel muted">Study order: Domain 1 tables until you can draw them → Domain 2 AWA/case types/channels until you can configure them → case lifecycle + major issue → portals/SLA/SHN/knowledge flashcards → Now Create + Guided Setup.</p>
+  </div>
+</body>
+</html>
