@@ -6,6 +6,9 @@ on:
     - cron: '*/10 * * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   generate-summary:
     runs-on: ubuntu-latest
@@ -17,6 +20,7 @@ jobs:
           sparse-checkout: |
             scripts
             daily-feed
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
