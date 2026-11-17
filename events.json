@@ -1,5 +1,28 @@
 [
   {
+    "id": "50ddd3047dfcf2d295faf0c8beaac583",
+    "title": "Returns May 29 & 30, 2027",
+    "date": "2026-01-08T00:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Doors Open Toronto",
+    "host": "City of Toronto",
+    "url": "https://www.toronto.ca/explore-enjoy/festivals-events/doors-open-toronto/",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-17T12:15:50.562337Z",
+    "isFree": true
+  },
+  {
     "id": "163c1781e71704bb6197e3919a367960",
     "title": "An immersive Titanic exhibit is coming to Toronto and it's like being on board the ship",
     "date": "2026-01-27T12:28:26.298Z",
@@ -3118,7 +3141,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:28.623314Z",
+    "last_updated": "2026-11-17T12:15:55.524914Z",
     "isFree": true
   },
   {
@@ -3141,7 +3164,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:28.623337Z",
+    "last_updated": "2026-11-17T12:15:55.524966Z",
     "isFree": true
   },
   {
@@ -3164,7 +3187,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:28.623357Z",
+    "last_updated": "2026-11-17T12:15:55.524988Z",
     "isFree": true
   },
   {
@@ -4025,7 +4048,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:28.623377Z",
+    "last_updated": "2026-11-17T12:15:55.525007Z",
     "isFree": true
   },
   {
@@ -5169,7 +5192,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-20T13:07:28.623401Z",
+    "last_updated": "2026-11-17T12:15:55.525031Z",
     "isFree": true
   },
   {
@@ -5672,7 +5695,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-20T13:07:28.623422Z",
+    "last_updated": "2026-11-17T12:15:55.525052Z",
     "isFree": true
   },
   {
@@ -5695,7 +5718,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:28.623441Z",
+    "last_updated": "2026-11-17T12:15:55.525070Z",
     "isFree": true
   },
   {
@@ -5718,7 +5741,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:28.623465Z",
+    "last_updated": "2026-11-17T12:15:55.525093Z",
     "isFree": true
   },
   {
@@ -7098,7 +7121,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-20T13:07:28.623486Z",
+    "last_updated": "2026-11-17T12:15:55.525113Z",
     "isFree": true
   },
   {
@@ -9499,7 +9522,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:28.623504Z",
+    "last_updated": "2026-11-17T12:15:55.525130Z",
     "isFree": true
   },
   {
@@ -10769,7 +10792,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:28.623521Z",
+    "last_updated": "2026-11-17T12:15:55.525147Z",
     "isFree": true
   },
   {
@@ -21172,7 +21195,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:23.405112Z",
+    "last_updated": "2026-11-17T12:15:50.051353Z",
     "isFree": true
   },
   {
@@ -21488,6 +21511,32 @@
       "Music",
       "Multi-Day"
     ]
+  },
+  {
+    "id": "e620380a664ff80734e8e41b8aa7bd03",
+    "title": "To be announced",
+    "date": "2026-05-02T00:00:00Z",
+    "location": "Nathan Phillips Square",
+    "address": "100 Queen St W, Toronto, ON M5H 2N2",
+    "lat": 43.6525,
+    "lng": -79.3832,
+    "source": "Nathan Phillips Square",
+    "host": "City of Toronto",
+    "url": "https://www.toronto.ca/services-payments/venues-facilities-bookings/booking-city-facilities/city-squares/nathan-phillips-square/events-happening-on-nathan-phillips-square/",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "To be announced at Nathan Phillips Square",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-17T12:15:50.051441Z",
+    "isFree": true
   },
   {
     "id": "48985626cf96319cf7314eb7d03f99bc",
@@ -22607,6 +22656,29 @@
       "Music",
       "Tech"
     ]
+  },
+  {
+    "id": "1d900dd2a9f0311a107bbe4a84e19e20",
+    "title": "Each May, Doors Open Toronto invites the public to explore the city’s most-loved buildings and sites, free of charge. The event provides rare access to buildings that are not usually open to the public and free access to sites that would usually charge an admission fee. Since its inception in 2000, it has attracted more than two million visits to nearly 700 unique locations and remains the largest event of its kind in Canada.",
+    "date": "2026-05-29T00:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Doors Open Toronto",
+    "host": "City of Toronto",
+    "url": "https://www.toronto.ca/explore-enjoy/festivals-events/doors-open-toronto/",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-17T12:15:50.562443Z",
+    "isFree": true
   },
   {
     "id": "047130c1a7eb36b76b26562c80cfd833",
@@ -23928,6 +24000,29 @@
     ]
   },
   {
+    "id": "900134c95f0e52b680cd811356ff251f",
+    "title": "Celebrate everything you love about Canada with the City of Toronto’s annual Canada Day fireworks and daytime events featuring",
+    "date": "2026-07-01T00:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Canada Day Toronto",
+    "host": "City of Toronto",
+    "url": "https://www.toronto.ca/explore-enjoy/festivals-events/canada-day/",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-17T12:15:50.582656Z",
+    "isFree": true
+  },
+  {
     "id": "3fa0d3bf61e8f85465be59544f6cacf4",
     "title": "Football World Cup 2026 - Round of 32 - Match 83 - 2K vs 2L Tickets",
     "date": "2026-07-02T00:00:00-04:00",
@@ -24832,7 +24927,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:23.406216Z",
+    "last_updated": "2026-11-17T12:15:50.052163Z",
     "isFree": true
   },
   {
@@ -25204,6 +25299,39 @@
     ]
   },
   {
+    "id": "632a84795258ee43c95aa928f55095ca",
+    "title": "THAI FESTIVAL TORONTO",
+    "date": "2026-08-30T00:00:00Z",
+    "location": "Sankofa Square",
+    "address": "1 Dundas St E, Toronto, ON M5B 2R8",
+    "lat": 43.6561,
+    "lng": -79.3802,
+    "source": "Sankofa Square",
+    "host": "Sankofa Square",
+    "url": "https://www.sankofasquare.ca/calendar/2026/8/29/thaifest",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Saturday, August 29 | 11 AM - 9 PMSunday, August 30 | 11 AM - 9 PMExperience the flavours and traditions of Thailand atThai Festival Toronto 2026. This free, all-ages celebration featuresauthentic street food,cultural performances, andunique shopping, bringing the spirit of Thailand to the heart of the city.Marking65 years of Thailand–Canada diplomatic relations, the festival offers a vibrant weekend of culture, community, and connection.Learn More",
+    "categories": [
+      "Arts",
+      "Food & Drink",
+      "Community"
+    ],
+    "tags": [
+      "Art",
+      "Food",
+      "Community",
+      "Cultural",
+      "Celebration",
+      "Festival"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-17T12:15:50.377612Z",
+    "isFree": true
+  },
+  {
     "id": "d7e64072428010173fe27a45cc700fdf",
     "title": "Iron Maiden, Megadeth in Toronto",
     "date": "2026-08-30T19:15:00-04:00",
@@ -25222,6 +25350,29 @@
     "tags": [
       "Tech"
     ]
+  },
+  {
+    "id": "a454cfa862a79977165ec6e974c03de9",
+    "title": "Back to Top",
+    "date": "2026-09-01T00:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Doors Open Toronto",
+    "host": "City of Toronto",
+    "url": "https://www.toronto.ca/explore-enjoy/festivals-events/doors-open-toronto/",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-17T12:15:50.562532Z",
+    "isFree": true
   },
   {
     "id": "07a5aed341a54d92c4a6993bfa4a9955",
@@ -25310,6 +25461,34 @@
     ]
   },
   {
+    "id": "ed3c4c58c94cab87e1784eacc23a3944",
+    "title": "K-TRAVEL FEST",
+    "date": "2026-09-13T00:00:00Z",
+    "location": "Sankofa Square",
+    "address": "1 Dundas St E, Toronto, ON M5B 2R8",
+    "lat": 43.6561,
+    "lng": -79.3802,
+    "source": "Sankofa Square",
+    "host": "Sankofa Square",
+    "url": "https://www.sankofasquare.ca/calendar/2026/9/12/k-travel-fest",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "September 12 & 13 | 11AM - 6PMK-Travel Fest, organized byKorea Tourism Organization, is a celebration of Korean travel and culture experiences. Explore the flavours, trends, and experiences of Korea through immersive activities inspired by destinations across the Korea.From K-beauty to K-food and K-crafts, discover what makes Korea unique and get the latest travel inspiration for your next trip. Try on traditional Korean clothing, discover your best colour combo with a Personal Colour Analysis, ",
+    "categories": [
+      "Food & Drink",
+      "Community"
+    ],
+    "tags": [
+      "Food",
+      "Celebration"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-17T12:15:50.376600Z",
+    "isFree": true
+  },
+  {
     "id": "561d8f28a76b662f66fbeeb986e008dd",
     "title": "Public market",
     "date": "2026-09-16T00:00:00Z",
@@ -25378,7 +25557,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:23.406544Z",
+    "last_updated": "2026-11-17T12:15:50.052451Z",
     "isFree": true
   },
   {
@@ -25872,7 +26051,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-20T13:07:23.406822Z",
+    "last_updated": "2026-11-17T12:15:50.052706Z",
     "isFree": true
   },
   {
@@ -25919,7 +26098,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:23.406873Z",
+    "last_updated": "2026-11-17T12:15:50.052757Z",
     "isFree": true
   },
   {
@@ -26051,7 +26230,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-20T13:07:23.406986Z",
+    "last_updated": "2026-11-17T12:15:50.052892Z",
     "isFree": true
   },
   {
@@ -26078,7 +26257,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-02-20T13:07:23.407013Z",
+    "last_updated": "2026-11-17T12:15:50.052922Z",
     "isFree": true
   },
   {
@@ -26103,6 +26282,64 @@
       "Tech",
       "Business"
     ]
+  },
+  {
+    "id": "1b7da5446eb719a2047995785a9b8e6b",
+    "title": "TORONTO BIENNIAL OF ART DIGITAL EXHIBITION",
+    "date": "2026-12-20T00:00:00Z",
+    "location": "Sankofa Square",
+    "address": "1 Dundas St E, Toronto, ON M5B 2R8",
+    "lat": 43.6561,
+    "lng": -79.3802,
+    "source": "Sankofa Square",
+    "host": "Sankofa Square",
+    "url": "https://www.sankofasquare.ca/calendar/2026/9/26/toronto-biennial-of-art",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "September 26 - December 20 | Screened nightly at 10PMExperience a digital artwork byJulien Creuzet, presented nightly across multiple screens at Sankofa Square as part of theToronto Biennial of Art.Influenced by Creuzet’s Martinican intellectual lineage, the work draws on poetry, history and Caribbean traditions.Learn more",
+    "categories": [
+      "Arts"
+    ],
+    "tags": [
+      "Art",
+      "Exhibit",
+      "Exhibition"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-17T12:15:50.374419Z",
+    "isFree": true
+  },
+  {
+    "id": "65c26359915543c6916612c7b2acf583",
+    "title": "HOLIDAY FAIR IN THE SQUARE",
+    "date": "2026-12-20T00:00:00Z",
+    "location": "Sankofa Square",
+    "address": "1 Dundas St E, Toronto, ON M5B 2R8",
+    "lat": 43.6561,
+    "lng": -79.3802,
+    "source": "Sankofa Square",
+    "host": "Sankofa Square",
+    "url": "https://www.sankofasquare.ca/calendar/2026/12/10/holiday-fair-in-the-square",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "December 10 - 20Tuesday–Friday, 4–10 PM | Saturday–Sunday, 12–10 PMClosed Monday, December 14.Celebrate the magic of the holiday season in the heart of downtown Toronto!Holiday Fair in the Square, presented byEpilepsy Toronto, returns with festive shopping, handcrafted gifts from local artisans, a classic carousel, photos with Santa, cozy fire pits and seasonal treats.Explore the Artisan Village, enjoy festive drinks at the Polar Point Bar, warm up with hot chocolate and s’mores, and take part i",
+    "categories": [
+      "Arts",
+      "Nightlife",
+      "Community"
+    ],
+    "tags": [
+      "Art",
+      "Bar",
+      "Community"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-17T12:15:50.374818Z",
+    "isFree": true
   },
   {
     "id": "7615894075d8383c52f8d5a4b5af3352",
@@ -26176,7 +26413,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-02-20T13:07:23.407069Z",
+    "last_updated": "2026-11-17T12:15:50.052979Z",
     "isFree": true
   }
 ]
