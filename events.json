@@ -19,7 +19,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.648235Z",
+    "last_updated": "2026-11-21T12:15:11.464613Z",
     "isFree": true
   },
   {
@@ -3141,7 +3141,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:07.744542Z",
+    "last_updated": "2026-11-21T12:15:17.104024Z",
     "isFree": true
   },
   {
@@ -3164,7 +3164,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:07.744557Z",
+    "last_updated": "2026-11-21T12:15:17.104042Z",
     "isFree": true
   },
   {
@@ -3187,7 +3187,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:07.744570Z",
+    "last_updated": "2026-11-21T12:15:17.104056Z",
     "isFree": true
   },
   {
@@ -4048,7 +4048,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:07.744584Z",
+    "last_updated": "2026-11-21T12:15:17.104071Z",
     "isFree": true
   },
   {
@@ -5192,7 +5192,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-20T12:16:07.744600Z",
+    "last_updated": "2026-11-21T12:15:17.104089Z",
     "isFree": true
   },
   {
@@ -5695,7 +5695,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-20T12:16:07.744613Z",
+    "last_updated": "2026-11-21T12:15:17.104102Z",
     "isFree": true
   },
   {
@@ -5718,7 +5718,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:07.744625Z",
+    "last_updated": "2026-11-21T12:15:17.104116Z",
     "isFree": true
   },
   {
@@ -5741,7 +5741,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:07.744641Z",
+    "last_updated": "2026-11-21T12:15:17.104135Z",
     "isFree": true
   },
   {
@@ -7121,7 +7121,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-20T12:16:07.744654Z",
+    "last_updated": "2026-11-21T12:15:17.104151Z",
     "isFree": true
   },
   {
@@ -9522,7 +9522,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:07.744664Z",
+    "last_updated": "2026-11-21T12:15:17.104163Z",
     "isFree": true
   },
   {
@@ -10792,7 +10792,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:07.744673Z",
+    "last_updated": "2026-11-21T12:15:17.104174Z",
     "isFree": true
   },
   {
@@ -21195,7 +21195,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.230546Z",
+    "last_updated": "2026-11-21T12:15:10.943674Z",
     "isFree": true
   },
   {
@@ -21535,7 +21535,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.230595Z",
+    "last_updated": "2026-11-21T12:15:10.943727Z",
     "isFree": true
   },
   {
@@ -22677,7 +22677,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.648302Z",
+    "last_updated": "2026-11-21T12:15:11.464689Z",
     "isFree": true
   },
   {
@@ -24019,7 +24019,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.667758Z",
+    "last_updated": "2026-11-21T12:15:11.483453Z",
     "isFree": true
   },
   {
@@ -24927,7 +24927,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.230990Z",
+    "last_updated": "2026-11-21T12:15:10.944172Z",
     "isFree": true
   },
   {
@@ -25328,7 +25328,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.500381Z",
+    "last_updated": "2026-11-21T12:15:11.373030Z",
     "isFree": true
   },
   {
@@ -25371,7 +25371,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.648351Z",
+    "last_updated": "2026-11-21T12:15:11.464750Z",
     "isFree": true
   },
   {
@@ -25461,6 +25461,35 @@
     ]
   },
   {
+    "id": "6380a54b5a5a1ac6a96de1d00004a7df",
+    "title": "Myst Saturdays - Reggaeton x Latin (iLoveThatParty)",
+    "date": "2026-09-12T22:30:00Z",
+    "end_date": "2026-11-29T03:00:00Z",
+    "location": "Myst Toronto",
+    "address": "423 College Street, Toronto, ON M5T 1T1, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "I Love That Party",
+    "url": "https://www.eventbrite.ca/e/myst-saturdays-reggaeton-x-latin-ilovethatparty-tickets-1999268733601",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "FREE on Guestlist. Playing all the best in Reggaeton and Latin Club Anthems. Your favourite Saturday party in Toronto",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1189589913%2F206853442738%2F1%2Foriginal.20260725-025538?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=f1bd93b28d49d3afd124872875032b4c",
+    "categories": [
+      "Arts",
+      "Nightlife"
+    ],
+    "tags": [
+      "Art",
+      "Club",
+      "Party"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-11-21T12:15:02.263688Z",
+    "isFree": true
+  },
+  {
     "id": "ed3c4c58c94cab87e1784eacc23a3944",
     "title": "K-TRAVEL FEST",
     "date": "2026-09-13T00:00:00Z",
@@ -25485,7 +25514,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.499887Z",
+    "last_updated": "2026-11-21T12:15:11.372275Z",
     "isFree": true
   },
   {
@@ -25557,7 +25586,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.231136Z",
+    "last_updated": "2026-11-21T12:15:10.944321Z",
     "isFree": true
   },
   {
@@ -26051,7 +26080,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-20T12:16:02.231276Z",
+    "last_updated": "2026-11-21T12:15:10.944481Z",
     "isFree": true
   },
   {
@@ -26098,7 +26127,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.231305Z",
+    "last_updated": "2026-11-21T12:15:10.944526Z",
     "isFree": true
   },
   {
@@ -26347,6 +26376,82 @@
     "isFree": false
   },
   {
+    "id": "2b58118c271be1a645adb318bed5a30d",
+    "title": "More Than a Workshop. A Room Full of Possibilities.",
+    "date": "2026-11-21T14:00:00Z",
+    "location": "Cedar Brae Golf Club",
+    "address": "55 Mac Frost Way, Toronto, ON M1X 1N6, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Asset Builder Club",
+    "url": "https://www.eventbrite.ca/e/more-than-a-workshop-a-room-full-of-possibilities-tickets-2002573100050",
+    "price": "$99",
+    "price_amount": 98.88,
+    "is_free": false,
+    "description": "Learn from industry professionals. Connect with investors and entrepreneurs. Build relationships with like-minded individuals.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1196453660%2F3005739926028%2F1%2Foriginal.20261023-162430?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=72d63eeea3ec866a52ec6cde2cfa4abb",
+    "categories": [
+      "Business"
+    ],
+    "tags": [
+      "Professional",
+      "Workshop"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:15:09.069045Z",
+    "isFree": false
+  },
+  {
+    "id": "62472eb2747be9a88278c9130b2fa9fb",
+    "title": "DIY Fiber Lab: Cotton Paper-Making Workshop",
+    "date": "2026-11-21T14:00:00Z",
+    "location": "George Chuvalo Neighbourhood Centre",
+    "address": "50 Sousa Mendes Street, Toronto, ON M6P 3Z5, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Sustainable Junction Triangle",
+    "url": "https://www.eventbrite.ca/e/diy-fiber-lab-cotton-paper-making-workshop-tickets-2001806092911",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Discover how discarded cotton textiles can be transformed into handmade paper.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1193979534%2F2110693760263%2F1%2Foriginal.20260921-024633?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.44&fp-y=0.175&s=309ab50d3be4631fc80c36a3ef69b8d0",
+    "categories": [
+      "Business"
+    ],
+    "tags": [
+      "Workshop"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:15:09.538240Z",
+    "isFree": true
+  },
+  {
+    "id": "0d3cdba5ded37f78541f19de708b52e9",
+    "title": "Eat a Peach: Tribute To The Allman Brothers Band",
+    "date": "2026-11-21T21:00:00Z",
+    "location": "El Mocambo",
+    "address": "464 Spadina Avenue, #462, Toronto, ON M5T 2G8, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Stagename",
+    "url": "https://www.eventbrite.ca/e/eat-a-peach-tribute-to-the-allman-brothers-band-tickets-1997636333047",
+    "price": "$39",
+    "price_amount": 38.95,
+    "is_free": false,
+    "description": "A live tribute to The Allman Brothers Band and Tedeschi Trucks Band at the legendary El Mocambo.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1194123043%2F1960589544733%2F1%2Foriginal.20260922-174647?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=6c4c54cf2d62e0d1d89b68cf43d78639",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:15:08.621629Z",
+    "isFree": false
+  },
+  {
     "id": "6b45d86b413fec4d92606e66e0249cee",
     "title": "PALM TREES @ ACQUA: SATURDAY NOVEMBER 21ST",
     "date": "2026-11-21T22:00:00Z",
@@ -26371,7 +26476,92 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-19T12:15:36.208906Z",
+    "last_updated": "2026-11-21T12:14:57.818842Z",
+    "isFree": false
+  },
+  {
+    "id": "9e370e9b2b0475fada4b96a2ea3b76b0",
+    "title": "TORONTO BAD BUNNY PARTY @ NEST | LADIES FREE + 1 FREE DRINK| SAT, NOV 21",
+    "date": "2026-11-21T22:00:00Z",
+    "end_date": "2026-11-22T03:00:00Z",
+    "location": "NEST",
+    "address": "423 College Street, Toronto, ON M5T 1T1, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "CLUBLIFE TORONTO",
+    "url": "https://www.eventbrite.ca/e/toronto-bad-bunny-party-nest-ladies-free-1-free-drink-sat-nov-21-tickets-2004964989255",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Entry With Tickets Only ! Join the  ultimate Bad Bunny  tribute party in Toronto . 1000+ Guests Expected. Book now. Arrive Early .19+  Event",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1198183590%2F173910726698%2F1%2Foriginal.20261117-185716?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=d55000358edc79ff7dcbfa32b7d181fc",
+    "categories": [
+      "Arts",
+      "Nightlife"
+    ],
+    "tags": [
+      "Art",
+      "Party"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-11-21T12:15:00.507838Z",
+    "isFree": true
+  },
+  {
+    "id": "4b79ddece546b2eb50771e7ed5bf5c86",
+    "title": "YUBIK in Toronto | Melodic Techno Warehouse Rave",
+    "date": "2026-11-21T22:00:00Z",
+    "end_date": "2026-11-22T04:00:00Z",
+    "location": "Geary Avenue Warehouse",
+    "address": "209 Geary Avenue, Toronto, ON M6H 2C1, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "HĒRA Social Events",
+    "url": "https://www.eventbrite.ca/e/yubik-in-toronto-melodic-techno-warehouse-rave-tickets-1998407684179",
+    "price": "$30",
+    "price_amount": 30.09,
+    "is_free": false,
+    "description": "Experience YUBIK (Afterlife / UNVRS Ibiza) live @ Geary Ave Warehouse. Melodic techno, raw warehouse energy. Nov 21. Final tickets available",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1197636666%2F1657491265353%2F1%2Foriginal.20261109-224550?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=2d3a6641b8362f7386aa32994fdfdc88",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-11-21T12:15:07.273100Z",
+    "isFree": false
+  },
+  {
+    "id": "372ea2f2cd19c3a857b7fe7ae4ad2e7a",
+    "title": "BODY HEAT — Afrobeats, Dancehall & R&B Party in Toronto | Sat Nov 21",
+    "date": "2026-11-21T22:00:00Z",
+    "end_date": "2026-11-22T04:00:00Z",
+    "location": "Mia Toronto",
+    "address": "244 Adelaide Street West, Toronto, ON M5H 1Y3, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Afrodisiac Party",
+    "url": "https://www.eventbrite.ca/e/body-heat-afrobeats-dancehall-rb-party-in-toronto-sat-nov-21-tickets-2003968270041",
+    "price": "$18",
+    "price_amount": 17.55,
+    "is_free": false,
+    "description": "The last Body Heat of 2026. Afrobeats, Dancehall & R&B at MIA Toronto with Deeboy, Snoopy, Bxnny & Feel Fancy. 19+.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1196722346%2F1303232552373%2F1%2Foriginal.20261027-212016?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=2d80748d809aa392a6b9cde593c47fe9",
+    "categories": [
+      "Music",
+      "Arts",
+      "Nightlife"
+    ],
+    "tags": [
+      "R&B",
+      "Art",
+      "Party",
+      "Dance"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-11-21T12:15:08.177842Z",
     "isFree": false
   },
   {
@@ -26397,7 +26587,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-19T12:15:35.728448Z",
+    "last_updated": "2026-11-21T12:14:58.302792Z",
     "isFree": false
   },
   {
@@ -26423,7 +26613,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-19T12:15:45.321723Z",
+    "last_updated": "2026-11-21T12:15:07.731815Z",
     "isFree": false
   },
   {
@@ -26450,6 +26640,31 @@
     "status": "UPCOMING",
     "is_multi_day": false,
     "last_updated": "2026-02-20T13:07:23.773319Z",
+    "isFree": true
+  },
+  {
+    "id": "3d58c695b10d1301362bb009b389aa92",
+    "title": "ON A TANGENT 03: The Order of Time with Kiana Salehi | Farsi",
+    "date": "2026-11-22T14:00:00Z",
+    "location": "BAAA! (Back Alley for Art & Architecture)",
+    "address": "300 Campbell Avenue, #Suite 114, Toronto, ON M6P 3S2, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Archi8",
+    "url": "https://www.eventbrite.com/e/on-a-tangent-03-the-order-of-time-with-kiana-salehi-farsi-tickets-2002402338297",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "Explore time, space, and human experience through Carlo Rovelli’s The Order of Time with Kiana Salehi. A conversation in Farsi.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1194990742%2F2882633963551%2F1%2Foriginal.20261003-225223?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=99d437ccb68f26164641e6d3e579c858",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:15:09.979474Z",
     "isFree": true
   },
   {
@@ -26493,8 +26708,32 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-19T12:15:40.302050Z",
+    "last_updated": "2026-11-21T12:15:03.645778Z",
     "isFree": true
+  },
+  {
+    "id": "ad944ef9a09a904b3d7aceabcecb8f54",
+    "title": "Conciliaciones Bancarias con IA - taller Práctico - Claude",
+    "date": "2026-11-24T18:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Centro de Formación Profesional",
+    "url": "https://www.eventbrite.com.ar/e/conciliaciones-bancarias-con-ia-taller-practico-claude-tickets-2003655280882",
+    "price": "$15000",
+    "price_amount": 15000.0,
+    "is_free": false,
+    "description": "Conciliaciones Bancarias con IA",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1196176396%2F462531016642%2F1%2Foriginal.20261020-110621?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=c9942c98c65443c7e21952647e2952cf",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:15:04.160604Z",
+    "isFree": false
   },
   {
     "id": "be590bdfdd4e2e9205b034810434a4ed",
@@ -26573,7 +26812,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-19T12:15:33.894996Z",
+    "last_updated": "2026-11-21T12:14:56.041970Z",
     "isFree": false
   },
   {
@@ -26600,7 +26839,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-20T12:16:02.231379Z",
+    "last_updated": "2026-11-21T12:15:10.944613Z",
     "isFree": true
   },
   {
@@ -26625,7 +26864,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-19T12:15:38.924063Z",
+    "last_updated": "2026-11-21T12:15:02.736667Z",
     "isFree": true
   },
   {
@@ -26649,7 +26888,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-19T12:15:41.181512Z",
+    "last_updated": "2026-11-21T12:15:04.599197Z",
     "isFree": false
   },
   {
@@ -26676,7 +26915,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-20T12:16:02.231397Z",
+    "last_updated": "2026-11-21T12:15:10.944632Z",
     "isFree": true
   },
   {
@@ -26701,7 +26940,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-19T12:15:39.370988Z",
+    "last_updated": "2026-11-21T12:15:03.183080Z",
     "isFree": true
   },
   {
@@ -26756,7 +26995,32 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": true,
-    "last_updated": "2026-11-19T12:15:36.675497Z",
+    "last_updated": "2026-11-21T12:14:56.486195Z",
+    "isFree": false
+  },
+  {
+    "id": "8bb696fe772356651842d9bc28c3ec35",
+    "title": "Café ZUZU: Holiday Wreath-Making Workshop with Botany Floral Studio",
+    "date": "2026-12-05T11:30:00Z",
+    "location": "Café ZUZU Pizzeria",
+    "address": "555 Dundas Street East, Toronto, ON M5A 2B7, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Café ZUZU Pizzeria",
+    "url": "https://www.eventbrite.ca/e/cafe-zuzu-holiday-wreath-making-workshop-with-botany-floral-studio-tickets-2004312838655",
+    "price": "$135",
+    "price_amount": 135.0,
+    "is_free": false,
+    "description": "Back by popular demand! Spend time with new friends, building your very own wreath for the season + optional lunch at Café ZUZU pizzeria!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1197189193%2F2991000706694%2F1%2Foriginal.20261103-173507?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=14233cdf04d86bee54a34c352346b9d9",
+    "categories": [
+      "Business"
+    ],
+    "tags": [
+      "Workshop"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:14:59.626341Z",
     "isFree": false
   },
   {
@@ -26780,7 +27044,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-19T12:15:42.509266Z",
+    "last_updated": "2026-11-21T12:15:05.473412Z",
     "isFree": true
   },
   {
@@ -26805,7 +27069,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-19T12:15:34.341319Z",
+    "last_updated": "2026-11-21T12:14:56.923997Z",
     "isFree": false
   },
   {
@@ -26833,6 +27097,55 @@
     "address": "100 Queens Park, Toronto, ON M5S 2C6",
     "lat": 43.6677,
     "lng": -79.3948,
+    "isFree": false
+  },
+  {
+    "id": "b7fa6dccf89a2b02cf8b7e594ed2cff5",
+    "title": "Christmas Power Data Platform 3ª Edición",
+    "date": "2026-12-11T15:00:00Z",
+    "end_date": "2026-12-12T15:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Various Organizers",
+    "url": "https://www.eventbrite.com/e/entradas-christmas-power-data-platform-3a-edicion-2005032887340",
+    "price": "Free",
+    "price_amount": 0.0,
+    "is_free": true,
+    "description": "3ª Edición del Christmas Power Data Platform 2026: Uniendo Innovación y Solidaridad por un Futuro Mejor",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1161429203%2F2967916994951%2F1%2Foriginal.20251024-081959?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=2dbb39454449449482b73748401780ca",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": true,
+    "last_updated": "2026-11-21T12:15:05.909990Z",
+    "isFree": true
+  },
+  {
+    "id": "84a18a641a398a002b1c84f3cebcf4da",
+    "title": "Què fer davant l’afàsia progressiva primària?",
+    "date": "2026-12-12T10:00:00Z",
+    "location": "Toronto, ON",
+    "source": "Eventbrite",
+    "host": "Col·legi de Logopedes de Catalunya",
+    "url": "https://www.eventbrite.es/e/registro-que-fer-davant-lafasia-progressiva-primaria-1989812235962",
+    "price": "$25",
+    "price_amount": 25.0,
+    "is_free": false,
+    "description": "Estratègies d’intervenció logopèdica basades en la reserva cognitiva i la plasticitat cerebral",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1184826015%2F354359581149%2F1%2Foriginal.20260518-080048?w=940&auto=format%2Ccompress&q=75&sharp=10&s=e9bc400e6f1d08b1723144791756b5e4",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:15:06.374334Z",
     "isFree": false
   },
   {
@@ -26885,6 +27198,56 @@
     ]
   },
   {
+    "id": "674859774febe39004aaeab9dabd3152",
+    "title": "A Very New Wave Xmas II - Night 2",
+    "date": "2026-12-18T20:00:00Z",
+    "location": "The Great Hall",
+    "address": "1087 Queen Street West, Toronto, ON M6J 1H3, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "UK Calling",
+    "url": "https://www.eventbrite.com/e/a-very-new-wave-xmas-ii-night-2-tickets-2004044848088",
+    "price": "$40",
+    "price_amount": 39.97,
+    "is_free": false,
+    "description": "Saturday sold out! UK Calling adds Dec 18 at The Great Hall with our biggest horn section ever. A special night for 2 Tone fans!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1196810468%2F81868694179%2F1%2Foriginal.20261028-215411?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.771&fp-y=0.588&s=bdf9e936f8142c4f7fe140dc838285c4",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:14:58.743814Z",
+    "isFree": false
+  },
+  {
+    "id": "38c49b0c07cae19ab137da18fa683585",
+    "title": "UK Calling: A Very New Wave Christmas II",
+    "date": "2026-12-19T19:00:00Z",
+    "location": "The Great Hall",
+    "address": "1087 Queen Street West, Toronto, ON M6J 1H3, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "UK Calling",
+    "url": "https://www.eventbrite.com/e/uk-calling-a-very-new-wave-christmas-ii-tickets-2002746030289",
+    "price": "$40",
+    "price_amount": 39.97,
+    "is_free": false,
+    "description": "A Very New Wave Xmas II. Nothing remotely Christmassy about it. Less Mariah. More Robert Smith. Dec 19 at The Great Hall.",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1194835550%2F81868694179%2F1%2Foriginal.20261001-171801?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.483&fp-y=0.086&s=c7425cd29f1a950ea57243afa48137db",
+    "categories": [
+      "General"
+    ],
+    "tags": [
+      "General"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:14:57.375951Z",
+    "isFree": false
+  },
+  {
     "id": "4e41f649c5f1369cb6ce9c098953ac14",
     "title": "Washington Crossing the Delaware / The Crossing - Film History Livestream",
     "date": "2026-12-19T20:00:00Z",
@@ -26905,7 +27268,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-19T12:15:43.430533Z",
+    "last_updated": "2026-11-21T12:15:06.833805Z",
     "isFree": true
   },
   {
@@ -26933,7 +27296,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.498755Z",
+    "last_updated": "2026-11-21T12:15:11.370375Z",
     "isFree": true
   },
   {
@@ -26963,7 +27326,7 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.499025Z",
+    "last_updated": "2026-11-21T12:15:11.370739Z",
     "isFree": true
   },
   {
@@ -27038,7 +27401,33 @@
     ],
     "status": "UPCOMING",
     "is_multi_day": false,
-    "last_updated": "2026-11-20T12:16:02.231429Z",
+    "last_updated": "2026-11-21T12:15:10.944670Z",
     "isFree": true
+  },
+  {
+    "id": "8c98f7fb3bfa96e03c698a97e04d805d",
+    "title": "Jinny Ng 吳若希 相遇 在多倫多- Live in Toronto 2027",
+    "date": "2027-01-28T20:00:00Z",
+    "location": "Chinese Cultural Centre Of Greater Toronto",
+    "address": "5183 Sheppard Avenue East, Toronto, ON M1B 5Z5, Toronto, ON",
+    "source": "Eventbrite",
+    "host": "JH Productions Inc.",
+    "url": "https://www.eventbrite.com/e/jinny-ng-live-in-toronto-2027-tickets-2004333130348",
+    "price": "$106",
+    "price_amount": 105.7,
+    "is_free": false,
+    "description": "Celebrate Jinny's first ever concert in Canada with your favorite TVB hit songs! With a full live band, it will be a night to remember!",
+    "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1197520559%2F2210071881433%2F1%2Foriginal.20261108-061104?crop=focalpoint&fit=crop&w=940&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.458&fp-y=0.318&s=f05345d04d4ce0281b7f74a107ce1a37",
+    "categories": [
+      "Music"
+    ],
+    "tags": [
+      "Concert",
+      "Live Band"
+    ],
+    "status": "UPCOMING",
+    "is_multi_day": false,
+    "last_updated": "2026-11-21T12:14:59.179639Z",
+    "isFree": false
   }
 ]
