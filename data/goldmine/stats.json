@@ -1,15 +1,15 @@
 {
-    "timestamp": "2026-11-23 16:36:34",
+    "timestamp": "2026-11-23 16:49:44",
     "by_type": {
-        "meme_coin": 7,
+        "meme_coin": 5,
         "sports": 1
     },
     "by_source": {
-        "meme_scanner": 7,
+        "meme_scanner": 5,
         "sports_value_bet": 1
     },
     "by_algorithm": {
-        "meme_scanner": 7,
+        "meme_scanner": 5,
         "value_bet": 1
     },
     "high_confidence": 0

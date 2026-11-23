@@ -1,78 +1,7 @@
 {
-    "timestamp": "2026-11-23 16:36:34",
-    "total_picks": 8,
+    "timestamp": "2026-11-23 16:49:44",
+    "total_picks": 6,
     "picks": [
-        {
-            "uuid": "meme_21",
-            "symbol": "AI",
-            "name": "AI",
-            "type": "meme_coin",
-            "source": "meme_scanner",
-            "algorithm": "meme_scanner",
-            "direction": "long",
-            "entry_price": "0.02190806",
-            "score": "77",
-            "confidence": "77",
-            "target_pct": "5.2",
-            "risk_pct": "2.8",
-            "pick_date": "2026-11-23 14:48:49",
-            "status": "active",
-            "collected_at": "2026-11-23 16:36:34",
-            "factors": {
-                "explosive_volume": {
-                    "score": 6,
-                    "max": 25,
-                    "vol_usd_24h": 3234410,
-                    "method": "aggregate"
-                },
-                "parabolic_momentum": {
-                    "score": 20,
-                    "max": 20,
-                    "mom_15m": 26.66,
-                    "mom_5m": 25.74
-                },
-                "rsi_hype_zone": {
-                    "score": 15,
-                    "max": 15,
-                    "rsi": 75.5
-                },
-                "social_proxy": {
-                    "score": 15,
-                    "max": 15,
-                    "velocity": 40,
-                    "mom_1h": 26.66,
-                    "vol_rank": 1.5,
-                    "method": "aggregate"
-                },
-                "volume_concentration": {
-                    "score": 8,
-                    "max": 10,
-                    "pct": 80.4,
-                    "method": "price_range"
-                },
-                "breakout_4h": {
-                    "score": 10,
-                    "max": 10,
-                    "breakout_pct": 9.99,
-                    "high_4h": 0.01991763
-                },
-                "low_cap_bonus": {
-                    "score": 3,
-                    "max": 5,
-                    "vol_usd": 3234410
-                },
-                "volatility": {
-                    "atr": 0.0007577,
-                    "atr_pct": 3.46
-                },
-                "btc_regime": {
-                    "regime": "chop",
-                    "btc_trend_pct": 0,
-                    "adjustment": 0,
-                    "raw_score": 77
-                }
-            }
-        },
         {
             "uuid": "meme_23",
             "symbol": "AI",
@@ -88,7 +17,7 @@
             "risk_pct": "2.8",
             "pick_date": "2026-11-23 14:58:11",
             "status": "active",
-            "collected_at": "2026-11-23 16:36:34",
+            "collected_at": "2026-11-23 16:49:44",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -159,7 +88,7 @@
             "risk_pct": "2.8",
             "pick_date": "2026-11-23 15:01:40",
             "status": "active",
-            "collected_at": "2026-11-23 16:36:34",
+            "collected_at": "2026-11-23 16:49:44",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -216,77 +145,6 @@
             }
         },
         {
-            "uuid": "meme_22",
-            "symbol": "NEIRO",
-            "name": "NEIRO",
-            "type": "meme_coin",
-            "source": "meme_scanner",
-            "algorithm": "meme_scanner",
-            "direction": "long",
-            "entry_price": "0.00004988",
-            "score": "71",
-            "confidence": "71",
-            "target_pct": "2",
-            "risk_pct": "1.5",
-            "pick_date": "2026-11-23 14:48:49",
-            "status": "active",
-            "collected_at": "2026-11-23 16:36:34",
-            "factors": {
-                "explosive_volume": {
-                    "score": 6,
-                    "max": 25,
-                    "vol_usd_24h": 2969515,
-                    "method": "aggregate"
-                },
-                "parabolic_momentum": {
-                    "score": 20,
-                    "max": 20,
-                    "mom_15m": 5.8,
-                    "mom_5m": 4.77
-                },
-                "rsi_hype_zone": {
-                    "score": 15,
-                    "max": 15,
-                    "rsi": 76.2
-                },
-                "social_proxy": {
-                    "score": 12,
-                    "max": 15,
-                    "velocity": 8.7,
-                    "mom_1h": 5.8,
-                    "vol_rank": 1.5,
-                    "method": "aggregate"
-                },
-                "volume_concentration": {
-                    "score": 8,
-                    "max": 10,
-                    "pct": 66.8,
-                    "method": "price_range"
-                },
-                "breakout_4h": {
-                    "score": 7,
-                    "max": 10,
-                    "breakout_pct": 1.61,
-                    "high_4h": 4.909e-5
-                },
-                "low_cap_bonus": {
-                    "score": 3,
-                    "max": 5,
-                    "vol_usd": 2969515
-                },
-                "volatility": {
-                    "atr": 4.5e-7,
-                    "atr_pct": 1
-                },
-                "btc_regime": {
-                    "regime": "chop",
-                    "btc_trend_pct": 0,
-                    "adjustment": 0,
-                    "raw_score": 71
-                }
-            }
-        },
-        {
             "uuid": "meme_24",
             "symbol": "NEIRO",
             "name": "NEIRO",
@@ -301,7 +159,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:58:11",
             "status": "active",
-            "collected_at": "2026-11-23 16:36:34",
+            "collected_at": "2026-11-23 16:49:44",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -372,7 +230,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 15:01:07",
             "status": "active",
-            "collected_at": "2026-11-23 16:36:34",
+            "collected_at": "2026-11-23 16:49:44",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -443,7 +301,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 15:01:40",
             "status": "active",
-            "collected_at": "2026-11-23 16:36:34",
+            "collected_at": "2026-11-23 16:49:44",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -511,9 +369,9 @@
             "odds": 1.9259,
             "ev_pct": 2.9,
             "confidence": 29,
-            "pick_date": "2026-11-23 16:36:34",
+            "pick_date": "2026-11-23 16:49:44",
             "status": "active",
-            "collected_at": "2026-11-23 16:36:34"
+            "collected_at": "2026-11-23 16:49:44"
         }
     ]
 }
