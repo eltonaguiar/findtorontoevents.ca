@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-11-23 19:05:29",
+    "timestamp": "2026-11-23 19:08:06",
     "total_picks": 3,
     "picks": [
         {
@@ -17,7 +17,7 @@
             "risk_pct": "3",
             "pick_date": "2026-11-23 18:48:59",
             "status": "active",
-            "collected_at": "2026-11-23 19:05:29",
+            "collected_at": "2026-11-23 19:08:06",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -88,7 +88,7 @@
             "risk_pct": "3",
             "pick_date": "2026-11-23 18:58:40",
             "status": "active",
-            "collected_at": "2026-11-23 19:05:29",
+            "collected_at": "2026-11-23 19:08:06",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -156,9 +156,9 @@
             "odds": 1.9259,
             "ev_pct": 2.9,
             "confidence": 29,
-            "pick_date": "2026-11-23 19:05:29",
+            "pick_date": "2026-11-23 19:08:06",
             "status": "active",
-            "collected_at": "2026-11-23 19:05:29"
+            "collected_at": "2026-11-23 19:08:06"
         }
     ]
 }
