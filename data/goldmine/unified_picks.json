@@ -1,6 +1,6 @@
 {
-    "timestamp": "2026-11-23 20:19:41",
-    "total_picks": 8,
+    "timestamp": "2026-11-23 20:35:53",
+    "total_picks": 9,
     "picks": [
         {
             "uuid": "meme_30",
@@ -17,7 +17,7 @@
             "risk_pct": "3",
             "pick_date": "2026-11-23 19:11:21",
             "status": "active",
-            "collected_at": "2026-11-23 20:19:41",
+            "collected_at": "2026-11-23 20:35:53",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -88,7 +88,7 @@
             "risk_pct": "3",
             "pick_date": "2026-11-23 19:25:14",
             "status": "active",
-            "collected_at": "2026-11-23 20:19:41",
+            "collected_at": "2026-11-23 20:35:53",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -159,7 +159,7 @@
             "risk_pct": "3",
             "pick_date": "2026-11-23 18:48:59",
             "status": "active",
-            "collected_at": "2026-11-23 20:19:41",
+            "collected_at": "2026-11-23 20:35:53",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -230,7 +230,7 @@
             "risk_pct": "3",
             "pick_date": "2026-11-23 18:58:40",
             "status": "active",
-            "collected_at": "2026-11-23 20:19:41",
+            "collected_at": "2026-11-23 20:35:53",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -301,7 +301,7 @@
             "risk_pct": "3",
             "pick_date": "2026-11-23 19:37:16",
             "status": "active",
-            "collected_at": "2026-11-23 20:19:41",
+            "collected_at": "2026-11-23 20:35:53",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -372,7 +372,7 @@
             "risk_pct": "3",
             "pick_date": "2026-11-23 20:10:11",
             "status": "active",
-            "collected_at": "2026-11-23 20:19:41",
+            "collected_at": "2026-11-23 20:35:53",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -443,7 +443,7 @@
             "risk_pct": "3",
             "pick_date": "2026-11-23 20:12:31",
             "status": "active",
-            "collected_at": "2026-11-23 20:19:41",
+            "collected_at": "2026-11-23 20:35:53",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -500,6 +500,77 @@
             }
         },
         {
+            "uuid": "meme_35",
+            "symbol": "FIONA",
+            "name": "FIONA",
+            "type": "meme_coin",
+            "source": "meme_scanner",
+            "algorithm": "meme_scanner",
+            "direction": "long",
+            "entry_price": "0.00318683",
+            "score": "70",
+            "confidence": "70",
+            "target_pct": "6",
+            "risk_pct": "3",
+            "pick_date": "2026-11-23 20:25:41",
+            "status": "active",
+            "collected_at": "2026-11-23 20:35:53",
+            "factors": {
+                "explosive_volume": {
+                    "score": 6,
+                    "max": 25,
+                    "vol_usd_24h": 5156213,
+                    "method": "aggregate"
+                },
+                "parabolic_momentum": {
+                    "score": 20,
+                    "max": 20,
+                    "mom_15m": 39.92,
+                    "mom_5m": 76.48
+                },
+                "rsi_hype_zone": {
+                    "score": 15,
+                    "max": 15,
+                    "rsi": 74.5
+                },
+                "social_proxy": {
+                    "score": 15,
+                    "max": 15,
+                    "velocity": 59.9,
+                    "mom_1h": 39.92,
+                    "vol_rank": 1.5,
+                    "method": "aggregate"
+                },
+                "volume_concentration": {
+                    "score": 3,
+                    "max": 10,
+                    "pct": 36.3,
+                    "method": "price_range"
+                },
+                "breakout_4h": {
+                    "score": 10,
+                    "max": 10,
+                    "breakout_pct": 15.57,
+                    "high_4h": 0.00275744
+                },
+                "low_cap_bonus": {
+                    "score": 1,
+                    "max": 5,
+                    "vol_usd": 5156213
+                },
+                "volatility": {
+                    "atr": 0.00026222,
+                    "atr_pct": 8.23
+                },
+                "btc_regime": {
+                    "regime": "chop",
+                    "btc_trend_pct": 0,
+                    "adjustment": 0,
+                    "raw_score": 70
+                }
+            }
+        },
+        {
             "uuid": "sports_actionnet_290575_02552d3c116b8a96f9ff0001b6ae661c",
             "symbol": "Montreal Canadiens vs Buffalo Sabres",
             "name": "Under 6.50",
@@ -511,9 +582,9 @@
             "odds": 1.9259,
             "ev_pct": 2.9,
             "confidence": 29,
-            "pick_date": "2026-11-23 20:19:41",
+            "pick_date": "2026-11-23 20:35:53",
             "status": "active",
-            "collected_at": "2026-11-23 20:19:41"
+            "collected_at": "2026-11-23 20:35:53"
         }
     ]
 }
