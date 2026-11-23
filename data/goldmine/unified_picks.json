@@ -1,79 +1,7 @@
 {
-    "timestamp": "2026-11-23 16:21:23",
-    "total_picks": 13,
+    "timestamp": "2026-11-23 16:36:34",
+    "total_picks": 8,
     "picks": [
-        {
-            "uuid": "meme_16",
-            "symbol": "SUI",
-            "name": "SUI",
-            "type": "meme_coin",
-            "source": "meme_scanner",
-            "algorithm": "meme_scanner",
-            "direction": "long",
-            "entry_price": "0.73242",
-            "score": "80",
-            "confidence": "80",
-            "target_pct": "3",
-            "risk_pct": "2",
-            "pick_date": "2026-11-23 14:27:56",
-            "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
-            "factors": {
-                "explosive_volume": {
-                    "score": 18,
-                    "max": 25,
-                    "ratio": 7.3,
-                    "recent_avg": 132437.6,
-                    "method": "candle"
-                },
-                "parabolic_momentum": {
-                    "score": 20,
-                    "max": 20,
-                    "mom_15m": 9.35,
-                    "mom_5m": 4.09
-                },
-                "rsi_hype_zone": {
-                    "score": 5,
-                    "max": 15,
-                    "rsi": 88.8
-                },
-                "social_proxy": {
-                    "score": 15,
-                    "max": 15,
-                    "velocity": 67.8,
-                    "mom_1h": 9.35,
-                    "vol_ratio": 7.3,
-                    "method": "candle"
-                },
-                "volume_concentration": {
-                    "score": 10,
-                    "max": 10,
-                    "pct": 94.5,
-                    "method": "candle"
-                },
-                "breakout_4h": {
-                    "score": 7,
-                    "max": 10,
-                    "breakout_pct": 1.78,
-                    "high_4h": 0.71962
-                },
-                "low_cap_bonus": {
-                    "score": 5,
-                    "max": 5,
-                    "vol_usd": 445545
-                },
-                "volatility": {
-                    "atr": 0.00792429,
-                    "atr_pct": 1.08
-                },
-                "btc_regime": {
-                    "regime": "chop",
-                    "btc_trend_pct": 0,
-                    "adjustment": 0,
-                    "raw_score": 80
-                }
-            }
-        },
         {
             "uuid": "meme_21",
             "symbol": "AI",
@@ -89,7 +17,7 @@
             "risk_pct": "2.8",
             "pick_date": "2026-11-23 14:48:49",
             "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
+            "collected_at": "2026-11-23 16:36:34",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -160,7 +88,7 @@
             "risk_pct": "2.8",
             "pick_date": "2026-11-23 14:58:11",
             "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
+            "collected_at": "2026-11-23 16:36:34",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -231,7 +159,7 @@
             "risk_pct": "2.8",
             "pick_date": "2026-11-23 15:01:40",
             "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
+            "collected_at": "2026-11-23 16:36:34",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -288,150 +216,6 @@
             }
         },
         {
-            "uuid": "meme_17",
-            "symbol": "XRP",
-            "name": "XRP",
-            "type": "meme_coin",
-            "source": "meme_scanner",
-            "algorithm": "meme_scanner",
-            "direction": "long",
-            "entry_price": "1.0217",
-            "score": "74",
-            "confidence": "74",
-            "target_pct": "2",
-            "risk_pct": "1.5",
-            "pick_date": "2026-11-23 14:27:56",
-            "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
-            "factors": {
-                "explosive_volume": {
-                    "score": 18,
-                    "max": 25,
-                    "ratio": 5.5,
-                    "recent_avg": 587701.7,
-                    "method": "candle"
-                },
-                "parabolic_momentum": {
-                    "score": 20,
-                    "max": 20,
-                    "mom_15m": 8.33,
-                    "mom_5m": 4.16
-                },
-                "rsi_hype_zone": {
-                    "score": 0,
-                    "max": 15,
-                    "rsi": 92.6
-                },
-                "social_proxy": {
-                    "score": 15,
-                    "max": 15,
-                    "velocity": 45.6,
-                    "mom_1h": 8.33,
-                    "vol_ratio": 5.5,
-                    "method": "candle"
-                },
-                "volume_concentration": {
-                    "score": 10,
-                    "max": 10,
-                    "pct": 82.1,
-                    "method": "candle"
-                },
-                "breakout_4h": {
-                    "score": 10,
-                    "max": 10,
-                    "breakout_pct": 2.64,
-                    "high_4h": 0.9954
-                },
-                "low_cap_bonus": {
-                    "score": 1,
-                    "max": 5,
-                    "vol_usd": 5988795
-                },
-                "volatility": {
-                    "atr": 0.01007143,
-                    "atr_pct": 1
-                },
-                "btc_regime": {
-                    "regime": "chop",
-                    "btc_trend_pct": 0,
-                    "adjustment": 0,
-                    "raw_score": 74
-                }
-            }
-        },
-        {
-            "uuid": "meme_18",
-            "symbol": "PEPE",
-            "name": "PEPE",
-            "type": "meme_coin",
-            "source": "meme_scanner",
-            "algorithm": "meme_scanner",
-            "direction": "long",
-            "entry_price": "0.00000374",
-            "score": "72",
-            "confidence": "72",
-            "target_pct": "2",
-            "risk_pct": "1.5",
-            "pick_date": "2026-11-23 14:27:56",
-            "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
-            "factors": {
-                "explosive_volume": {
-                    "score": 12,
-                    "max": 25,
-                    "ratio": 3.2,
-                    "recent_avg": 1138460000,
-                    "method": "candle"
-                },
-                "parabolic_momentum": {
-                    "score": 20,
-                    "max": 20,
-                    "mom_15m": 9.1,
-                    "mom_5m": 3.63
-                },
-                "rsi_hype_zone": {
-                    "score": 5,
-                    "max": 15,
-                    "rsi": 84.9
-                },
-                "social_proxy": {
-                    "score": 15,
-                    "max": 15,
-                    "velocity": 29.5,
-                    "mom_1h": 9.1,
-                    "vol_ratio": 3.2,
-                    "method": "candle"
-                },
-                "volume_concentration": {
-                    "score": 10,
-                    "max": 10,
-                    "pct": 62.9,
-                    "method": "candle"
-                },
-                "breakout_4h": {
-                    "score": 10,
-                    "max": 10,
-                    "breakout_pct": 2.19,
-                    "high_4h": 3.66e-6
-                },
-                "low_cap_bonus": {
-                    "score": 0,
-                    "max": 5,
-                    "vol_usd": 285289131
-                },
-                "volatility": {
-                    "atr": 4.0e-8,
-                    "atr_pct": 1
-                },
-                "btc_regime": {
-                    "regime": "chop",
-                    "btc_trend_pct": 0,
-                    "adjustment": 0,
-                    "raw_score": 72
-                }
-            }
-        },
-        {
             "uuid": "meme_22",
             "symbol": "NEIRO",
             "name": "NEIRO",
@@ -446,7 +230,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:48:49",
             "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
+            "collected_at": "2026-11-23 16:36:34",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -517,7 +301,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:58:11",
             "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
+            "collected_at": "2026-11-23 16:36:34",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -588,7 +372,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 15:01:07",
             "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
+            "collected_at": "2026-11-23 16:36:34",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -659,7 +443,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 15:01:40",
             "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
+            "collected_at": "2026-11-23 16:36:34",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -716,150 +500,6 @@
             }
         },
         {
-            "uuid": "meme_19",
-            "symbol": "SOL",
-            "name": "SOL",
-            "type": "meme_coin",
-            "source": "meme_scanner",
-            "algorithm": "meme_scanner",
-            "direction": "long",
-            "entry_price": "78.11",
-            "score": "70",
-            "confidence": "70",
-            "target_pct": "2",
-            "risk_pct": "1.5",
-            "pick_date": "2026-11-23 14:27:56",
-            "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
-            "factors": {
-                "explosive_volume": {
-                    "score": 12,
-                    "max": 25,
-                    "ratio": 4.9,
-                    "recent_avg": 11480.76,
-                    "method": "candle"
-                },
-                "parabolic_momentum": {
-                    "score": 20,
-                    "max": 20,
-                    "mom_15m": 7.64,
-                    "mom_5m": 2.92
-                },
-                "rsi_hype_zone": {
-                    "score": 5,
-                    "max": 15,
-                    "rsi": 87.8
-                },
-                "social_proxy": {
-                    "score": 15,
-                    "max": 15,
-                    "velocity": 37.4,
-                    "mom_1h": 7.64,
-                    "vol_ratio": 4.9,
-                    "method": "candle"
-                },
-                "volume_concentration": {
-                    "score": 10,
-                    "max": 10,
-                    "pct": 77.1,
-                    "method": "candle"
-                },
-                "breakout_4h": {
-                    "score": 7,
-                    "max": 10,
-                    "breakout_pct": 1.73,
-                    "high_4h": 76.78
-                },
-                "low_cap_bonus": {
-                    "score": 1,
-                    "max": 5,
-                    "vol_usd": 9950408
-                },
-                "volatility": {
-                    "atr": 0.84428571,
-                    "atr_pct": 1.08
-                },
-                "btc_regime": {
-                    "regime": "chop",
-                    "btc_trend_pct": 0,
-                    "adjustment": 0,
-                    "raw_score": 70
-                }
-            }
-        },
-        {
-            "uuid": "meme_20",
-            "symbol": "DOGE",
-            "name": "DOGE",
-            "type": "meme_coin",
-            "source": "meme_scanner",
-            "algorithm": "meme_scanner",
-            "direction": "long",
-            "entry_price": "0.060121",
-            "score": "70",
-            "confidence": "70",
-            "target_pct": "2",
-            "risk_pct": "1.5",
-            "pick_date": "2026-11-23 14:27:56",
-            "status": "active",
-            "collected_at": "2026-11-23 16:21:23",
-            "factors": {
-                "explosive_volume": {
-                    "score": 18,
-                    "max": 25,
-                    "ratio": 7,
-                    "recent_avg": 2351753.67,
-                    "method": "candle"
-                },
-                "parabolic_momentum": {
-                    "score": 20,
-                    "max": 20,
-                    "mom_15m": 7.9,
-                    "mom_5m": 3.31
-                },
-                "rsi_hype_zone": {
-                    "score": 0,
-                    "max": 15,
-                    "rsi": 93.5
-                },
-                "social_proxy": {
-                    "score": 15,
-                    "max": 15,
-                    "velocity": 55.4,
-                    "mom_1h": 7.9,
-                    "vol_ratio": 7,
-                    "method": "candle"
-                },
-                "volume_concentration": {
-                    "score": 10,
-                    "max": 10,
-                    "pct": 93.2,
-                    "method": "candle"
-                },
-                "breakout_4h": {
-                    "score": 7,
-                    "max": 10,
-                    "breakout_pct": 1.71,
-                    "high_4h": 0.059108
-                },
-                "low_cap_bonus": {
-                    "score": 0,
-                    "max": 5,
-                    "vol_usd": 451524802
-                },
-                "volatility": {
-                    "atr": 0.00050836,
-                    "atr_pct": 1
-                },
-                "btc_regime": {
-                    "regime": "chop",
-                    "btc_trend_pct": 0,
-                    "adjustment": 0,
-                    "raw_score": 70
-                }
-            }
-        },
-        {
             "uuid": "sports_actionnet_290575_02552d3c116b8a96f9ff0001b6ae661c",
             "symbol": "Montreal Canadiens vs Buffalo Sabres",
             "name": "Under 6.50",
@@ -871,9 +511,9 @@
             "odds": 1.9259,
             "ev_pct": 2.9,
             "confidence": 29,
-            "pick_date": "2026-11-23 16:21:23",
+            "pick_date": "2026-11-23 16:36:34",
             "status": "active",
-            "collected_at": "2026-11-23 16:21:23"
+            "collected_at": "2026-11-23 16:36:34"
         }
     ]
 }
