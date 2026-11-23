@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-11-23 15:06:48",
+    "timestamp": "2026-11-23 15:10:35",
     "total_picks": 20,
     "picks": [
         {
@@ -17,7 +17,7 @@
             "risk_pct": "2",
             "pick_date": "2026-11-23 14:12:41",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 18,
@@ -89,7 +89,7 @@
             "risk_pct": "2",
             "pick_date": "2026-11-23 14:27:56",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 18,
@@ -161,7 +161,7 @@
             "risk_pct": "2.8",
             "pick_date": "2026-11-23 14:48:49",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -232,7 +232,7 @@
             "risk_pct": "2.8",
             "pick_date": "2026-11-23 14:58:11",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -303,7 +303,7 @@
             "risk_pct": "2.8",
             "pick_date": "2026-11-23 15:01:40",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -374,7 +374,7 @@
             "risk_pct": "2",
             "pick_date": "2026-11-23 13:57:59",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 18,
@@ -446,7 +446,7 @@
             "risk_pct": "2",
             "pick_date": "2026-11-23 14:15:42",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 18,
@@ -518,7 +518,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:27:56",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 18,
@@ -590,7 +590,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:12:41",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 18,
@@ -662,7 +662,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:27:56",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 12,
@@ -734,7 +734,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:48:49",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -805,7 +805,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:58:11",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -876,7 +876,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 15:01:07",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -947,7 +947,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 15:01:40",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 6,
@@ -1018,7 +1018,7 @@
             "risk_pct": "2.4",
             "pick_date": "2026-11-23 14:12:06",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 10,
@@ -1089,7 +1089,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:12:41",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 8,
@@ -1161,7 +1161,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:15:42",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 18,
@@ -1233,7 +1233,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:27:56",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 12,
@@ -1305,7 +1305,7 @@
             "risk_pct": "1.5",
             "pick_date": "2026-11-23 14:27:56",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48",
+            "collected_at": "2026-11-23 15:10:35",
             "factors": {
                 "explosive_volume": {
                     "score": 18,
@@ -1374,9 +1374,9 @@
             "odds": 1.9259,
             "ev_pct": 2.9,
             "confidence": 29,
-            "pick_date": "2026-11-23 15:06:48",
+            "pick_date": "2026-11-23 15:10:35",
             "status": "active",
-            "collected_at": "2026-11-23 15:06:48"
+            "collected_at": "2026-11-23 15:10:35"
         }
     ]
 }
