@@ -1,7 +1,79 @@
 {
-    "timestamp": "2026-11-23 13:49:39",
-    "total_picks": 1,
+    "timestamp": "2026-11-23 14:07:23",
+    "total_picks": 2,
     "picks": [
+        {
+            "uuid": "meme_9",
+            "symbol": "DOGE",
+            "name": "DOGE",
+            "type": "meme_coin",
+            "source": "meme_scanner",
+            "algorithm": "meme_scanner",
+            "direction": "long",
+            "entry_price": "0.057421",
+            "score": "75",
+            "confidence": "75",
+            "target_pct": "3",
+            "risk_pct": "2",
+            "pick_date": "2026-11-23 13:57:59",
+            "status": "active",
+            "collected_at": "2026-11-23 14:07:23",
+            "factors": {
+                "explosive_volume": {
+                    "score": 18,
+                    "max": 25,
+                    "ratio": 5.2,
+                    "recent_avg": 779568,
+                    "method": "candle"
+                },
+                "parabolic_momentum": {
+                    "score": 20,
+                    "max": 20,
+                    "mom_15m": 3.14,
+                    "mom_5m": 3.39
+                },
+                "rsi_hype_zone": {
+                    "score": 5,
+                    "max": 15,
+                    "rsi": 87.4
+                },
+                "social_proxy": {
+                    "score": 12,
+                    "max": 15,
+                    "velocity": 16.4,
+                    "mom_1h": 3.14,
+                    "vol_ratio": 5.2,
+                    "method": "candle"
+                },
+                "volume_concentration": {
+                    "score": 10,
+                    "max": 10,
+                    "pct": 82.2,
+                    "method": "candle"
+                },
+                "breakout_4h": {
+                    "score": 10,
+                    "max": 10,
+                    "breakout_pct": 2.76,
+                    "high_4h": 0.055879
+                },
+                "low_cap_bonus": {
+                    "score": 0,
+                    "max": 5,
+                    "vol_usd": 299731530
+                },
+                "volatility": {
+                    "atr": 0.00028971,
+                    "atr_pct": 1
+                },
+                "btc_regime": {
+                    "regime": "chop",
+                    "btc_trend_pct": 0,
+                    "adjustment": 0,
+                    "raw_score": 75
+                }
+            }
+        },
         {
             "uuid": "sports_actionnet_290575_02552d3c116b8a96f9ff0001b6ae661c",
             "symbol": "Montreal Canadiens vs Buffalo Sabres",
@@ -14,9 +86,9 @@
             "odds": 1.9259,
             "ev_pct": 2.9,
             "confidence": 29,
-            "pick_date": "2026-11-23 13:49:39",
+            "pick_date": "2026-11-23 14:07:23",
             "status": "active",
-            "collected_at": "2026-11-23 13:49:39"
+            "collected_at": "2026-11-23 14:07:23"
         }
     ]
 }
