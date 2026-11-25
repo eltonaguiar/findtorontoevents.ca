@@ -97,11 +97,15 @@ def main():
     if len(pruned) > 0:
         pruned_indices = [tickers.index(t) for t in pruned]
         pruned_prices = prices[:, pruned_indices]
-        pca = PCA(n_components=5)
-        ortho = pca.fit_transform(pruned_prices)
-        with open('data/ortho.json', 'w') as f:
-            json.dump(ortho.tolist(), f)
-        print('PCA orthogonalized signals saved to data/ortho.json')
+        n_components = min(5, pruned_prices.shape[0], pruned_prices.shape[1])
+        if n_components < 1:
+            print('Not enough data for PCA; skipping')
+        else:
+            pca = PCA(n_components=n_components)
+            ortho = pca.fit_transform(pruned_prices)
+            with open('data/ortho.json', 'w') as f:
+                json.dump(ortho.tolist(), f)
+            print('PCA orthogonalized signals saved to data/ortho.json')
 
 
 if __name__ == '__main__':
