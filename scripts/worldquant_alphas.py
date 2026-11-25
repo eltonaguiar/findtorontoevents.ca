@@ -8,7 +8,12 @@ import yfinance as yf
 from talib import RSI, SMA, EMA, MACD, ATR, ADX, OBV, WILLR
 
 def fetch_data(ticker, period='1y'):
-    data = yf.download(ticker, period=period)
+    data = yf.download(ticker, period=period, auto_adjust=False, progress=False)
+    # yfinance returns MultiIndex columns ('Close','SPY'); flatten so data['Close'] is 1-D
+    if getattr(data.columns, 'nlevels', 1) > 1:
+        data.columns = [c[0] if isinstance(c, tuple) else c for c in data.columns]
+    if 'Adj Close' not in data.columns and 'Close' in data.columns:
+        data['Adj Close'] = data['Close']
     return data
 
 def alpha_1(data):
