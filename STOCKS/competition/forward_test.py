@@ -457,6 +457,8 @@ def cmd_resolve():
         tp = pick['tp_price']
         sl = pick['sl_price']
         expiry = pick['expiry_date']
+        if not entry:
+            continue  # entry price missing/zero: change_pct is undefined, leave the pick unresolved
         change_pct = (current_price - entry) / entry
 
         resolved = False
