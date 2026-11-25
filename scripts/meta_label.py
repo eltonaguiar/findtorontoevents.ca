@@ -43,7 +43,8 @@ def engineer_features(df):
     df['regime_bull'] = (df['regime'] == 'bull').astype(int)
     df['regime_bear'] = (df['regime'] == 'bear').astype(int)
     df['is_buy'] = (df['signal_type'] == 'buy').astype(int)
-    df['hold_hours'] = (pd.to_datetime(df['exit_date']) - pd.to_datetime(df['entry_date'])).dt.total_seconds() / 3600
+    if 'hold_hours' not in df.columns:
+        df['hold_hours'] = (pd.to_datetime(df['exit_time']) - pd.to_datetime(df['entry_time'])).dt.total_seconds() / 3600
     
     features = ['confidence', 'spy_ret', 'vix_value', 'win_rate_rolling',
                 'regime_bull', 'regime_bear', 'is_buy', 'hold_hours']
@@ -74,6 +75,7 @@ def train_model():
     prec = precision_score(y_test, preds)
     print(f"Accuracy: {acc:.2f}, Precision: {prec:.2f}")
     
+    os.makedirs('models', exist_ok=True)
     model.save_model('models/meta_label_model.json')
     return model
 
