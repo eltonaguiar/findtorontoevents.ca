@@ -55,6 +55,8 @@ def compute_kelly():
         if avg_loss <= 0:
             avg_loss = 0.01  # Prevent division by zero
 
+        if avg_win <= 0:
+            continue  # no positive payoff history: Kelly is undefined, skip instead of dividing by zero
         odds = avg_win / avg_loss  # b = avg_win / avg_loss
 
         # Kelly criterion: f* = p - q/b = win_rate - (1-win_rate) / odds
