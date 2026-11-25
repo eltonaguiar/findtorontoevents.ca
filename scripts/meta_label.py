@@ -48,7 +48,7 @@ def engineer_features(df):
     
     features = ['confidence', 'spy_ret', 'vix_value', 'win_rate_rolling',
                 'regime_bull', 'regime_bear', 'is_buy', 'hold_hours']
-    X = df[features].fillna(0)
+    X = df[features].apply(pd.to_numeric, errors='coerce').fillna(0)
     y = df['label']
     return X, y, features
 
