@@ -18,7 +18,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install beautifulsoup4 requests pandas mysql-connector-python
+          pip install beautifulsoup4 requests pandas mysql-connector-python fake_useragent lxml
           
       - name: Run Yahoo scraper
         run: python scripts/yahoo_scraper.py
