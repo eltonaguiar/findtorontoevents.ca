@@ -19,7 +19,17 @@ def connect_db():
     )
 
 def fetch_returns(ticker, period='1y'):
-    data = yf.download(ticker, period=period)['Adj Close']
+    frame = yf.download(ticker, period=period, auto_adjust=False, progress=False)
+    if getattr(frame.columns, 'nlevels', 1) > 1:
+        frame.columns = [c[0] if isinstance(c, tuple) else c for c in frame.columns]
+    if 'Adj Close' in frame.columns:
+        data = frame['Adj Close']
+    elif 'Close' in frame.columns:
+        data = frame['Close']
+    else:
+        data = frame.iloc[:, 0]
+    if getattr(data, 'ndim', 1) > 1:
+        data = data.iloc[:, 0]
     returns = 100 * data.pct_change().dropna()  # In percent
     return returns
 
