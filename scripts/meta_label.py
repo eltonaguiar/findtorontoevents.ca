@@ -22,12 +22,13 @@ def connect_db():
 def fetch_trade_data():
     conn = connect_db()
     query = """
-    SELECT t.*, s.confidence, s.algo_name, s.signal_type,
-           m.regime, m.spy_ret, m.vix_value
+    SELECT t.*, s.signal_strength AS confidence, s.algorithm_name AS algo_name, s.signal_type,
+           m.hmm_regime AS regime, m.vix_level AS vix_value, NULL AS spy_ret,
+           t.realized_pct AS return_pct
     FROM lm_trades t
     JOIN lm_signals s ON t.signal_id = s.id
-    LEFT JOIN lm_market_regime m ON DATE(t.entry_date) = m.regime_date
-    WHERE t.status = 'closed' AND t.return_pct IS NOT NULL
+    LEFT JOIN lm_market_regime m ON DATE(t.entry_time) = m.date
+    WHERE t.status = 'closed' AND t.realized_pct IS NOT NULL
     """
     df = pd.read_sql(query, conn)
     conn.close()
