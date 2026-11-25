@@ -3,7 +3,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>Access forbidden!</title>
+<title>Object not found!</title>
 <link rev="made" href="mailto:%5bno%20address%20given%5d" />
 <style type="text/css"><!--/*--><![CDATA[/*><!--*/ 
     body { color: #000000; background-color: #FFFFFF; }
@@ -14,14 +14,16 @@
 </head>
 
 <body>
-<h1>Access forbidden!</h1>
+<h1>Object not found!</h1>
 <p>
 
 
+    The requested URL was not found on this server.
+
   
 
-    You don't have permission to access the requested object.
-    It is either read-protected or not readable by the server.
+    If you entered the URL manually please check your
+    spelling and try again.
 
   
 
@@ -32,7 +34,7 @@ the <a href="mailto:%5bno%20address%20given%5d">webmaster</a>.
 
 </p>
 
-<h2>Error 403</h2>
+<h2>Error 404</h2>
 <address>
   <a href="/">findtorontoevents.ca</a><br />
   <span>Apache</span>
