@@ -42,7 +42,7 @@ jobs:
 
       - name: Deploy fetch scripts to FTP
         env:
-          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_HOST: ${{ secrets.FTP_SERVER }}
           FTP_USER: ${{ secrets.FTP_USER }}
           FTP_PASS: ${{ secrets.FTP_PASS }}
         run: |
