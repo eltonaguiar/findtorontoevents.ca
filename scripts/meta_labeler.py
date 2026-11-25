@@ -37,6 +37,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from utils import post_to_api, call_api
 from config import API_BASE, ADMIN_KEY
 
+
+def _num_col(df, name, default):
+    """Numeric Series for `name`, falling back to a constant column when absent."""
+    if name in df.columns:
+        return pd.to_numeric(df[name], errors='coerce').fillna(default)
+    return pd.Series(default, index=df.index, dtype='float64')
+
 logger = logging.getLogger('meta_labeler')
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'meta_labeler.json')
@@ -75,16 +82,16 @@ def engineer_features(signals_df):
         df['is_friday'] = 0
 
     # Signal features
-    df['strength'] = pd.to_numeric(df.get('signal_strength', 50), errors='coerce').fillna(50)
-    df['tp_sl_ratio'] = pd.to_numeric(df.get('target_tp_pct', 5), errors='coerce') / \
-                        pd.to_numeric(df.get('target_sl_pct', 3), errors='coerce').clip(lower=0.1)
-    df['hold_hours'] = pd.to_numeric(df.get('max_hold_hours', 24), errors='coerce').fillna(24)
+    df['strength'] = _num_col(df, 'signal_strength', 50)
+    df['tp_sl_ratio'] = _num_col(df, 'target_tp_pct', 5) / \
+                        _num_col(df, 'target_sl_pct', 3).clip(lower=0.1)
+    df['hold_hours'] = _num_col(df, 'max_hold_hours', 24)
 
     # Regime features
-    df['composite_score'] = pd.to_numeric(df.get('composite_score', 50), errors='coerce').fillna(50)
-    df['hurst'] = pd.to_numeric(df.get('hurst', 0.5), errors='coerce').fillna(0.5)
-    df['ewma_vol'] = pd.to_numeric(df.get('ewma_vol', 0.02), errors='coerce').fillna(0.02)
-    df['vix_level'] = pd.to_numeric(df.get('vix_level', 20), errors='coerce').fillna(20)
+    df['composite_score'] = _num_col(df, 'composite_score', 50)
+    df['hurst'] = _num_col(df, 'hurst', 0.5)
+    df['ewma_vol'] = _num_col(df, 'ewma_vol', 0.02)
+    df['vix_level'] = _num_col(df, 'vix_level', 20)
 
     # Interaction features
     df['strength_x_regime'] = df['strength'] * df['composite_score'] / 100
@@ -103,8 +110,8 @@ def engineer_features(signals_df):
 
     # Bundle recent performance (online learning feature)
     # This gets populated from rolling stats
-    df['bundle_recent_wr'] = pd.to_numeric(df.get('bundle_recent_wr', 0.5), errors='coerce').fillna(0.5)
-    df['algo_recent_wr'] = pd.to_numeric(df.get('algo_recent_wr', 0.5), errors='coerce').fillna(0.5)
+    df['bundle_recent_wr'] = _num_col(df, 'bundle_recent_wr', 0.5)
+    df['algo_recent_wr'] = _num_col(df, 'algo_recent_wr', 0.5)
 
     # Feature columns
     feature_cols = [
