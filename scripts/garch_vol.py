@@ -39,8 +39,8 @@ def run_vol_forecast():
     cursor = conn.cursor(dictionary=True)
     
     # Get active algos
-    cursor.execute("SELECT DISTINCT algo_name FROM lm_kelly_fractions")
-    algos = [row['algo_name'] for row in cursor.fetchall()]
+    cursor.execute("SELECT DISTINCT algorithm_name FROM lm_kelly_fractions")
+    algos = [row['algorithm_name'] for row in cursor.fetchall()]
     
     for algo in algos:
         # Assume algo tied to SPY vol for simplicity; customize per algo if needed
@@ -48,18 +48,18 @@ def run_vol_forecast():
         vol = forecast_vol(returns)
         
         # Get current Kelly
-        cursor.execute("SELECT kelly_fraction FROM lm_kelly_fractions WHERE algo_name = %s ORDER BY calculation_date DESC LIMIT 1", (algo,))
+        cursor.execute("SELECT half_kelly FROM lm_kelly_fractions WHERE algorithm_name = %s ORDER BY updated_at DESC LIMIT 1", (algo,))
         row = cursor.fetchone()
         if row:
-            kelly = float(row['kelly_fraction'])
+            kelly = float(row['half_kelly'])
             adjusted = adjust_kelly(kelly, vol)
             
             # Update DB (add vol_adjusted_kelly column first if needed)
             cursor.execute("""
             UPDATE lm_kelly_fractions 
             SET vol_adjusted_kelly = %s 
-            WHERE algo_name = %s 
-            ORDER BY calculation_date DESC LIMIT 1
+            WHERE algorithm_name = %s
+            ORDER BY updated_at DESC LIMIT 1
             """, (adjusted, algo))
     
     conn.commit()
