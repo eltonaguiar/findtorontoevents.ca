@@ -27,6 +27,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from utils import post_to_api, call_api
 from config import API_BASE, ADMIN_KEY, TRACKED_TICKERS
 
+
+def _to_num(value, default=0.0):
+    """Coerce API values that may arrive as strings (e.g. "55.2%" or "3.1") to float."""
+    if value is None:
+        return default
+    try:
+        return float(str(value).strip().rstrip('%'))
+    except (TypeError, ValueError):
+        return default
+
 logger = logging.getLogger('position_sizer')
 
 
@@ -379,7 +389,7 @@ def calculate_position_size(signal, algo_stats, regime_data, capital=10000):
     algo_sharpe, is_decaying, decay_weight = calculate_alpha_decay(recent_trades)
 
     # Step 5: Signal strength modifier
-    strength = signal.get('strength', 50) / 100.0
+    strength = _to_num(signal.get('strength', 50), 50) / 100.0
     strength_mod = 0.5 + 0.5 * strength  # Range 0.5-1.0
 
     # Step 6: Combine
@@ -439,9 +449,9 @@ def run_position_sizing():
         algo_name = algo.get('algorithm_name', 'Unknown')
 
         stats = {
-            'win_rate': algo.get('win_rate', 50) / 100.0,
-            'avg_profit': algo.get('avg_pnl_pct', 3) / 100.0,
-            'avg_loss': abs(algo.get('worst_trade_pct', -2)) / 100.0,
+            'win_rate': _to_num(algo.get('win_rate', 50), 50) / 100.0,
+            'avg_profit': _to_num(algo.get('avg_pnl_pct', 3), 3) / 100.0,
+            'avg_loss': abs(_to_num(algo.get('worst_trade_pct', -2), -2)) / 100.0,
             'recent_trades': algo.get('recent_trades', []),
             'recent_returns': []
         }
