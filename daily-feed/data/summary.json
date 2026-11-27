@@ -1,0 +1,374 @@
+{
+  "generated_at": "2026-11-27T23:09:32Z",
+  "date_display": "Friday, November 27, 2026",
+  "quote": {
+    "text": "I find that the harder I work, the more luck I seem to have.",
+    "author": "Thomas Jefferson"
+  },
+  "weather": {
+    "current_temp": 4.2,
+    "feels_like": 1.7,
+    "high": 4.7,
+    "low": 1.5,
+    "precipitation_mm": 0.0,
+    "weather_code": 3,
+    "weather_desc": "Overcast",
+    "jacket_needed": "yes",
+    "jacket_message": "Cold out there. A warm jacket is definitely needed."
+  },
+  "freebies": {
+    "count": 15,
+    "top_5": [
+      {
+        "id": "f1",
+        "name": "Allan Gardens Conservatory",
+        "description": "Victorian glass greenhouse with tropical plants, orchids, seasonal flower shows",
+        "hours": "Daily 10am-5pm",
+        "address": "19 Horticultural Ave",
+        "category": "parks",
+        "lat": 43.6614,
+        "lng": -79.3745,
+        "source_url": "https://www.toronto.ca/explore-enjoy/parks-gardens-beaches/gardens-and-horticulture/conservatories/allan-gardens-conservatory/"
+      },
+      {
+        "id": "f2",
+        "name": "High Park + Free Zoo",
+        "description": "400 acres, hiking trails, free zoo with capybaras, bison, llamas, peacocks",
+        "hours": "Daily dawn to dusk",
+        "address": "1873 Bloor St W",
+        "category": "parks",
+        "lat": 43.6465,
+        "lng": -79.4637,
+        "source_url": "https://www.highparkzoo.ca/"
+      },
+      {
+        "id": "f3",
+        "name": "Riverdale Farm",
+        "description": "Working farm with cows, pigs, goats, chickens, horses — completely free",
+        "hours": "Daily 9am-5pm",
+        "address": "201 Winchester St",
+        "category": "parks",
+        "lat": 43.6677,
+        "lng": -79.3597,
+        "source_url": "https://www.toronto.ca/explore-enjoy/parks-gardens-beaches/zoos-farms/riverdalefarm/"
+      },
+      {
+        "id": "f4",
+        "name": "The Power Plant Gallery",
+        "description": "Canada's leading contemporary art gallery — always free",
+        "hours": "Wed-Sun 10am-5pm, Thu until 8pm",
+        "address": "231 Queens Quay W",
+        "category": "gallery",
+        "lat": 43.6383,
+        "lng": -79.3818,
+        "source_url": "https://www.thepowerplant.org/visit"
+      },
+      {
+        "id": "f5",
+        "name": "MOCA (Museum of Contemporary Art)",
+        "description": "Pay-what-you-can contemporary art museum",
+        "hours": "Thu-Sun 10am-5pm, Fri until 9pm",
+        "address": "158 Sterling Rd",
+        "category": "gallery",
+        "lat": 43.6614,
+        "lng": -79.4507,
+        "source_url": "https://moca.ca/visit/"
+      }
+    ],
+    "all_items": [
+      {
+        "id": "f1",
+        "name": "Allan Gardens Conservatory",
+        "description": "Victorian glass greenhouse with tropical plants, orchids, seasonal flower shows",
+        "hours": "Daily 10am-5pm",
+        "address": "19 Horticultural Ave",
+        "category": "parks",
+        "lat": 43.6614,
+        "lng": -79.3745,
+        "source_url": "https://www.toronto.ca/explore-enjoy/parks-gardens-beaches/gardens-and-horticulture/conservatories/allan-gardens-conservatory/"
+      },
+      {
+        "id": "f2",
+        "name": "High Park + Free Zoo",
+        "description": "400 acres, hiking trails, free zoo with capybaras, bison, llamas, peacocks",
+        "hours": "Daily dawn to dusk",
+        "address": "1873 Bloor St W",
+        "category": "parks",
+        "lat": 43.6465,
+        "lng": -79.4637,
+        "source_url": "https://www.highparkzoo.ca/"
+      },
+      {
+        "id": "f3",
+        "name": "Riverdale Farm",
+        "description": "Working farm with cows, pigs, goats, chickens, horses — completely free",
+        "hours": "Daily 9am-5pm",
+        "address": "201 Winchester St",
+        "category": "parks",
+        "lat": 43.6677,
+        "lng": -79.3597,
+        "source_url": "https://www.toronto.ca/explore-enjoy/parks-gardens-beaches/zoos-farms/riverdalefarm/"
+      },
+      {
+        "id": "f4",
+        "name": "The Power Plant Gallery",
+        "description": "Canada's leading contemporary art gallery — always free",
+        "hours": "Wed-Sun 10am-5pm, Thu until 8pm",
+        "address": "231 Queens Quay W",
+        "category": "gallery",
+        "lat": 43.6383,
+        "lng": -79.3818,
+        "source_url": "https://www.thepowerplant.org/visit"
+      },
+      {
+        "id": "f5",
+        "name": "MOCA (Museum of Contemporary Art)",
+        "description": "Pay-what-you-can contemporary art museum",
+        "hours": "Thu-Sun 10am-5pm, Fri until 9pm",
+        "address": "158 Sterling Rd",
+        "category": "gallery",
+        "lat": 43.6614,
+        "lng": -79.4507,
+        "source_url": "https://moca.ca/visit/"
+      },
+      {
+        "id": "f6",
+        "name": "Rouge National Urban Park",
+        "description": "Canada's first national urban park — 40+ sq km of forest, wetland, beach",
+        "hours": "Daily dawn to dusk",
+        "address": "Multiple entrances",
+        "category": "parks",
+        "lat": 43.8084,
+        "lng": -79.1589,
+        "source_url": "https://parks.canada.ca/pn-np/on/rouge"
+      },
+      {
+        "id": "f7",
+        "name": "Graffiti Alley",
+        "description": "1 km of street art murals, constantly evolving",
+        "hours": "24/7",
+        "address": "Rush Lane (Portland to Spadina)",
+        "category": "gallery",
+        "lat": 43.6478,
+        "lng": -79.402,
+        "source_url": "https://www.destinationtoronto.com/explore-toronto/graffiti-alley"
+      },
+      {
+        "id": "f8",
+        "name": "Nathan Phillips Square",
+        "description": "TORONTO sign, reflecting pool, skating in winter",
+        "hours": "24/7",
+        "address": "100 Queen St W",
+        "category": "parks",
+        "lat": 43.6534,
+        "lng": -79.3841,
+        "source_url": "https://www.toronto.ca/explore-enjoy/festivals-events/nathan-phillips-square/"
+      },
+      {
+        "id": "f9",
+        "name": "Distillery District",
+        "description": "Pedestrian-only historic district, cobblestones, public art",
+        "hours": "24/7 (outdoor)",
+        "address": "55 Mill St",
+        "category": "gallery",
+        "lat": 43.6503,
+        "lng": -79.3596,
+        "source_url": "https://www.thedistillerydistrict.com/"
+      },
+      {
+        "id": "f10",
+        "name": "Scarborough Bluffs",
+        "description": "90-metre geological cliffs along Lake Ontario",
+        "hours": "24/7",
+        "address": "1 Brimley Rd S",
+        "category": "parks",
+        "lat": 43.711,
+        "lng": -79.2308,
+        "source_url": "https://www.toronto.ca/"
+      },
+      {
+        "id": "f11",
+        "name": "Evergreen Brick Works",
+        "description": "Former quarry: wetlands, trails, free exhibits, Saturday farmers market",
+        "hours": "Grounds daily",
+        "address": "550 Bayview Ave",
+        "category": "parks",
+        "lat": 43.6844,
+        "lng": -79.3651,
+        "source_url": "https://www.evergreen.ca/evergreen-brick-works/"
+      },
+      {
+        "id": "f12",
+        "name": "Harbourfront Centre Galleries",
+        "description": "Multiple free gallery spaces with rotating contemporary art",
+        "hours": "Daily 10am-6pm+",
+        "address": "235 Queens Quay W",
+        "category": "gallery",
+        "lat": 43.6385,
+        "lng": -79.3829,
+        "source_url": "https://harbourfrontcentre.com/"
+      },
+      {
+        "id": "f13",
+        "name": "Toronto Reference Library",
+        "description": "Free exhibits, Arthur Conan Doyle Room, digital innovation hub",
+        "hours": "Mon-Sat varies",
+        "address": "789 Yonge St",
+        "category": "gallery",
+        "lat": 43.6725,
+        "lng": -79.3869,
+        "source_url": "https://www.torontopubliclibrary.ca/torontoreferencelibrary/"
+      },
+      {
+        "id": "w8",
+        "name": "MOCA — Late Friday (PWYC)",
+        "description": "Contemporary art museum, extended hours until 9pm.",
+        "hours": "10am-9pm",
+        "address": "158 Sterling Rd",
+        "category": "museum",
+        "savings": 10,
+        "source_url": "https://moca.ca/visit/",
+        "lat": 43.6614,
+        "lng": -79.4507
+      },
+      {
+        "id": "w9",
+        "name": "First Friday Gallery Crawl (1st Fri/month)",
+        "description": "Dozens of galleries open late with free receptions.",
+        "hours": "7pm-11pm",
+        "address": "Queen West, Ossington, Dundas West",
+        "category": "gallery",
+        "savings": 0,
+        "source_url": "https://www.blogto.com/arts/"
+      }
+    ],
+    "today_day": "friday",
+    "link": "https://findtorontoevents.ca/fc/api/deals.php"
+  },
+  "financial": {
+    "stocks": {
+      "count": 0,
+      "top_3": []
+    },
+    "crypto": {
+      "count": 0,
+      "top_3": []
+    },
+    "forex": {
+      "count": 0,
+      "top_3": []
+    },
+    "momentum": {
+      "top_3": []
+    },
+    "recent_wins": {
+      "count": 2,
+      "trades": [
+        {
+          "symbol": "EURUSD",
+          "asset_class": "FOREX",
+          "algorithm": "RSI(2) Scalp",
+          "direction": "SHORT",
+          "entry_price": 1.09153,
+          "exit_price": 1.09068,
+          "realized_pnl": 0.02,
+          "realized_pct": 0.0779,
+          "hold_hours": 6.14,
+          "exit_reason": "max_hold",
+          "entry_time": "2026-11-24 01:38:08",
+          "exit_time": "2026-11-24 07:46:25"
+        },
+        {
+          "symbol": "GBPUSD",
+          "asset_class": "FOREX",
+          "algorithm": "RSI(2) Scalp",
+          "direction": "SHORT",
+          "entry_price": 1.30465,
+          "exit_price": 1.30412,
+          "realized_pnl": 0.01,
+          "realized_pct": 0.0406,
+          "hold_hours": 6.14,
+          "exit_reason": "max_hold",
+          "entry_time": "2026-11-24 01:38:08",
+          "exit_time": "2026-11-24 07:46:25"
+        }
+      ]
+    },
+    "sports": {
+      "available": false,
+      "message": "Coming soon"
+    },
+    "ml_status": {
+      "stocks": "active",
+      "crypto": "active",
+      "forex": "active",
+      "penny_stocks": "screener_only",
+      "sports": "wip"
+    }
+  },
+  "news": {
+    "count": 10,
+    "stories": [
+      {
+        "title": "Free home repair program that helps fix social housing in Hamilton gets funding boost",
+        "source": "",
+        "url": "https://www.thespec.com/news/hamilton-region/free-home-repair-program-gets-boost-from-national-charity/article_97c39476-bd0e-5289-80fd-1eb6e5870679.html",
+        "published": "2026-11-27 22:45:00"
+      },
+      {
+        "title": "London, Ont., police officer charged with assault in off-duty incident",
+        "source": "",
+        "url": "https://www.thespec.com/news/ontario/london-ont-police-officer-charged-with-assault-in-off-duty-incident/article_90acb8f0-ebc5-50ab-8d15-0547e512f59a.html",
+        "published": "2026-11-27 22:39:02"
+      },
+      {
+        "title": "Quebec premier announces new review of Churchill Falls energy deal",
+        "source": "",
+        "url": "https://www.thespec.com/news/canada/quebec-premier-announces-new-review-of-churchill-falls-energy-deal/article_43cce715-b6f4-5ecc-8e3a-e4651910e63b.html",
+        "published": "2026-11-27 22:37:51"
+      },
+      {
+        "title": "ACLU seeks court order blocking Trump administration's efforts to unmask ICE critics on social media",
+        "source": "",
+        "url": "https://www.thespec.com/news/world/united-states/aclu-seeks-court-order-blocking-trump-administration-s-efforts-to-unmask-ice-critics-on-social-media/article_1d87746f-1e05-52b4-9009-0dd644c4620b.html",
+        "published": "2026-11-27 22:29:50"
+      },
+      {
+        "title": "Maple Leafs sign prospect Alexander Bilecki to entry-level contract",
+        "source": "",
+        "url": "https://torontosun.com/sports/hockey/nhl/toronto-maple-leafs/maple-leafs-sign-prospect-alexander-bilecki-to-entry-level-contract",
+        "published": "2026-11-27 22:28:10"
+      },
+      {
+        "title": "Advisory council to issue antisemitism report as Jewish groups call out campus hate",
+        "source": "",
+        "url": "https://www.barrietoday.com/national-news/advisory-council-to-issue-antisemitism-report-as-jewish-groups-call-out-campus-hate-13063252",
+        "published": "2026-11-27 22:19:24"
+      },
+      {
+        "title": "Advisory council to issue antisemitism report as Jewish groups call out campus hate",
+        "source": "",
+        "url": "https://www.torontotoday.ca/national-news/advisory-council-to-issue-antisemitism-report-as-jewish-groups-call-out-campus-hate-13063252",
+        "published": "2026-11-27 22:19:24"
+      },
+      {
+        "title": "Trent Lakes, Ont., man now faces 32 charges relating to sex abuse of youth",
+        "source": "",
+        "url": "https://torontosun.com/news/local-news/trent-lakes-man-charges-sex-abuse-of-youth",
+        "published": "2026-11-27 22:16:05"
+      },
+      {
+        "title": "Ontario calls for Criminal Code changes to give home invasion victims more protection",
+        "source": "",
+        "url": "https://www.torontotoday.ca/ontario-news/ontario-calls-for-criminal-code-changes-to-give-home-invasion-victims-more-protection-13067151",
+        "published": "2026-11-27 22:14:02"
+      },
+      {
+        "title": "Ontario calls for Criminal Code changes to give home invasion victims more protection",
+        "source": "",
+        "url": "https://www.barrietoday.com/ontario-news/ontario-calls-for-criminal-code-changes-to-give-home-invasion-victims-more-protection-13067151",
+        "published": "2026-11-27 22:14:02"
+      }
+    ]
+  }
+}
