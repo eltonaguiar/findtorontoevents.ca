@@ -1796,12 +1796,12 @@
       "generated_date": "2026-11-25",
       "expiry_date": "2026-11-28",
       "hold_days_max": 3,
-      "status": "OPEN",
-      "resolved_at": null,
-      "resolved_price": null,
-      "resolved_reason": null,
-      "pnl_pct": null,
-      "pnl_dollar": null
+      "status": "WON",
+      "resolved_at": "2026-11-27 16:13:53 EST",
+      "resolved_price": 310.31,
+      "resolved_reason": "TP_HIT",
+      "pnl_pct": 4.34,
+      "pnl_dollar": 43.44
     },
     {
       "id": "Short-Term Reversal_stocks_AMD_2026-11-25",
@@ -4911,15 +4911,15 @@
   ],
   "summary": {
     "total_picks": 169,
-    "open": 119,
-    "won": 28,
+    "open": 118,
+    "won": 29,
     "lost": 22,
-    "win_rate": 56.0,
-    "avg_pnl_pct": 1.69,
-    "total_pnl_pct": 84.44,
+    "win_rate": 56.9,
+    "avg_pnl_pct": 1.74,
+    "total_pnl_pct": 88.78,
     "last_generate": "2026-11-27 14:37:52 EST",
-    "last_resolve": "2026-11-27 14:37:56 EST"
+    "last_resolve": "2026-11-27 16:13:53 EST"
   },
   "last_generate": "2026-11-27 14:37:52 EST",
-  "last_resolve": "2026-11-27 14:37:56 EST"
+  "last_resolve": "2026-11-27 16:13:53 EST"
 }
