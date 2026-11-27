@@ -1768,12 +1768,12 @@
       "generated_date": "2026-11-25",
       "expiry_date": "2026-11-30",
       "hold_days_max": 5,
-      "status": "OPEN",
-      "resolved_at": null,
-      "resolved_price": null,
-      "resolved_reason": null,
-      "pnl_pct": null,
-      "pnl_dollar": null
+      "status": "WON",
+      "resolved_at": "2026-11-27 20:12:33 EST",
+      "resolved_price": 424.54,
+      "resolved_reason": "TP_HIT",
+      "pnl_pct": 5.92,
+      "pnl_dollar": 59.19
     },
     {
       "id": "Short-Term Reversal_stocks_AVGO_2026-11-25",
@@ -1824,12 +1824,12 @@
       "generated_date": "2026-11-25",
       "expiry_date": "2026-11-28",
       "hold_days_max": 3,
-      "status": "OPEN",
-      "resolved_at": null,
-      "resolved_price": null,
-      "resolved_reason": null,
-      "pnl_pct": null,
-      "pnl_dollar": null
+      "status": "WON",
+      "resolved_at": "2026-11-27 20:12:33 EST",
+      "resolved_price": 424.54,
+      "resolved_reason": "TP_HIT",
+      "pnl_pct": 5.92,
+      "pnl_dollar": 59.19
     },
     {
       "id": "Short-Term Reversal_stocks_AMZN_2026-11-25",
@@ -3020,12 +3020,12 @@
       "generated_date": "2026-11-25",
       "expiry_date": "2026-11-28",
       "hold_days_max": 3,
-      "status": "OPEN",
-      "resolved_at": null,
-      "resolved_price": null,
-      "resolved_reason": null,
-      "pnl_pct": null,
-      "pnl_dollar": null
+      "status": "WON",
+      "resolved_at": "2026-11-27 20:12:33 EST",
+      "resolved_price": 7.46,
+      "resolved_reason": "TP_HIT",
+      "pnl_pct": 4.34,
+      "pnl_dollar": 43.36
     },
     {
       "id": "Short-Term Reversal_penny_stocks_LCID_2026-11-25",
@@ -3137,12 +3137,12 @@
       "generated_date": "2026-11-25",
       "expiry_date": "2026-12-09",
       "hold_days_max": 14,
-      "status": "OPEN",
-      "resolved_at": null,
-      "resolved_price": null,
-      "resolved_reason": null,
-      "pnl_pct": null,
-      "pnl_dollar": null
+      "status": "WON",
+      "resolved_at": "2026-11-27 20:12:33 EST",
+      "resolved_price": 17.65,
+      "resolved_reason": "TP_HIT",
+      "pnl_pct": 6.87,
+      "pnl_dollar": 68.73
     },
     {
       "id": "Classic Momentum_meme_coins_PEPE24478-USD_2026-11-25",
@@ -4911,15 +4911,15 @@
   ],
   "summary": {
     "total_picks": 169,
-    "open": 118,
-    "won": 29,
+    "open": 114,
+    "won": 33,
     "lost": 22,
-    "win_rate": 56.9,
-    "avg_pnl_pct": 1.74,
-    "total_pnl_pct": 88.78,
+    "win_rate": 60.0,
+    "avg_pnl_pct": 2.03,
+    "total_pnl_pct": 111.83,
     "last_generate": "2026-11-27 14:37:52 EST",
-    "last_resolve": "2026-11-27 16:13:53 EST"
+    "last_resolve": "2026-11-27 20:12:33 EST"
   },
   "last_generate": "2026-11-27 14:37:52 EST",
-  "last_resolve": "2026-11-27 16:13:53 EST"
+  "last_resolve": "2026-11-27 20:12:33 EST"
 }
