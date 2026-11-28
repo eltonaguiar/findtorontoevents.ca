@@ -1852,12 +1852,12 @@
       "generated_date": "2026-11-25",
       "expiry_date": "2026-11-28",
       "hold_days_max": 3,
-      "status": "OPEN",
-      "resolved_at": null,
-      "resolved_price": null,
-      "resolved_reason": null,
-      "pnl_pct": null,
-      "pnl_dollar": null
+      "status": "WON",
+      "resolved_at": "2026-11-28 00:31:17 EST",
+      "resolved_price": 254.12,
+      "resolved_reason": "EXPIRED",
+      "pnl_pct": 3.68,
+      "pnl_dollar": 36.84
     },
     {
       "id": "Quality Compounders_stocks_COST_2026-11-25",
@@ -2992,12 +2992,12 @@
       "generated_date": "2026-11-25",
       "expiry_date": "2026-11-28",
       "hold_days_max": 3,
-      "status": "OPEN",
-      "resolved_at": null,
-      "resolved_price": null,
-      "resolved_reason": null,
-      "pnl_pct": null,
-      "pnl_dollar": null
+      "status": "WON",
+      "resolved_at": "2026-11-28 00:31:17 EST",
+      "resolved_price": 5.59,
+      "resolved_reason": "EXPIRED",
+      "pnl_pct": 3.81,
+      "pnl_dollar": 38.07
     },
     {
       "id": "Short-Term Reversal_penny_stocks_DNA_2026-11-25",
@@ -3048,12 +3048,12 @@
       "generated_date": "2026-11-25",
       "expiry_date": "2026-11-28",
       "hold_days_max": 3,
-      "status": "OPEN",
-      "resolved_at": null,
-      "resolved_price": null,
-      "resolved_reason": null,
-      "pnl_pct": null,
-      "pnl_dollar": null
+      "status": "WON",
+      "resolved_at": "2026-11-28 00:31:17 EST",
+      "resolved_price": 2.6,
+      "resolved_reason": "EXPIRED",
+      "pnl_pct": 2.16,
+      "pnl_dollar": 21.61
     },
     {
       "id": "Value + Quality_penny_stocks_NIO_2026-11-25",
@@ -4911,15 +4911,15 @@
   ],
   "summary": {
     "total_picks": 169,
-    "open": 114,
-    "won": 33,
+    "open": 111,
+    "won": 36,
     "lost": 22,
-    "win_rate": 60.0,
-    "avg_pnl_pct": 2.03,
-    "total_pnl_pct": 111.83,
+    "win_rate": 62.1,
+    "avg_pnl_pct": 2.09,
+    "total_pnl_pct": 121.48,
     "last_generate": "2026-11-27 14:37:52 EST",
-    "last_resolve": "2026-11-27 20:12:33 EST"
+    "last_resolve": "2026-11-28 00:31:17 EST"
   },
   "last_generate": "2026-11-27 14:37:52 EST",
-  "last_resolve": "2026-11-27 20:12:33 EST"
+  "last_resolve": "2026-11-28 00:31:17 EST"
 }
